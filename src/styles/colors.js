@@ -13,7 +13,7 @@ const blueVersion = {
   gold: '#FFD700',
   pink: '#ff6983',
   purple: '#7a44cf',
-  background: '#EEEEEE',
+  background: '#17171A',
   backgroundLight: '#FFFFFF',
   border: '#acacac',
   header: '#5a8dee',
