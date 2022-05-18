@@ -13,13 +13,14 @@ const SplashScreen = ({navigation}) => {
     setTimeout(() => {
       navigation.navigate('through');
     }, 3000);
+    return () => {};
   });
 
   return (
     <KeyboardAvoidingView>
       <SafeAreaView
         style={{
-          backgroundColor: colors.background,
+          backgroundColor: colors.grey24,
           width: '100%',
           height: '100%',
         }}>

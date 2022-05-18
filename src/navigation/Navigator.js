@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, Pressable} from 'react-native';
 import {
   createDrawerNavigator,
   DrawerItem,
@@ -11,15 +11,24 @@ import {createStackNavigator} from '@react-navigation/stack';
 const Stack = createStackNavigator();
 
 import {Block, Icon, Text} from 'galio-framework';
-import {colors} from '../styles';
+
+import {colors, commonStyles} from '../styles';
 
 import SplashScreen from '../pages/SplashScreen';
 import ThroughScreen from '../pages/ThroughScreen';
+import ImportWalletScreen from '../pages/ImportWallet/ImportWalletScreen';
+
 import SignInScreen from '../pages/SignInScreen';
 import HomeScreen from '../pages/HomeScreen';
 import CharterPricingScreen from '../pages/CharterPricingScreen';
 import CharterJoinScreen from '../pages/CharterJoinScreen';
-import {Fastfood} from '@material-ui/icons';
+import FontAwesome, {
+  SolidIcons,
+  RegularIcons,
+  BrandIcons,
+  parseIconFromClassName,
+} from 'react-native-fontawesome';
+import {Rowing} from '@material-ui/icons';
 
 const drawerData = [
   {
@@ -174,6 +183,37 @@ const EditCardStack = props => {
   );
 };
 
+const ImportWalletHeader = ({navigation}) => {
+  return (
+    <View
+      style={{
+        backgroundColor: colors.grey24,
+        paddingTop: 44,
+        paddingHorizontal: 16,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+      }}>
+      <View style={{flex: 1}}>
+        <Pressable
+          onPress={() => {
+            navigation.goBack();
+          }}
+          style={{width: 20}}>
+          <FontAwesome
+            style={{fontSize: 16, color: 'white'}}
+            icon={SolidIcons.chevronLeft}
+          />
+        </Pressable>
+      </View>
+      <View
+        style={{justifyContent: 'center', width: '100%', alignItems: 'center'}}>
+        <Text style={commonStyles.headerText}>Import from Seed</Text>
+      </View>
+    </View>
+  );
+};
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -190,6 +230,13 @@ class App extends React.Component {
           name="through"
           component={ThroughScreen}
           options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="importwallet"
+          component={ImportWalletScreen}
+          options={{
+            header: ImportWalletHeader,
+          }}
         />
         <Stack.Screen
           name="SignIn"

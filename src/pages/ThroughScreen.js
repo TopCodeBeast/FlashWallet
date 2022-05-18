@@ -35,7 +35,7 @@ const ThroughScreen = ({navigation}) => {
     <KeyboardAvoidingView>
       <SafeAreaView
         style={{
-          backgroundColor: colors.background,
+          backgroundColor: colors.grey24,
           width: '100%',
           height: '100%',
         }}>
@@ -62,8 +62,8 @@ const ThroughScreen = ({navigation}) => {
                 active={current}
                 passiveDotWidth={8}
                 activeDotWidth={10}
-                passiveColor={'#4C516B'}
-                activeColor={'#FEBF32'}
+                passiveColor={colors.grey18}
+                activeColor={colors.green5}
               />
             </View>
             <View
@@ -96,7 +96,9 @@ const ThroughScreen = ({navigation}) => {
               }}>
               <Pressable
                 style={commonStyles.secondaryButton}
-                onPress={() => {}}>
+                onPress={() => {
+                  navigation.navigate('importwallet');
+                }}>
                 <Text style={commonStyles.secondaryButtonText}>
                   Import Using Seed Phrase
                 </Text>
