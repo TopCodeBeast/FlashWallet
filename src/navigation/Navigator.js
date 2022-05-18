@@ -14,6 +14,7 @@ import {Block, Icon, Text} from 'galio-framework';
 import {colors} from '../styles';
 
 import SplashScreen from '../pages/SplashScreen';
+import ThroughScreen from '../pages/ThroughScreen';
 import SignInScreen from '../pages/SignInScreen';
 import HomeScreen from '../pages/HomeScreen';
 import CharterPricingScreen from '../pages/CharterPricingScreen';
@@ -183,6 +184,11 @@ class App extends React.Component {
         <Stack.Screen
           name="splash"
           component={SplashScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="through"
+          component={ThroughScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen
