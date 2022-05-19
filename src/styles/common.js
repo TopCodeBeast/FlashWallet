@@ -87,6 +87,15 @@ export default StyleSheet.create({
     borderRadius: 8,
     backgroundColor: colors.green5,
   },
+  disabledButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    elevation: 3,
+    borderRadius: 8,
+    backgroundColor: colors.grey23,
+  },
   primaryButtonText: {
     fontFamily: 'Poppins',
     fontSize: 16,

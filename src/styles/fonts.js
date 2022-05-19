@@ -183,4 +183,9 @@ export default {
     lineHeight: 18,
     textDecorationLine: 'line-through',
   },
+  big_type1: {
+    fontFamily: 'Poppins',
+    fontSize: 40,
+    lineHeight: 56,
+  },
 };

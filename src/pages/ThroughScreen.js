@@ -107,7 +107,7 @@ const ThroughScreen = ({navigation}) => {
               <TouchableOpacity
                 style={commonStyles.primaryButton}
                 onPress={() => {
-                  navigation.navigate('createwallet1');
+                  navigation.navigate('createwallet');
                 }}>
                 <Text style={commonStyles.primaryButtonText}>
                   Create a New Wallet
