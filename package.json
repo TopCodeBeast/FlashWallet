@@ -28,6 +28,7 @@
     "react-native": "0.64.2",
     "react-native-awesome-loading": "^1.0.15",
     "react-native-calendars": "^1.1266.0",
+    "react-native-check-box": "^2.1.7",
     "react-native-color-picker": "^0.6.0",
     "react-native-dialog": "^8.2.0",
     "react-native-divider": "^1.0.3",

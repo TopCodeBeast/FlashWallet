@@ -131,4 +131,56 @@ export default {
     fontWeight: '800',
     textDecorationLine: 'underline',
   },
+  caption_large_semibold: {
+    fontFamily: 'Poppins',
+    fontSize: 14,
+    lineHeight: 22,
+    fontWeight: '800',
+  },
+  caption_large_semibold_link: {
+    fontFamily: 'Poppins',
+    fontSize: 14,
+    lineHeight: 22,
+    fontWeight: '800',
+    textDecorationLine: 'underline',
+  },
+  caption_large_regular: {
+    fontFamily: 'Poppins',
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  caption_small12_16_semibold: {
+    fontFamily: 'Poppins',
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '800',
+  },
+  caption_small12_16_regular: {
+    fontFamily: 'Poppins',
+    fontSize: 12,
+    lineHeight: 16,
+  },
+  caption_small12_16_strike: {
+    fontFamily: 'Poppins',
+    fontSize: 12,
+    lineHeight: 16,
+    textDecorationLine: 'line-through',
+  },
+  caption_small12_18_semibold: {
+    fontFamily: 'Poppins',
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: '800',
+  },
+  caption_small12_18_regular: {
+    fontFamily: 'Poppins',
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  caption_small12_18_strike: {
+    fontFamily: 'Poppins',
+    fontSize: 12,
+    lineHeight: 18,
+    textDecorationLine: 'line-through',
+  },
 };

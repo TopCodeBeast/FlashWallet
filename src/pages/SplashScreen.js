@@ -10,15 +10,15 @@ const logoImage = require('../assets/images/splash/logo.png');
 
 const SplashScreen = ({navigation}) => {
   useEffect(() => {
-    setTimeout(() => {
-      navigation.navigate('through');
-    }, 3000);
     return () => {};
   });
 
   return (
     <KeyboardAvoidingView>
       <SafeAreaView
+        onTouchEnd={() => {
+          navigation.navigate('through');
+        }}
         style={{
           backgroundColor: colors.grey24,
           width: '100%',

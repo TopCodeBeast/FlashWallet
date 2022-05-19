@@ -5,22 +5,58 @@ import {
   KeyboardAvoidingView,
   SafeAreaView,
   Text,
+  TouchableOpacity,
   View,
-  Pressable,
-  TextInput,
 } from 'react-native';
-
-import FontAwesome, {
-  SolidIcons,
-  RegularIcons,
-  BrandIcons,
-  parseIconFromClassName,
-} from 'react-native-fontawesome';
 
 import {colors, commonStyles, fonts} from '../../styles';
 import {Input, Block} from 'galio-framework';
 import {FloatingLabelInput} from 'react-native-floating-label-input';
 import ToggleSwitch from 'toggle-switch-react-native';
+import {SvgXml} from 'react-native-svg';
+
+const qrScanSvgXml = `<svg
+width="24"
+height="24"
+viewBox="0 0 24 24"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
+<path
+  d="M21 8V5C21 3.895 20.105 3 19 3H16"
+  stroke="${colors.green5}"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+/>
+<path
+  d="M8 3H5C3.895 3 3 3.895 3 5V8"
+  stroke="${colors.green5}"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+/>
+<path
+  d="M3 16V19C3 20.105 3.895 21 5 21H8"
+  stroke="${colors.green5}"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+/>
+<path
+  d="M16 21H19C20.105 21 21 20.105 21 19V16"
+  stroke="${colors.green5}"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+/>
+<path
+  d="M3 12H21"
+  stroke="${colors.green5}"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+/>
+</svg>`;
 
 const commonInputContainerStyles = {
   borderWidth: 1,
@@ -54,6 +90,28 @@ const ImportWalletScreen = ({navigation}) => {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [signInWithFaceId, setSignInWithFaceId] = useState(true);
   const [canPass, setCanPass] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const checkCanPass = data => {
+    if (!data.seedPhrase) {
+      setCanPass(false);
+      return;
+    }
+    if (!data.password) {
+      setCanPass(false);
+      return;
+    }
+    if (!data.passwordConfirm) {
+      setCanPass(false);
+      return;
+    }
+    setCanPass(true);
+  };
+
+  const onImportWallet = () => {
+    if (password.length < 8) {
+    }
+  };
 
   return (
     <KeyboardAvoidingView>
@@ -70,13 +128,16 @@ const ImportWalletScreen = ({navigation}) => {
               display: 'flex',
               flexDirection: 'row',
               marginBottom: 24,
+              alignItems: 'center',
             }}>
             <View style={{width: '75%'}}>
               <FloatingLabelInput
                 label={'Seed Phrase'}
-                isPassword
                 value={seedPhrase}
-                onChangeText={value => setSeedPhrase(value)}
+                onChangeText={value => {
+                  setSeedPhrase(value);
+                  checkCanPass({password, passwordConfirm, seedPhrase: value});
+                }}
                 containerStyles={commonInputContainerStyles}
                 customLabelStyles={commonInputCustomLabelStyles}
                 inputStyles={{
@@ -92,11 +153,13 @@ const ImportWalletScreen = ({navigation}) => {
                 multiline
               />
             </View>
-            <View style={{marginLeft: 40, marginTop: 20}}>
-              <FontAwesome
-                style={{fontSize: 20, color: colors.green5}}
-                icon={SolidIcons.qrcode}
-              />
+            <View
+              style={{
+                width: '25%',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <SvgXml xml={qrScanSvgXml} />
             </View>
           </View>
           <View style={{marginBottom: 24}}>
@@ -104,18 +167,32 @@ const ImportWalletScreen = ({navigation}) => {
               label={'New Password'}
               isPassword
               value={password}
-              onChangeText={value => setPassword(value)}
+              onChangeText={value => {
+                setPassword(value);
+                checkCanPass({password: value, passwordConfirm, seedPhrase});
+              }}
               containerStyles={commonInputContainerStyles}
               customLabelStyles={commonInputCustomLabelStyles}
               inputStyles={commonInputInputStyles}
             />
+            <Text
+              style={{
+                paddingLeft: 16,
+                ...fonts.caption_small12_16_regular,
+                color: 'grey',
+              }}>
+              Must be at least 8 characters.
+            </Text>
           </View>
           <View style={{marginBottom: 24}}>
             <FloatingLabelInput
               label={'Confirm Password'}
               isPassword
               value={passwordConfirm}
-              onChangeText={value => setPasswordConfirm(value)}
+              onChangeText={value => {
+                setPasswordConfirm(value);
+                checkCanPass({password, passwordConfirm: value, seedPhrase});
+              }}
               containerStyles={commonInputContainerStyles}
               customLabelStyles={commonInputCustomLabelStyles}
               inputStyles={commonInputInputStyles}
@@ -172,10 +249,10 @@ const ImportWalletScreen = ({navigation}) => {
             width: '90%',
             left: '5%',
           }}>
-          <Pressable
+          <TouchableOpacity
             style={commonStyles.secondaryButton}
             onPress={() => {
-              console.log(123);
+              onImportWallet();
             }}
             disabled={!canPass}>
             <Text
@@ -185,7 +262,7 @@ const ImportWalletScreen = ({navigation}) => {
               }}>
               Import
             </Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     </KeyboardAvoidingView>

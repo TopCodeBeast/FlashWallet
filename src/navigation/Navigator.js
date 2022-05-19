@@ -12,7 +12,7 @@ const Stack = createStackNavigator();
 
 import {Block, Icon, Text} from 'galio-framework';
 
-import {colors, commonStyles} from '../styles';
+import {colors, commonStyles, fonts} from '../styles';
 
 import SplashScreen from '../pages/SplashScreen';
 import ThroughScreen from '../pages/ThroughScreen';
@@ -29,6 +29,7 @@ import FontAwesome, {
   parseIconFromClassName,
 } from 'react-native-fontawesome';
 import {Rowing} from '@material-ui/icons';
+import CreateWalletScreen1 from '../pages/CreateWallet/CreateWalletScreen1';
 
 const drawerData = [
   {
@@ -190,6 +191,7 @@ const ImportWalletHeader = ({navigation}) => {
         backgroundColor: colors.grey24,
         paddingTop: 44,
         paddingHorizontal: 16,
+        paddingBottom: 10,
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
@@ -209,6 +211,191 @@ const ImportWalletHeader = ({navigation}) => {
       <View
         style={{justifyContent: 'center', width: '100%', alignItems: 'center'}}>
         <Text style={commonStyles.headerText}>Import from Seed</Text>
+      </View>
+    </View>
+  );
+};
+
+const CreateWalletHeader1 = ({navigation}) => {
+  return (
+    <View
+      style={{
+        backgroundColor: colors.grey24,
+        paddingTop: 44,
+        paddingHorizontal: 16,
+        paddingBottom: 10,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <View style={{flex: 1}}>
+        <Pressable
+          onPress={() => {
+            navigation.goBack();
+          }}
+          style={{width: 20}}>
+          <FontAwesome
+            style={{fontSize: 16, color: 'white'}}
+            icon={SolidIcons.chevronLeft}
+          />
+        </Pressable>
+      </View>
+      <View
+        style={{
+          justifyContent: 'space-around',
+          flexDirection: 'row',
+          width: '90%',
+          height: 8,
+        }}>
+        <View
+          style={{
+            width: '30%',
+            height: 8,
+            backgroundColor: colors.green5,
+            borderRadius: 2,
+          }}></View>
+        <View
+          style={{
+            width: '30%',
+            height: 8,
+            backgroundColor: colors.grey23,
+          }}></View>
+        <View
+          style={{
+            width: '30%',
+            height: 8,
+            backgroundColor: colors.grey23,
+          }}></View>
+      </View>
+      <View style={{alignItems: 'center'}}>
+        <Text
+          style={{color: colors.grey13, ...fonts.caption_small12_16_regular}}>
+          1/3
+        </Text>
+      </View>
+    </View>
+  );
+};
+const CreateWalletHeader2 = ({navigation}) => {
+  return (
+    <View
+      style={{
+        backgroundColor: colors.grey24,
+        paddingTop: 44,
+        paddingHorizontal: 16,
+        paddingBottom: 10,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <View style={{flex: 1}}>
+        <Pressable
+          onPress={() => {
+            navigation.goBack();
+          }}
+          style={{width: 20}}>
+          <FontAwesome
+            style={{fontSize: 16, color: 'white'}}
+            icon={SolidIcons.chevronLeft}
+          />
+        </Pressable>
+      </View>
+      <View
+        style={{
+          justifyContent: 'space-around',
+          flexDirection: 'row',
+          width: '90%',
+          height: 8,
+        }}>
+        <View
+          style={{
+            width: '30%',
+            height: 8,
+            backgroundColor: colors.green5,
+            borderRadius: 2,
+          }}></View>
+        <View
+          style={{
+            width: '30%',
+            height: 8,
+            backgroundColor: colors.green5,
+          }}></View>
+        <View
+          style={{
+            width: '30%',
+            height: 8,
+            backgroundColor: colors.grey23,
+          }}></View>
+      </View>
+      <View style={{alignItems: 'center'}}>
+        <Text
+          style={{color: colors.grey13, ...fonts.caption_small12_16_regular}}>
+          2/3
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+const CreateWalletHeader3 = ({navigation}) => {
+  return (
+    <View
+      style={{
+        backgroundColor: colors.grey24,
+        paddingTop: 44,
+        paddingHorizontal: 16,
+        paddingBottom: 10,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <View style={{flex: 1}}>
+        <Pressable
+          onPress={() => {
+            navigation.goBack();
+          }}
+          style={{width: 20}}>
+          <FontAwesome
+            style={{fontSize: 16, color: 'white'}}
+            icon={SolidIcons.chevronLeft}
+          />
+        </Pressable>
+      </View>
+      <View
+        style={{
+          justifyContent: 'space-around',
+          flexDirection: 'row',
+          width: '90%',
+          height: 8,
+        }}>
+        <View
+          style={{
+            width: '30%',
+            height: 8,
+            backgroundColor: colors.green5,
+            borderRadius: 2,
+          }}></View>
+        <View
+          style={{
+            width: '30%',
+            height: 8,
+            backgroundColor: colors.green5,
+          }}></View>
+        <View
+          style={{
+            width: '30%',
+            height: 8,
+            backgroundColor: colors.green5,
+          }}></View>
+      </View>
+      <View style={{alignItems: 'center'}}>
+        <Text
+          style={{color: colors.grey13, ...fonts.caption_small12_16_regular}}>
+          3/3
+        </Text>
       </View>
     </View>
   );
@@ -236,6 +423,13 @@ class App extends React.Component {
           component={ImportWalletScreen}
           options={{
             header: ImportWalletHeader,
+          }}
+        />
+        <Stack.Screen
+          name="createwallet1"
+          component={CreateWalletScreen1}
+          options={{
+            header: CreateWalletHeader1,
           }}
         />
         <Stack.Screen

@@ -6,7 +6,7 @@ import {
   SafeAreaView,
   Text,
   View,
-  Pressable,
+  TouchableOpacity,
 } from 'react-native';
 import Dots from 'react-native-dots-pagination';
 
@@ -73,7 +73,7 @@ const ThroughScreen = ({navigation}) => {
                 position: 'absolute',
                 left: '5%',
               }}>
-              <Pressable
+              <TouchableOpacity
                 style={commonStyles.secondaryButton}
                 onPress={() => {
                   setCurrent((current + 1) % 4);
@@ -81,7 +81,7 @@ const ThroughScreen = ({navigation}) => {
                 <Text style={commonStyles.secondaryButtonText}>
                   {current < 2 ? 'Next' : 'Get Start'}
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </>
         )}
@@ -94,7 +94,7 @@ const ThroughScreen = ({navigation}) => {
                 position: 'absolute',
                 left: '5%',
               }}>
-              <Pressable
+              <TouchableOpacity
                 style={commonStyles.secondaryButton}
                 onPress={() => {
                   navigation.navigate('importwallet');
@@ -102,13 +102,17 @@ const ThroughScreen = ({navigation}) => {
                 <Text style={commonStyles.secondaryButtonText}>
                   Import Using Seed Phrase
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
               <View style={{height: 15}}></View>
-              <Pressable style={commonStyles.primaryButton} onPress={() => {}}>
+              <TouchableOpacity
+                style={commonStyles.primaryButton}
+                onPress={() => {
+                  navigation.navigate('createwallet1');
+                }}>
                 <Text style={commonStyles.primaryButtonText}>
                   Create a New Wallet
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </>
         )}

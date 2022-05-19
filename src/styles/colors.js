@@ -77,6 +77,9 @@ const blueVersion = {
   grey22: '#2A2D3C',
   grey23: '#222531',
   grey24: '#17171A',
+
+  //gradient
+  gradient8: ['#A9CDFF', '#72F6D1', '#A0ED8D', '#FED365', '#FAA49E'],
 };
 
 export default blueVersion;
