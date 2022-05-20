@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, createRef, useRef} from 'react';
 import {connect} from 'react-redux';
 import {
   Image,
@@ -7,11 +7,10 @@ import {
   Text,
   View,
   Pressable,
-  TextInput,
   Linking,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   Dimensions,
+  Button,
 } from 'react-native';
 
 import FontAwesome, {
@@ -29,6 +28,8 @@ import CheckBox from 'react-native-check-box';
 import ConfirmSeedScreen from './ConfirmSeedScreen';
 
 import {SvgXml} from 'react-native-svg';
+import {BlurView} from '@react-native-community/blur';
+import RBSheet from 'react-native-raw-bottom-sheet';
 
 const commonInputContainerStyles = {
   borderWidth: 1,
@@ -63,12 +64,8 @@ import writeSeedTitleSvgXml from './writeSeedTitleSVG';
 import successTitleSvgXml from './successTitleSVG';
 
 const image = require('../../assets/images/createwallet2/image.png');
-const seedMaskImage = require('../../assets/images/createwallet2/seed_mask.png');
 
 const screenWidth = Dimensions.get('screen').width;
-const screenHeight = Dimensions.get('screen').height;
-
-console.log(screenWidth, screenHeight);
 
 const mnemonic = [
   'future',
@@ -92,6 +89,13 @@ const CreateWalletScreen = ({navigation}) => {
   const [isAgreeChecked, setIsAgreeChecked] = useState(true);
   const [canPass, setCanPass] = useState(false);
   const [showSeed, setShowSeed] = useState(false);
+  const [viewRef, setViewRef] = useState(null);
+  const [understandNotSecurity, setUnderstandNotSecurity] = useState(false);
+
+  const backgroundImageRef = createRef();
+  const refRBSkipSecuritySheet = useRef(null);
+  const refRBSeedPhraseSheet = useRef(null);
+  const refRBProtectWalletSheet = useRef(null);
 
   const [status, setStatus] = useState('create_password');
 
@@ -128,7 +132,7 @@ const CreateWalletScreen = ({navigation}) => {
           <Pressable
             onPress={() => {
               if (status === 'success') {
-                setStatus('confirm_seed');
+                setStatus('secure_wallet');
               } else if (status === 'confirm_seed') {
                 setStatus('write_seed');
               } else if (status === 'write_seed') {
@@ -377,6 +381,166 @@ const CreateWalletScreen = ({navigation}) => {
   const secureWalletRender = () => {
     return (
       <View style={{height: '100%'}}>
+        <RBSheet
+          ref={refRBSkipSecuritySheet}
+          closeOnDragDown={true}
+          closeOnPressBack={false}
+          closeOnPressMask={false}
+          customStyles={{
+            wrapper: {
+              backgroundColor: '#222531BB',
+            },
+            draggableIcon: {
+              backgroundColor: colors.grey9,
+            },
+            container: {
+              backgroundColor: colors.grey24,
+            },
+          }}>
+          <View>
+            <View style={{paddingTop: 16}}>
+              <Text
+                style={{...fonts.title2, color: 'white', textAlign: 'center'}}>
+                Skip Account Security?
+              </Text>
+            </View>
+            <View
+              style={{
+                paddingTop: 40,
+                flexDirection: 'row',
+                paddingLeft: 24,
+                paddingRight: 24,
+                alignItems: 'center',
+              }}>
+              <CheckBox
+                checkedCheckBoxColor={colors.green5}
+                checkBoxColor={colors.grey13}
+                isChecked={understandNotSecurity}
+                onClick={() => {
+                  setUnderstandNotSecurity(!understandNotSecurity);
+                }}
+              />
+              <View
+                style={{
+                  marginLeft: 8,
+                  width: '80%',
+                }}>
+                <Text
+                  style={{
+                    color: 'white',
+                    ...fonts.para_regular,
+                  }}>
+                  I understand that if i lose mt seed phrase i will not be able
+                  to access my wallet
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                marginTop: 12,
+                paddingHorizontal: 24,
+                paddingTop: 8,
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                alignItems: 'center',
+              }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setStatus('secure_seed');
+                }}>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    ...fonts.btn_large_normal,
+                    color: colors.green5,
+                  }}>
+                  Secure Now
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={
+                  understandNotSecurity
+                    ? commonStyles.primaryButton
+                    : commonStyles.disabledButton
+                }
+                onPress={() => {
+                  setStatus('success');
+                }}
+                disabled={!understandNotSecurity}>
+                <Text
+                  style={{
+                    ...fonts.btn_large_normal,
+                    color: understandNotSecurity ? 'black' : colors.grey18,
+                  }}>
+                  Skip
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </RBSheet>
+        <RBSheet
+          height={460}
+          ref={refRBSeedPhraseSheet}
+          closeOnDragDown={true}
+          closeOnPressBack={false}
+          closeOnPressMask={false}
+          customStyles={{
+            wrapper: {
+              backgroundColor: '#222531BB',
+            },
+            draggableIcon: {
+              backgroundColor: colors.grey9,
+            },
+            container: {
+              backgroundColor: colors.grey24,
+            },
+          }}>
+          <View>
+            <View style={{paddingTop: 12}}>
+              <Text
+                style={{...fonts.title2, color: 'white', textAlign: 'center'}}>
+                What is a 'Seed Phrase'?
+              </Text>
+            </View>
+            <View style={{paddingTop: 24, paddingHorizontal: 24}}>
+              <Text
+                style={{
+                  ...fonts.para_regular,
+                  color: 'white',
+                  textAlign: 'left',
+                }}>
+                A seed phrase is a set of twelve words that contains all the
+                information about your wallet, including your funds. It's like a
+                secret code used to access your entire wallet.{'\n'}You must
+                keep your seed phrase secret and safe. If someone gets your seed
+                phrase, they'll gain control over your accounts. {'\n'}Save it
+                in a place where only you can access it. If you lose it, not
+                even MetaMask can help you recover it.
+              </Text>
+            </View>
+            <View style={{paddingTop: 40}}>
+              <TouchableOpacity
+                style={{
+                  ...commonStyles.primaryButton,
+                  width: '90%',
+                  left: '5%',
+                }}
+                onPress={() => {
+                  refRBSeedPhraseSheet.current.close();
+                }}>
+                <Text
+                  style={{
+                    ...fonts.btn_large_normal,
+                    color: 'black',
+                    textAlign: 'center',
+                  }}>
+                  I Got It.
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </RBSheet>
+
         <View style={{width: '100%', alignItems: 'center'}}>
           <Image source={image} />
         </View>
@@ -398,7 +562,7 @@ const CreateWalletScreen = ({navigation}) => {
               <Text
                 style={{color: colors.blue5, ...fonts.para_semibold}}
                 onPress={() => {
-                  setStatus('secure_seed');
+                  refRBSeedPhraseSheet.current.open();
                 }}>
                 Seed Phrase
               </Text>{' '}
@@ -424,7 +588,10 @@ const CreateWalletScreen = ({navigation}) => {
             width: '90%',
             left: '5%',
           }}>
-          <TouchableWithoutFeedback>
+          <TouchableOpacity
+            onPress={() => {
+              refRBSkipSecuritySheet.current.open();
+            }}>
             <View style={{paddingVertical: 12, marginBottom: 8}}>
               <Text
                 style={{
@@ -435,7 +602,7 @@ const CreateWalletScreen = ({navigation}) => {
                 Remind Me Later
               </Text>
             </View>
-          </TouchableWithoutFeedback>
+          </TouchableOpacity>
           <TouchableOpacity
             style={{
               ...commonStyles.primaryButton,
@@ -459,6 +626,65 @@ const CreateWalletScreen = ({navigation}) => {
   const secureSeedRender = () => {
     return (
       <View style={{width: '100%', paddingTop: 40, height: '100%'}}>
+        <RBSheet
+          height={360}
+          ref={refRBProtectWalletSheet}
+          closeOnDragDown={true}
+          closeOnPressBack={false}
+          closeOnPressMask={false}
+          customStyles={{
+            wrapper: {
+              backgroundColor: '#222531BB',
+            },
+            draggableIcon: {
+              backgroundColor: colors.grey9,
+            },
+            container: {
+              backgroundColor: colors.grey24,
+            },
+          }}>
+          <View>
+            <View style={{paddingTop: 12}}>
+              <Text
+                style={{...fonts.title2, color: 'white', textAlign: 'center'}}>
+                Protect Your Wallet
+              </Text>
+            </View>
+            <View style={{paddingTop: 24, paddingHorizontal: 24}}>
+              <Text
+                style={{
+                  ...fonts.para_regular,
+                  color: 'white',
+                  textAlign: 'left',
+                }}>
+                Dont’t risk losing your funds. Protect your wallet by saving
+                your seed phrase in a place you trust.{'\n'}It’s the only way to
+                recover your wallet if you get locked out of the app or get a
+                new device.
+              </Text>
+            </View>
+            <View style={{paddingTop: 40}}>
+              <TouchableOpacity
+                style={{
+                  ...commonStyles.primaryButton,
+                  width: '90%',
+                  left: '5%',
+                }}
+                onPress={() => {
+                  refRBProtectWalletSheet.current.close();
+                }}>
+                <Text
+                  style={{
+                    ...fonts.btn_large_normal,
+                    color: 'black',
+                    textAlign: 'center',
+                  }}>
+                  I Got It.
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </RBSheet>
         <View
           style={{
             flexDirection: 'row',
@@ -484,7 +710,11 @@ const CreateWalletScreen = ({navigation}) => {
           }}>
           <Text style={{...fonts.para_regular, color: colors.grey9}}>
             Secure your wallet's "
-            <Text style={{color: colors.blue5, ...fonts.para_semibold}}>
+            <Text
+              style={{color: colors.blue5, ...fonts.para_semibold}}
+              onPress={() => {
+                refRBProtectWalletSheet.current.open();
+              }}>
               Seed Phrase
             </Text>
             "
@@ -584,7 +814,6 @@ const CreateWalletScreen = ({navigation}) => {
       </View>
     );
   };
-
   const writeSeedRender = () => {
     return (
       <View style={{width: '100%', paddingTop: 40, height: '100%'}}>
@@ -606,6 +835,15 @@ const CreateWalletScreen = ({navigation}) => {
             borderRadius: 8,
             borderColor: colors.grey22,
             borderWidth: 1,
+          }}
+          ref={backgroundImageRef}
+          onLoadEnd={() => {
+            // Workaround for a tricky race condition on initial load
+            InteractionManager.runAfterInteractions(() => {
+              setTimeout(() => {
+                setViewRef(findNodeHandle(backgroundImageRef.current));
+              }, 500);
+            });
           }}>
           {mnemonic.map((item, index) => {
             if (index < 6) {
@@ -655,16 +893,17 @@ const CreateWalletScreen = ({navigation}) => {
           })}
           {!showSeed && (
             <>
-              <Image
-                source={seedMaskImage}
+              <BlurView
+                viewRef={viewRef}
                 style={{
                   position: 'absolute',
-                  width: screenWidth - 48,
-                  height: 336,
-                  borderRadius: 8,
-                  borderColor: colors.grey22,
-                  borderWidth: 1,
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  right: 0,
                 }}
+                blurType="light"
+                overlayColor={'rgba(0, 0, 255, 0)'}
               />
               <View
                 style={{

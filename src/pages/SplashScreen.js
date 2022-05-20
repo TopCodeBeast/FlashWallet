@@ -30,7 +30,7 @@ const SplashScreen = ({navigation}) => {
             left: '40%',
             top: '-5.6%',
             width: '60%',
-            height: '50%',
+            height: '40%',
             resizeMode: 'stretch',
           }}
         />
@@ -38,7 +38,7 @@ const SplashScreen = ({navigation}) => {
           source={logoImage}
           style={{
             left: '10%',
-            top: '8%',
+            top: '10%',
           }}
         />
         <Text
@@ -48,7 +48,7 @@ const SplashScreen = ({navigation}) => {
             color: 'white',
             width: 274,
             left: '10%',
-            top: '12%',
+            top: '16%',
           }}>
           Millions of people participate
         </Text>
