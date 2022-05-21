@@ -14,7 +14,6 @@ import FontAwesome, {
   RegularIcons,
   BrandIcons,
 } from 'react-native-fontawesome';
-import RBSheet from 'react-native-raw-bottom-sheet';
 import LinearGradient from 'react-native-linear-gradient';
 import MaskedView from '@react-native-community/masked-view';
 
@@ -29,11 +28,14 @@ import {
   SecondaryButton,
   TextButton,
 } from '../../../components/Buttons';
+import TokenShow from './TokenShow/TokenShow';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 const buyIconSvgXml = require('../SVGData').buyIcon;
 
 const WalletTab = ({navigation}) => {
+  const [selectedToken, setSelectedToken] = useState('');
+
   useEffect(() => {
     return () => {};
   });
@@ -109,6 +111,10 @@ const WalletTab = ({navigation}) => {
     );
   };
 
+  const tokenRowPressed = token => {
+    setSelectedToken(token);
+  };
+
   return (
     <KeyboardAvoidingView>
       <SafeAreaView
@@ -117,14 +123,29 @@ const WalletTab = ({navigation}) => {
           width: '100%',
           height: '100%',
         }}>
-        <Header />
-        <Image
-          source={backImage}
-          style={{position: 'absolute', right: '-15%', top: '10%'}}
-        />
-        {renderNetworkBalance()}
-        {renderTransactionButtonGroup()}
-        <TokenAndCollectiblesTab />
+        {selectedToken.length > 0 && (
+          <TokenShow
+            backPressed={() => {
+              setSelectedToken('');
+            }}
+          />
+        )}
+        {!selectedToken && (
+          <>
+            <Header />
+            <Image
+              source={backImage}
+              style={{position: 'absolute', right: '-15%', top: '10%'}}
+            />
+            {/* <View style={{height: '20%'}}></View> */}
+            {renderNetworkBalance()}
+            {renderTransactionButtonGroup()}
+            <TokenAndCollectiblesTab
+              navigation={navigation}
+              tokenPressed={tokenRowPressed}
+            />
+          </>
+        )}
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

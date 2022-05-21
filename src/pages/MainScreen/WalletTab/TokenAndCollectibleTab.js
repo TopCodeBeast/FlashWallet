@@ -19,7 +19,7 @@ import {TextButton} from '../../../components/Buttons';
 import TokenItemRow from './TokenItemRow';
 import CollectibleItemRow from './CollectibleItemRow';
 
-const TokenAndCollectiblesTab = () => {
+const TokenAndCollectiblesTab = ({navigation, tokenPressed}) => {
   const [curTabIndex, setCurTabIndex] = useState(0);
   const [tabRoutes] = useState([
     {
@@ -36,6 +36,9 @@ const TokenAndCollectiblesTab = () => {
     <View style={{flex: 1}}>
       <ScrollView>
         <TokenItemRow
+          onPress={() => {
+            tokenPressed('BNB');
+          }}
           name="Binance Coin"
           balance={19.2371}
           unit="BNB"
@@ -98,10 +101,7 @@ const TokenAndCollectiblesTab = () => {
             curTabIndex === i
               ? useColorModeValue('white', colors.grey12)
               : useColorModeValue(colors.grey12, colors.grey12);
-          const borderColor =
-            curTabIndex === i
-              ? 'white'
-              : useColorModeValue('coolGray.200', 'gray.400');
+
           return (
             <View
               key={'tabbar_' + i}

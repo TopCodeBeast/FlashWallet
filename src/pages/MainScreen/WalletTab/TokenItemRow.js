@@ -1,10 +1,10 @@
-import {View, Text} from 'react-native';
+import {View, Text, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {colors, fonts} from '../../../styles';
 
-const TokenItemRow = ({name, unit, balance, trend, usdAmount}) => {
+const TokenItemRow = ({name, unit, balance, trend, usdAmount, onPress}) => {
   return (
-    <View style={{padding: 16, marginTop: 24}}>
+    <TouchableOpacity style={{padding: 16, marginTop: 24}} onPress={onPress}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <View
           style={{
@@ -50,7 +50,7 @@ const TokenItemRow = ({name, unit, balance, trend, usdAmount}) => {
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

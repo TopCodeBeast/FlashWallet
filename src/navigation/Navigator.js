@@ -30,7 +30,6 @@ import FontAwesome, {
   BrandIcons,
   parseIconFromClassName,
 } from 'react-native-fontawesome';
-import {Rowing} from '@material-ui/icons';
 
 const drawerData = [
   {
