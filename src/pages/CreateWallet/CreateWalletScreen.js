@@ -20,7 +20,6 @@ import FontAwesome, {
 } from 'react-native-fontawesome';
 
 import {colors, fonts} from '../../styles';
-import {FloatingLabelInput} from 'react-native-floating-label-input';
 import ToggleSwitch from 'toggle-switch-react-native';
 import CheckBox from 'react-native-check-box';
 
@@ -30,32 +29,6 @@ import {SvgXml} from 'react-native-svg';
 import {BlurView} from '@react-native-community/blur';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
-const commonInputContainerStyles = {
-  borderWidth: 1,
-  borderRadius: 8,
-  borderColor: 'grey',
-  paddingHorizontal: 10,
-};
-const commonInputCustomLabelStyles = {
-  colorFocused: 'grey',
-  colorBlurred: 'grey',
-  fontFamily: 'Poppins',
-  fontSize: 12,
-  color: 'grey',
-  lineHeight: 16,
-  letterSpacing: 0,
-};
-const commonInputInputStyles = {
-  color: 'white',
-  fontFamily: 'Poppins',
-  fontSize: 14,
-  color: 'white',
-  lineHeight: 24,
-  height: 64,
-  letterSpacing: 0,
-  fontWeight: 'bold',
-};
-
 import createPasswordTitleSvgXml from './createPasswordTitleSVG';
 import secureWalletTitleSvgXml from './secureWalletTitleSVG';
 import infoCircleIconSvgXml from './infoCircleIconSVG';
@@ -63,6 +36,7 @@ import writeSeedTitleSvgXml from './writeSeedTitleSVG';
 import successTitleSvgXml from './successTitleSVG';
 import TextButton from '../../components/Buttons/TextButton';
 import SecondaryButton from '../../components/Buttons/SecondaryButton';
+import FloatLabelInput from '../../components/FloatLabelInput';
 
 const image = require('../../assets/images/createwallet2/image.png');
 
@@ -231,9 +205,9 @@ const CreateWalletScreen = ({navigation}) => {
         </View>
         <View style={{width: '100%', paddingHorizontal: 24, marginTop: 40}}>
           <View style={{marginBottom: 24}}>
-            <FloatingLabelInput
+            <FloatLabelInput
               label={'New Password'}
-              isPassword
+              isPassword={true}
               value={password}
               onChangeText={value => {
                 setPassword(value);
@@ -243,10 +217,8 @@ const CreateWalletScreen = ({navigation}) => {
                   isAgreeChecked,
                 });
               }}
-              containerStyles={commonInputContainerStyles}
-              customLabelStyles={commonInputCustomLabelStyles}
-              inputStyles={commonInputInputStyles}
             />
+
             <Text
               style={{
                 paddingLeft: 16,
@@ -258,9 +230,9 @@ const CreateWalletScreen = ({navigation}) => {
             </Text>
           </View>
           <View>
-            <FloatingLabelInput
+            <FloatLabelInput
               label={'Confirm Password'}
-              isPassword
+              isPassword={true}
               value={passwordConfirm}
               onChangeText={value => {
                 setPasswordConfirm(value);
@@ -270,10 +242,8 @@ const CreateWalletScreen = ({navigation}) => {
                   isAgreeChecked,
                 });
               }}
-              containerStyles={commonInputContainerStyles}
-              customLabelStyles={commonInputCustomLabelStyles}
-              inputStyles={commonInputInputStyles}
             />
+
             <Text
               style={{
                 paddingLeft: 16,

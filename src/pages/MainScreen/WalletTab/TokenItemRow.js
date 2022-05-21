@@ -1,8 +1,8 @@
 import {View, Text} from 'react-native';
 import React from 'react';
-import {colors, fonts} from '../../styles';
+import {colors, fonts} from '../../../styles';
 
-const CollectibleItemRow = ({name, unit, balance, trend, usdAmount}) => {
+const TokenItemRow = ({name, unit, balance, trend, usdAmount}) => {
   return (
     <View style={{padding: 16, marginTop: 24}}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -54,4 +54,4 @@ const CollectibleItemRow = ({name, unit, balance, trend, usdAmount}) => {
   );
 };
 
-export default CollectibleItemRow;
+export default TokenItemRow;

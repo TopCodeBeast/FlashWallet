@@ -10,11 +10,10 @@ import {
 } from 'react-native';
 
 import {colors, commonStyles, fonts} from '../../styles';
-import {Input, Block} from 'galio-framework';
-import {FloatingLabelInput} from 'react-native-floating-label-input';
 import ToggleSwitch from 'toggle-switch-react-native';
 import {SvgXml} from 'react-native-svg';
 import {SecondaryButton} from '../../components/Buttons';
+import FloatLabelInput from '../../components/FloatLabelInput';
 
 const qrScanSvgXml = `<svg
 width="24"
@@ -58,32 +57,6 @@ xmlns="http://www.w3.org/2000/svg">
   stroke-linejoin="round"
 />
 </svg>`;
-
-const commonInputContainerStyles = {
-  borderWidth: 1,
-  borderRadius: 8,
-  borderColor: 'grey',
-  paddingHorizontal: 10,
-};
-const commonInputCustomLabelStyles = {
-  colorFocused: 'grey',
-  colorBlurred: 'grey',
-  fontFamily: 'Poppins',
-  fontSize: 12,
-  color: 'grey',
-  lineHeight: 16,
-  letterSpacing: 0,
-};
-const commonInputInputStyles = {
-  color: 'white',
-  fontFamily: 'Poppins',
-  fontSize: 14,
-  color: 'white',
-  lineHeight: 24,
-  height: 64,
-  letterSpacing: 0,
-  fontWeight: 'bold',
-};
 
 const ImportWalletScreen = ({navigation}) => {
   const [seedPhrase, setSeedPhrase] = useState('');
@@ -132,15 +105,13 @@ const ImportWalletScreen = ({navigation}) => {
               alignItems: 'center',
             }}>
             <View style={{width: '75%'}}>
-              <FloatingLabelInput
+              <FloatLabelInput
                 label={'Seed Phrase'}
                 value={seedPhrase}
                 onChangeText={value => {
                   setSeedPhrase(value);
                   checkCanPass({password, passwordConfirm, seedPhrase: value});
                 }}
-                containerStyles={commonInputContainerStyles}
-                customLabelStyles={commonInputCustomLabelStyles}
                 inputStyles={{
                   color: 'white',
                   fontFamily: 'Poppins',
@@ -164,7 +135,7 @@ const ImportWalletScreen = ({navigation}) => {
             </View>
           </View>
           <View style={{marginBottom: 24}}>
-            <FloatingLabelInput
+            <FloatLabelInput
               label={'New Password'}
               isPassword
               value={password}
@@ -172,10 +143,8 @@ const ImportWalletScreen = ({navigation}) => {
                 setPassword(value);
                 checkCanPass({password: value, passwordConfirm, seedPhrase});
               }}
-              containerStyles={commonInputContainerStyles}
-              customLabelStyles={commonInputCustomLabelStyles}
-              inputStyles={commonInputInputStyles}
             />
+
             <Text
               style={{
                 paddingLeft: 16,
@@ -186,7 +155,7 @@ const ImportWalletScreen = ({navigation}) => {
             </Text>
           </View>
           <View style={{marginBottom: 24}}>
-            <FloatingLabelInput
+            <FloatLabelInput
               label={'Confirm Password'}
               isPassword
               value={passwordConfirm}
@@ -194,9 +163,6 @@ const ImportWalletScreen = ({navigation}) => {
                 setPasswordConfirm(value);
                 checkCanPass({password, passwordConfirm: value, seedPhrase});
               }}
-              containerStyles={commonInputContainerStyles}
-              customLabelStyles={commonInputCustomLabelStyles}
-              inputStyles={commonInputInputStyles}
             />
           </View>
           <View

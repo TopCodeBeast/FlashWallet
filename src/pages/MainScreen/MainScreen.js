@@ -17,7 +17,7 @@ import FontAwesome, {
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 const Tab = createBottomTabNavigator();
 
-import WalletTab from './WalletTab';
+import WalletTab from './WalletTab/WalletTab';
 
 const MainScreen = ({navigation}) => {
   const tabBar = ({state, descriptors, navigation}) => {
