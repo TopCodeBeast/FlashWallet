@@ -1,22 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {connect} from 'react-redux';
 
-import {
-  Image,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  Text,
-  View,
-  Pressable,
-  TextInput,
-  Linking,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Dimensions,
-  StyleSheet,
-} from 'react-native';
+import {Text, View, TouchableOpacity} from 'react-native';
 import MaskedView from '@react-native-community/masked-view';
-import {colors, commonStyles, fonts} from '../../styles';
+import {colors, fonts} from '../../styles';
 
 const mnemonic = [
   'future',
@@ -37,6 +24,7 @@ import {SvgXml} from 'react-native-svg';
 import LinearGradient from 'react-native-linear-gradient';
 
 import confirmSeedTitleSvgXml from './confirmSeedTitleSVG';
+import PrimaryButton from '../../components/Buttons/PrimaryButton';
 
 const testNumbers = [
   1 + Math.floor(Math.random() * 4),
@@ -214,10 +202,7 @@ const ConfirmSeedScreen = ({navigation, successCallback}) => {
           width: '90%',
           left: '5%',
         }}>
-        <TouchableOpacity
-          style={
-            isCorrect ? commonStyles.primaryButton : commonStyles.disabledButton
-          }
+        <PrimaryButton
           onPress={() => {
             if (step === 2) {
               successCallback();
@@ -227,15 +212,9 @@ const ConfirmSeedScreen = ({navigation, successCallback}) => {
               setStep(step + 1);
             }
           }}
-          disabled={!isCorrect}>
-          <Text
-            style={{
-              ...fonts.btn_large_normal,
-              color: isCorrect ? 'black' : colors.grey18,
-            }}>
-            Next
-          </Text>
-        </TouchableOpacity>
+          text="Next"
+          enableFlag={isCorrect}
+        />
       </View>
     </View>
   );

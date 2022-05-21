@@ -8,10 +8,10 @@ import {
   View,
   Pressable,
   Linking,
-  TouchableOpacity,
   Dimensions,
-  Button,
 } from 'react-native';
+
+import PrimaryButton from '../../components/Buttons/PrimaryButton';
 
 import FontAwesome, {
   SolidIcons,
@@ -19,8 +19,7 @@ import FontAwesome, {
   BrandIcons,
 } from 'react-native-fontawesome';
 
-import {colors, commonStyles, fonts} from '../../styles';
-import {Input, Block} from 'galio-framework';
+import {colors, fonts} from '../../styles';
 import {FloatingLabelInput} from 'react-native-floating-label-input';
 import ToggleSwitch from 'toggle-switch-react-native';
 import CheckBox from 'react-native-check-box';
@@ -62,6 +61,8 @@ import secureWalletTitleSvgXml from './secureWalletTitleSVG';
 import infoCircleIconSvgXml from './infoCircleIconSVG';
 import writeSeedTitleSvgXml from './writeSeedTitleSVG';
 import successTitleSvgXml from './successTitleSVG';
+import TextButton from '../../components/Buttons/TextButton';
+import SecondaryButton from '../../components/Buttons/SecondaryButton';
 
 const image = require('../../assets/images/createwallet2/image.png');
 
@@ -357,22 +358,13 @@ const CreateWalletScreen = ({navigation}) => {
             width: '90%',
             left: '5%',
           }}>
-          <TouchableOpacity
-            style={
-              canPass ? commonStyles.primaryButton : commonStyles.disabledButton
-            }
+          <PrimaryButton
+            enableFlag={canPass}
             onPress={() => {
               setStatus('secure_wallet');
             }}
-            disabled={!canPass}>
-            <Text
-              style={{
-                ...fonts.btn_large_normal,
-                color: canPass ? 'black' : colors.grey18,
-              }}>
-              Create Password
-            </Text>
-          </TouchableOpacity>
+            text="Create Password"
+          />
         </View>
       </View>
     );
@@ -382,6 +374,7 @@ const CreateWalletScreen = ({navigation}) => {
     return (
       <View style={{height: '100%'}}>
         <RBSheet
+          height={280}
           ref={refRBSkipSecuritySheet}
           closeOnDragDown={true}
           closeOnPressBack={false}
@@ -444,37 +437,19 @@ const CreateWalletScreen = ({navigation}) => {
                 justifyContent: 'space-around',
                 alignItems: 'center',
               }}>
-              <TouchableOpacity
+              <TextButton
                 onPress={() => {
                   setStatus('secure_seed');
-                }}>
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    ...fonts.btn_large_normal,
-                    color: colors.green5,
-                  }}>
-                  Secure Now
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={
-                  understandNotSecurity
-                    ? commonStyles.primaryButton
-                    : commonStyles.disabledButton
-                }
+                }}
+                text="Secure Now"
+              />
+              <PrimaryButton
                 onPress={() => {
                   setStatus('success');
                 }}
-                disabled={!understandNotSecurity}>
-                <Text
-                  style={{
-                    ...fonts.btn_large_normal,
-                    color: understandNotSecurity ? 'black' : colors.grey18,
-                  }}>
-                  Skip
-                </Text>
-              </TouchableOpacity>
+                text="Skip"
+                enableFlag={understandNotSecurity}
+              />
             </View>
           </View>
         </RBSheet>
@@ -518,25 +493,13 @@ const CreateWalletScreen = ({navigation}) => {
                 even MetaMask can help you recover it.
               </Text>
             </View>
-            <View style={{paddingTop: 40}}>
-              <TouchableOpacity
-                style={{
-                  ...commonStyles.primaryButton,
-                  width: '90%',
-                  left: '5%',
-                }}
+            <View style={{paddingTop: 40, paddingHorizontal: 24}}>
+              <PrimaryButton
                 onPress={() => {
                   refRBSeedPhraseSheet.current.close();
-                }}>
-                <Text
-                  style={{
-                    ...fonts.btn_large_normal,
-                    color: 'black',
-                    textAlign: 'center',
-                  }}>
-                  I Got It.
-                </Text>
-              </TouchableOpacity>
+                }}
+                text="I Got It."
+              />
             </View>
           </View>
         </RBSheet>
@@ -588,36 +551,22 @@ const CreateWalletScreen = ({navigation}) => {
             width: '90%',
             left: '5%',
           }}>
-          <TouchableOpacity
-            onPress={() => {
-              refRBSkipSecuritySheet.current.open();
-            }}>
-            <View style={{paddingVertical: 12, marginBottom: 8}}>
-              <Text
-                style={{
-                  ...fonts.btn_large_normal,
-                  color: colors.green5,
-                  textAlign: 'center',
-                }}>
-                Remind Me Later
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              ...commonStyles.primaryButton,
-            }}
-            onPress={() => {
-              setStatus('secure_seed');
-            }}>
-            <Text
-              style={{
-                ...fonts.btn_large_normal,
-                color: 'black',
-              }}>
-              Start
-            </Text>
-          </TouchableOpacity>
+          <View>
+            <TextButton
+              onPress={() => {
+                refRBSkipSecuritySheet.current.open();
+              }}
+              text="Remind Me Later"
+            />
+          </View>
+          <View style={{marginTop: 24}}>
+            <PrimaryButton
+              onPress={() => {
+                setStatus('secure_seed');
+              }}
+              text="Start"
+            />
+          </View>
         </View>
       </View>
     );
@@ -663,25 +612,13 @@ const CreateWalletScreen = ({navigation}) => {
                 new device.
               </Text>
             </View>
-            <View style={{paddingTop: 40}}>
-              <TouchableOpacity
-                style={{
-                  ...commonStyles.primaryButton,
-                  width: '90%',
-                  left: '5%',
-                }}
+            <View style={{paddingTop: 40, paddingHorizontal: 24}}>
+              <PrimaryButton
                 onPress={() => {
                   refRBProtectWalletSheet.current.close();
-                }}>
-                <Text
-                  style={{
-                    ...fonts.btn_large_normal,
-                    color: 'black',
-                    textAlign: 'center',
-                  }}>
-                  I Got It.
-                </Text>
-              </TouchableOpacity>
+                }}
+                text="I Got It."
+              />
             </View>
           </View>
         </RBSheet>
@@ -794,22 +731,13 @@ const CreateWalletScreen = ({navigation}) => {
             width: '90%',
             left: '5%',
           }}>
-          <TouchableOpacity
-            style={
-              canPass ? commonStyles.primaryButton : commonStyles.disabledButton
-            }
+          <PrimaryButton
             onPress={() => {
               setStatus('write_seed');
             }}
-            disabled={!canPass}>
-            <Text
-              style={{
-                ...fonts.btn_large_normal,
-                color: canPass ? 'black' : colors.grey18,
-              }}>
-              Start
-            </Text>
-          </TouchableOpacity>
+            text="Start"
+            enableFlag={canPass}
+          />
         </View>
       </View>
     );
@@ -936,32 +864,22 @@ const CreateWalletScreen = ({navigation}) => {
                   </View>
                 </View>
                 <View style={{marginTop: 40}}>
-                  <TouchableOpacity
-                    style={{
-                      ...commonStyles.secondaryButton,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
+                  <SecondaryButton
                     onPress={() => {
                       setShowSeed(true);
-                    }}>
-                    <FontAwesome
-                      style={{
-                        fontSize: 16,
-                        color: colors.green5,
-                        marginRight: 12,
-                      }}
-                      icon={RegularIcons.eye}
-                    />
-                    <Text
-                      style={{
-                        ...fonts.btn_large_normal,
-                        color: colors.green5,
-                      }}>
-                      View
-                    </Text>
-                  </TouchableOpacity>
+                    }}
+                    text="View"
+                    icon={
+                      <FontAwesome
+                        style={{
+                          fontSize: 16,
+                          color: colors.green5,
+                          marginRight: 12,
+                        }}
+                        icon={RegularIcons.eye}
+                      />
+                    }
+                  />
                 </View>
               </View>
             </>
@@ -974,25 +892,14 @@ const CreateWalletScreen = ({navigation}) => {
             width: '90%',
             left: '5%',
           }}>
-          <TouchableOpacity
-            style={
-              showSeed
-                ? commonStyles.primaryButton
-                : commonStyles.disabledButton
-            }
+          <PrimaryButton
             onPress={() => {
               setStatus('confirm_seed');
               setShowSeed(false);
             }}
-            disabled={!showSeed}>
-            <Text
-              style={{
-                ...fonts.btn_large_normal,
-                color: showSeed ? 'black' : colors.grey18,
-              }}>
-              Next
-            </Text>
-          </TouchableOpacity>
+            text="Next"
+            enableFlag={showSeed}
+          />
         </View>
       </View>
     );
@@ -1039,19 +946,12 @@ const CreateWalletScreen = ({navigation}) => {
             bottom: 120,
             width: '100%',
           }}>
-          <TouchableOpacity
-            style={commonStyles.primaryButton}
+          <PrimaryButton
             onPress={() => {
               navigation.navigate('mainscreen');
-            }}>
-            <Text
-              style={{
-                ...fonts.btn_large_normal,
-                color: 'black',
-              }}>
-              Success
-            </Text>
-          </TouchableOpacity>
+            }}
+            text="Success"
+          />
         </View>
       </View>
     );

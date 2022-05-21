@@ -14,6 +14,7 @@ import {Input, Block} from 'galio-framework';
 import {FloatingLabelInput} from 'react-native-floating-label-input';
 import ToggleSwitch from 'toggle-switch-react-native';
 import {SvgXml} from 'react-native-svg';
+import {SecondaryButton} from '../../components/Buttons';
 
 const qrScanSvgXml = `<svg
 width="24"
@@ -249,20 +250,13 @@ const ImportWalletScreen = ({navigation}) => {
             width: '90%',
             left: '5%',
           }}>
-          <TouchableOpacity
-            style={commonStyles.secondaryButton}
+          <SecondaryButton
+            enableFlag={canPass}
             onPress={() => {
               onImportWallet();
             }}
-            disabled={!canPass}>
-            <Text
-              style={{
-                ...fonts.btn_large_normal,
-                color: canPass ? colors.green5 : colors.grey18,
-              }}>
-              Import
-            </Text>
-          </TouchableOpacity>
+            text="Import"
+          />
         </View>
       </SafeAreaView>
     </KeyboardAvoidingView>

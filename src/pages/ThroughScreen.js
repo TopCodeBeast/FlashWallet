@@ -6,11 +6,11 @@ import {
   SafeAreaView,
   Text,
   View,
-  TouchableOpacity,
 } from 'react-native';
 import Dots from 'react-native-dots-pagination';
 
 import {colors, commonStyles} from '../styles';
+import {PrimaryButton, SecondaryButton} from '../components/Buttons';
 
 //import images
 
@@ -73,15 +73,12 @@ const ThroughScreen = ({navigation}) => {
                 position: 'absolute',
                 left: '5%',
               }}>
-              <TouchableOpacity
-                style={commonStyles.secondaryButton}
+              <SecondaryButton
                 onPress={() => {
                   setCurrent((current + 1) % 4);
-                }}>
-                <Text style={commonStyles.secondaryButtonText}>
-                  {current < 2 ? 'Next' : 'Get Start'}
-                </Text>
-              </TouchableOpacity>
+                }}
+                text={current < 2 ? 'Next' : 'Get Start'}
+              />
             </View>
           </>
         )}
@@ -94,25 +91,19 @@ const ThroughScreen = ({navigation}) => {
                 position: 'absolute',
                 left: '5%',
               }}>
-              <TouchableOpacity
-                style={commonStyles.secondaryButton}
+              <SecondaryButton
                 onPress={() => {
                   navigation.navigate('importwallet');
-                }}>
-                <Text style={commonStyles.secondaryButtonText}>
-                  Import Using Seed Phrase
-                </Text>
-              </TouchableOpacity>
+                }}
+                text="Import Using Seed Phrase"
+              />
               <View style={{height: 15}}></View>
-              <TouchableOpacity
-                style={commonStyles.primaryButton}
+              <PrimaryButton
                 onPress={() => {
                   navigation.navigate('createwallet');
-                }}>
-                <Text style={commonStyles.primaryButtonText}>
-                  Create a New Wallet
-                </Text>
-              </TouchableOpacity>
+                }}
+                text="Create a New Wallet"
+              />
             </View>
           </>
         )}

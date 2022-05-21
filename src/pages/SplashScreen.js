@@ -17,7 +17,7 @@ const SplashScreen = ({navigation}) => {
     <KeyboardAvoidingView>
       <SafeAreaView
         onTouchEnd={() => {
-          navigation.navigate('through');
+          navigation.replace('through');
         }}
         style={{
           backgroundColor: colors.grey24,
