@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
-import {View, StyleSheet, Pressable} from 'react-native';
+import {View, StyleSheet, Pressable, TouchableOpacity} from 'react-native';
 import {
   createDrawerNavigator,
   DrawerItem,
@@ -196,20 +196,18 @@ const ImportWalletHeader = ({navigation}) => {
         flexDirection: 'row',
         alignItems: 'center',
       }}>
-      <View style={{flex: 1}}>
-        <Pressable
+      <View>
+        <TouchableOpacity
           onPress={() => {
             navigation.goBack();
-          }}
-          style={{width: 20}}>
+          }}>
           <FontAwesome
             style={{fontSize: 16, color: 'white'}}
             icon={SolidIcons.chevronLeft}
           />
-        </Pressable>
+        </TouchableOpacity>
       </View>
-      <View
-        style={{justifyContent: 'center', width: '100%', alignItems: 'center'}}>
+      <View style={{justifyContent: 'center', flex: 1, alignItems: 'center'}}>
         <Text style={commonStyles.headerText}>Import from Seed</Text>
       </View>
     </View>

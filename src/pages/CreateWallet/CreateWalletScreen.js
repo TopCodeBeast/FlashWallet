@@ -37,6 +37,7 @@ import successTitleSvgXml from './successTitleSVG';
 import TextButton from '../../components/Buttons/TextButton';
 import SecondaryButton from '../../components/Buttons/SecondaryButton';
 import FloatLabelInput from '../../components/FloatLabelInput';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const image = require('../../assets/images/createwallet2/image.png');
 
@@ -103,8 +104,8 @@ const CreateWalletScreen = ({navigation}) => {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <View style={{flex: 1}}>
-          <Pressable
+        <View>
+          <TouchableOpacity
             onPress={() => {
               if (status === 'success') {
                 setStatus('secure_wallet');
@@ -126,13 +127,13 @@ const CreateWalletScreen = ({navigation}) => {
               style={{fontSize: 16, color: 'white'}}
               icon={SolidIcons.chevronLeft}
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
         <View
           style={{
             justifyContent: 'space-around',
             flexDirection: 'row',
-            width: '90%',
+            flex: 1,
             height: 8,
           }}>
           <View
@@ -269,7 +270,7 @@ const CreateWalletScreen = ({navigation}) => {
             <ToggleSwitch
               isOn={signInWithFaceId}
               onColor={colors.green5}
-              offColor="grey"
+              offColor={colors.grey23}
               size="large"
               onToggle={isOn => setSignInWithFaceId(isOn)}
               animationSpeed={100}

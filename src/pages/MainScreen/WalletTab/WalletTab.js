@@ -73,8 +73,9 @@ const WalletTab = ({navigation}) => {
         style={{
           marginHorizontal: 24,
           flexDirection: 'row',
-          justifyContent: 'space-around',
           marginTop: 40,
+          alignItems: 'center',
+          justifyContent: 'space-around',
         }}>
         <View style={{marginRight: 16}}>
           <SecondaryButton

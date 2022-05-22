@@ -318,8 +318,7 @@ const HistoryRow = ({
                   borderBottomLeftRadius: 8,
                   borderBottomRightRadius: 8,
                   borderColor: colors.grey9,
-                  borderTopWidth: 0,
-                  borderBottomWidth: 1,
+                  borderTopColor: 'transparent',
                   flexDirection: 'row',
                 }}>
                 <View>
