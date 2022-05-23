@@ -10,6 +10,9 @@ const logoImage = require('../assets/images/splash/logo.png');
 
 const SplashScreen = ({navigation}) => {
   useEffect(() => {
+    // setTimeout(() => {
+    //   navigation.replace('through');
+    // }, 3000);
     return () => {};
   });
 

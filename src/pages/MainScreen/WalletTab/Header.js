@@ -36,119 +36,119 @@ const avatar2Image = require('../../../assets/avatars/avatar2.png');
 const avatar3Image = require('../../../assets/avatars/avatar3.png');
 const avatarBadgeSvgXml = require('../SVGData').avatarBadge;
 
-const renderNetworkRow = (networkName, networkColor, isSelected) => {
-  return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        refRBNetworkSelectSheet.current.close();
-      }}>
-      <View
-        style={{
-          paddingVertical: 12,
-          paddingHorizontal: 8,
-          flexDirection: 'row',
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          <View
-            style={{
-              width: 12,
-              height: 12,
-              borderRadius: 6,
-              backgroundColor: networkColor,
-              marginRight: 16,
-            }}></View>
-          <Text style={{...fonts.para_regular, color: 'white'}}>
-            {networkName}
-          </Text>
-        </View>
-        {isSelected && (
-          <View style={{flexDirection: 'row-reverse', flex: 1}}>
-            <FontAwesome
-              style={{fontSize: 24, color: colors.green5}}
-              icon={RegularIcons.checkCircle}
-            />
-          </View>
-        )}
-      </View>
-    </TouchableWithoutFeedback>
-  );
-};
-
-const renderAccountRow = (
-  accountName,
-  accountBalance,
-  accountIcon,
-  isSelected,
-) => {
-  return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        refRBAccountSelectSheet.current.close();
-      }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: 16,
-          marginHorizontal: 16,
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: colors.grey23,
-              marginRight: 16,
-            }}>
-            <View style={{position: 'absolute', left: 0, top: 0}}>
-              {accountIcon}
-            </View>
-          </View>
-          <View>
-            <View>
-              <Text style={{...fonts.title2, color: 'white'}}>
-                {accountName}
-              </Text>
-            </View>
-            <View>
-              <Text
-                style={{
-                  ...fonts.caption_small12_18_regular,
-                  color: colors.grey9,
-                }}>
-                {accountBalance + ' ETH'}
-              </Text>
-            </View>
-          </View>
-        </View>
-        {isSelected && (
-          <View style={{flexDirection: 'row-reverse', flex: 1}}>
-            <FontAwesome
-              style={{fontSize: 24, color: colors.green5}}
-              icon={RegularIcons.checkCircle}
-            />
-          </View>
-        )}
-      </View>
-    </TouchableWithoutFeedback>
-  );
-};
-
 const Header = () => {
   const refRBNetworkSelectSheet = useRef(null);
   const refRBAccountSelectSheet = useRef(null);
   const [accountStatus, setAccountStatus] = useState('default');
   const [accountName, setAccountName] = useState('');
   const [importedPrivateKey, setImportedPrivateKey] = useState('');
+
+  const renderNetworkRow = (networkName, networkColor, isSelected) => {
+    return (
+      <TouchableWithoutFeedback
+        onPress={() => {
+          refRBNetworkSelectSheet.current.close();
+        }}>
+        <View
+          style={{
+            paddingVertical: 12,
+            paddingHorizontal: 8,
+            flexDirection: 'row',
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <View
+              style={{
+                width: 12,
+                height: 12,
+                borderRadius: 6,
+                backgroundColor: networkColor,
+                marginRight: 16,
+              }}></View>
+            <Text style={{...fonts.para_regular, color: 'white'}}>
+              {networkName}
+            </Text>
+          </View>
+          {isSelected && (
+            <View style={{flexDirection: 'row-reverse', flex: 1}}>
+              <FontAwesome
+                style={{fontSize: 24, color: colors.green5}}
+                icon={RegularIcons.checkCircle}
+              />
+            </View>
+          )}
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  };
+
+  const renderAccountRow = (
+    accountName,
+    accountBalance,
+    accountIcon,
+    isSelected,
+  ) => {
+    return (
+      <TouchableWithoutFeedback
+        onPress={() => {
+          refRBAccountSelectSheet.current.close();
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 16,
+            marginHorizontal: 16,
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: colors.grey23,
+                marginRight: 16,
+              }}>
+              <View style={{position: 'absolute', left: 0, top: 0}}>
+                {accountIcon}
+              </View>
+            </View>
+            <View>
+              <View>
+                <Text style={{...fonts.title2, color: 'white'}}>
+                  {accountName}
+                </Text>
+              </View>
+              <View>
+                <Text
+                  style={{
+                    ...fonts.caption_small12_18_regular,
+                    color: colors.grey9,
+                  }}>
+                  {accountBalance + ' ETH'}
+                </Text>
+              </View>
+            </View>
+          </View>
+          {isSelected && (
+            <View style={{flexDirection: 'row-reverse', flex: 1}}>
+              <FontAwesome
+                style={{fontSize: 24, color: colors.green5}}
+                icon={RegularIcons.checkCircle}
+              />
+            </View>
+          )}
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  };
 
   const renderNetworkRBSheet = () => {
     return (

@@ -18,6 +18,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 const Tab = createBottomTabNavigator();
 
 import WalletTab from './WalletTab/WalletTab';
+import SettingsTab from './SettingsTab/SettingsTab';
 
 const MainScreen = ({navigation}) => {
   const tabBar = ({state, descriptors, navigation}) => {
@@ -128,7 +129,7 @@ const MainScreen = ({navigation}) => {
             }}
           />
           <Tab.Screen name="Swap" component={WalletTab} />
-          <Tab.Screen name="Settings" component={WalletTab} />
+          <Tab.Screen name="Settings" component={SettingsTab} />
         </Tab.Navigator>
       </SafeAreaView>
     </KeyboardAvoidingView>
