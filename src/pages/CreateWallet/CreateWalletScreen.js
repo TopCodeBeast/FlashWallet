@@ -1,4 +1,6 @@
 import React, {useState, useEffect, createRef, useRef} from 'react';
+
+import Engine from '../../engine';
 import {connect} from 'react-redux';
 import {
   Image,
@@ -6,18 +8,18 @@ import {
   SafeAreaView,
   Text,
   View,
-  Pressable,
   Linking,
   Dimensions,
 } from 'react-native';
 
-import PrimaryButton from '../../components/Buttons/PrimaryButton';
+import {
+  PrimaryButton,
+  TextButton,
+  SecondaryButton,
+} from '../../components/Buttons';
+import Modal from 'react-native-modal';
 
-import FontAwesome, {
-  SolidIcons,
-  RegularIcons,
-  BrandIcons,
-} from 'react-native-fontawesome';
+import FontAwesome, {SolidIcons, RegularIcons} from 'react-native-fontawesome';
 
 import {colors, fonts} from '../../styles';
 import ToggleSwitch from 'toggle-switch-react-native';
@@ -34,10 +36,14 @@ import secureWalletTitleSvgXml from './secureWalletTitleSVG';
 import infoCircleIconSvgXml from './infoCircleIconSVG';
 import writeSeedTitleSvgXml from './writeSeedTitleSVG';
 import successTitleSvgXml from './successTitleSVG';
-import TextButton from '../../components/Buttons/TextButton';
-import SecondaryButton from '../../components/Buttons/SecondaryButton';
 import FloatLabelInput from '../../components/FloatLabelInput';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+
+import {passwordStrength} from 'check-password-strength';
+
+import Constants from '../../constants';
+const passwordStrengthCheckOption = Constants.passwordStrengthCheckOption;
+const passwordLevelColor = Constants.passwordLevelColor;
 
 const image = require('../../assets/images/createwallet2/image.png');
 
@@ -61,6 +67,10 @@ const mnemonic = [
 const CreateWalletScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [passwordStrengthLabel, setPasswordStrengthLabel] =
+    useState('No Password');
+  const [createPasswordModalVisible, setCreatePasswordModalVisible] =
+    useState(false);
   const [signInWithFaceId, setSignInWithFaceId] = useState(true);
   const [isAgreeChecked, setIsAgreeChecked] = useState(true);
   const [canPass, setCanPass] = useState(false);
@@ -75,6 +85,11 @@ const CreateWalletScreen = ({navigation}) => {
 
   const [status, setStatus] = useState('create_password');
 
+  const onPressCreatePassword = async () => {
+    Engine.Password.savePasswordToStorage(password);
+    setStatus('secure_wallet');
+  };
+
   const checkCanPass = data => {
     if (!data.password) {
       setCanPass(false);
@@ -85,6 +100,14 @@ const CreateWalletScreen = ({navigation}) => {
       return;
     }
     if (!data.isAgreeChecked) {
+      setCanPass(false);
+      return;
+    }
+    if (data.password.length < 8) {
+      setCanPass(false);
+      return;
+    }
+    if (data.password !== data.passwordConfirm) {
       setCanPass(false);
       return;
     }
@@ -187,6 +210,46 @@ const CreateWalletScreen = ({navigation}) => {
   const createPasswordRender = () => {
     return (
       <View style={{height: '100%'}}>
+        <Modal
+          isVisible={createPasswordModalVisible}
+          style={{
+            justifyContent: 'center',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: 'white',
+              padding: 24,
+              borderRadius: 12,
+            }}>
+            <Text style={{color: 'black', textAlign: 'center'}}>
+              <Text style={{...fonts.title2}}>Password is not strong.</Text>
+              {'\n'}Are you sure you want to use this passord?
+            </Text>
+            <View
+              style={{
+                marginTop: 24,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+              <PrimaryButton
+                onPress={() => {
+                  setCreatePasswordModalVisible(false);
+                }}
+                text={'No, try again.'}
+              />
+              <SecondaryButton
+                onPress={() => {
+                  setCreatePasswordModalVisible(false);
+                  onPressCreatePassword();
+                }}
+                text="Yes, I am sure."
+              />
+            </View>
+          </View>
+        </Modal>
         <View style={{width: '100%', alignItems: 'center', paddingTop: 40}}>
           <View>
             <SvgXml xml={createPasswordTitleSvgXml} />
@@ -217,18 +280,38 @@ const CreateWalletScreen = ({navigation}) => {
                   passwordConfirm,
                   isAgreeChecked,
                 });
+                setPasswordStrengthLabel(
+                  passwordStrength(value, passwordStrengthCheckOption).value,
+                );
               }}
             />
-
-            <Text
-              style={{
-                paddingLeft: 16,
-                ...fonts.caption_small12_16_regular,
-                color: 'grey',
-              }}>
-              Password strength:{' '}
-              <Text style={{color: colors.green5}}>Good</Text>
-            </Text>
+            {password.length > 0 && (
+              <>
+                <Text
+                  style={{
+                    paddingLeft: 16,
+                    ...fonts.caption_small12_16_regular,
+                    color: colors.grey12,
+                  }}>
+                  Password strength:{' '}
+                  <Text
+                    style={{color: passwordLevelColor[passwordStrengthLabel]}}>
+                    {passwordStrengthLabel}
+                  </Text>
+                </Text>
+                {password.length < 8 && (
+                  <Text
+                    style={{
+                      paddingLeft: 16,
+                      paddingTop: 4,
+                      ...fonts.caption_small12_16_regular,
+                      color: colors.grey12,
+                    }}>
+                    Must be at least 8 characters.
+                  </Text>
+                )}
+              </>
+            )}
           </View>
           <View>
             <FloatLabelInput
@@ -244,15 +327,31 @@ const CreateWalletScreen = ({navigation}) => {
                 });
               }}
             />
-
-            <Text
-              style={{
-                paddingLeft: 16,
-                ...fonts.caption_small12_16_regular,
-                color: 'grey',
-              }}>
-              Must be at least 8 characters.
-            </Text>
+            {passwordConfirm.length > 0 && (
+              <Text
+                style={{
+                  paddingLeft: 16,
+                  ...fonts.caption_small12_16_regular,
+                  color:
+                    password === passwordConfirm
+                      ? colors.green5
+                      : colors.grey12,
+                }}>
+                {password === passwordConfirm
+                  ? 'Password matched.'
+                  : 'Password must match.'}
+                {password === passwordConfirm && (
+                  <FontAwesome
+                    style={{
+                      fontSize: 12,
+                      color: colors.green5,
+                      marginLeft: 12,
+                    }}
+                    icon={SolidIcons.check}
+                  />
+                )}
+              </Text>
+            )}
           </View>
         </View>
         <View
@@ -332,7 +431,13 @@ const CreateWalletScreen = ({navigation}) => {
           <PrimaryButton
             enableFlag={canPass}
             onPress={() => {
-              setStatus('secure_wallet');
+              if (
+                passwordStrength(password, passwordStrengthCheckOption).id < 2
+              ) {
+                setCreatePasswordModalVisible(true);
+                return;
+              }
+              onPressCreatePassword();
             }}
             text="Create Password"
           />

@@ -28,6 +28,8 @@
     "accordion-collapse-react-native": "^1.0.1",
     "axios": "^0.21.1",
     "babel-plugin-macros": "^3.1.0",
+    "bcryptjs": "^2.4.3",
+    "check-password-strength": "^2.0.5",
     "galio-framework": "^0.8.0",
     "native-base": "^3.4.5",
     "path": "^0.12.7",
