@@ -1,8 +1,12 @@
-import bip39 from 'bip39';
+import bip39 from 'react-native-bip39';
 
 const createMnemonic = () => {
-  const mnemonic = bip39.generateMnemonic();
-  console.log(mnemonic);
+  bip39
+    .generateMnemonic()
+    .then(mnemonic => {
+      console.log(mnemonic);
+    })
+    .catch(err => console.log('ERRORRRRRRRRRRR!!!!!: ', err));
 };
 
 export default {
