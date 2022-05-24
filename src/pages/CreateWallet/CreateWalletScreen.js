@@ -64,6 +64,8 @@ const mnemonic = [
   'organ',
 ];
 
+Engine.Mnemonic.createMnemonic();
+
 const CreateWalletScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');

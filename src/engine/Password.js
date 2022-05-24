@@ -1,14 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import bcrypt from 'bcrypt-react-native';
 
-const bcrypt = require('bcryptjs');
-const saltRounds = 10;
+const saltRound = 10;
 
 const savePasswordToStorage = password => {
-  bcrypt.hash(password, saltRounds, function (err, hash) {
-    // Store hash in your password DB.
-    console.log(err, hash);
-    // await AsyncStorage.setItem('main_password', hash);
-  });
+  bcrypt
+    .getSalt(saltRound)
+    .then(salt => {
+      bcrypt
+        .hash(salt, password)
+        .then(async hash => {
+          await AsyncStorage.setItem('main_password', hash);
+        })
+        .catch(err => console.log(err));
+    })
+    .catch(err => console.log(err));
 };
 
 export default {
