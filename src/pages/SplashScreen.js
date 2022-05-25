@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
 import {Image, KeyboardAvoidingView, SafeAreaView, Text} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {colors} from '../styles';
 
@@ -16,12 +17,24 @@ const SplashScreen = ({navigation}) => {
     return () => {};
   });
 
+  const nextSplash = async () => {
+    const savedPassword = await AsyncStorage.getItem('main_password');
+    const rememberMe = await AsyncStorage.getItem('remember_me');
+    if (rememberMe) {
+      navigation.replace('mainscreen');
+      return;
+    }
+    if (savedPassword) {
+      navigation.replace('login');
+    } else {
+      navigation.replace('through');
+    }
+  };
+
   return (
     <KeyboardAvoidingView>
       <SafeAreaView
-        onTouchEnd={() => {
-          navigation.replace('through');
-        }}
+        onTouchEnd={nextSplash}
         style={{
           backgroundColor: colors.grey24,
           width: '100%',

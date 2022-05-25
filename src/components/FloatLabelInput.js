@@ -34,7 +34,11 @@ const FloatLabelInput = ({label, isPassword, value, onChangeText, ...rest}) => {
       isPassword={isPassword}
       value={value}
       onChangeText={onChangeText}
-      containerStyles={commonInputContainerStyles}
+      containerStyles={Object.assign(
+        {},
+        commonInputContainerStyles,
+        rest.style,
+      )}
       customLabelStyles={commonInputCustomLabelStyles}
       inputStyles={rest.inputStyles ? rest.inputStyles : commonInputInputStyles}
       {...rest}

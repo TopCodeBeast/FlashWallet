@@ -30,6 +30,7 @@ import FontAwesome, {
   BrandIcons,
   parseIconFromClassName,
 } from 'react-native-fontawesome';
+import LogIn from '../pages/LogIn';
 
 const drawerData = [
   {
@@ -224,6 +225,11 @@ class App extends React.Component {
         <Stack.Screen
           name="splash"
           component={SplashScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="login"
+          component={LogIn}
           options={{headerShown: false}}
         />
         <Stack.Screen

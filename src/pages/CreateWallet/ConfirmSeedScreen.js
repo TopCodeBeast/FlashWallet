@@ -5,21 +5,6 @@ import {Text, View, TouchableOpacity} from 'react-native';
 import MaskedView from '@react-native-community/masked-view';
 import {colors, fonts} from '../../styles';
 
-const mnemonic = [
-  'future',
-  'use',
-  'abuse',
-  'bubble',
-  'disagree',
-  'yard',
-  'exit',
-  'engage',
-  'drum',
-  'frequent',
-  'target',
-  'organ',
-];
-
 import {SvgXml} from 'react-native-svg';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -77,7 +62,7 @@ const testNumbersCandidates = [
   getNearNumbers(testNumbers[2]),
 ];
 
-const ConfirmSeedScreen = ({navigation, successCallback}) => {
+const ConfirmSeedScreen = ({navigation, successCallback, mnemonic}) => {
   const [step, setStep] = useState(0);
   const [isCorrect, setIsCorrect] = useState(false);
   const [curAns, setCurAns] = useState('');

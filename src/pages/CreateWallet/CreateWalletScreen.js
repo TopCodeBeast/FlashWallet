@@ -49,23 +49,6 @@ const image = require('../../assets/images/createwallet2/image.png');
 
 const screenWidth = Dimensions.get('screen').width;
 
-const mnemonic = [
-  'future',
-  'use',
-  'abuse',
-  'bubble',
-  'disagree',
-  'yard',
-  'exit',
-  'engage',
-  'drum',
-  'frequent',
-  'target',
-  'organ',
-];
-
-Engine.Mnemonic.createMnemonic();
-
 const CreateWalletScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -86,10 +69,28 @@ const CreateWalletScreen = ({navigation}) => {
   const refRBProtectWalletSheet = useRef(null);
 
   const [status, setStatus] = useState('create_password');
+  const [mnemonic, setMnemonic] = useState([]);
+
+  useEffect(async () => {
+    let phrase = await Engine.Mnemonic.createMnemonic();
+    phrase = phrase.split(' ');
+    setMnemonic(phrase);
+    return () => {};
+  }, []);
 
   const onPressCreatePassword = async () => {
     Engine.Password.savePasswordToStorage(password);
     setStatus('secure_wallet');
+  };
+
+  const onPressSuccess = () => {
+    Engine.Mnemonic.saveMnemonic(mnemonic)
+      .then(res => {
+        navigation.navigate('mainscreen');
+      })
+      .catch(err => {
+        console.log(err);
+      });
   };
 
   const checkCanPass = data => {
@@ -1024,12 +1025,7 @@ const CreateWalletScreen = ({navigation}) => {
             bottom: 120,
             width: '100%',
           }}>
-          <PrimaryButton
-            onPress={() => {
-              navigation.navigate('mainscreen');
-            }}
-            text="Success"
-          />
+          <PrimaryButton onPress={onPressSuccess} text="Success" />
         </View>
       </View>
     );
@@ -1053,6 +1049,7 @@ const CreateWalletScreen = ({navigation}) => {
             successCallback={() => {
               setStatus('success');
             }}
+            mnemonic={mnemonic}
           />
         )}
         {status === 'success' && successRender()}
