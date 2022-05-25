@@ -42,6 +42,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {passwordStrength} from 'check-password-strength';
 
 import Constants from '../../constants';
+
 const passwordStrengthCheckOption = Constants.passwordStrengthCheckOption;
 const passwordLevelColor = Constants.passwordLevelColor;
 
@@ -62,6 +63,8 @@ const CreateWalletScreen = ({navigation}) => {
   const [showSeed, setShowSeed] = useState(false);
   const [viewRef, setViewRef] = useState(null);
   const [understandNotSecurity, setUnderstandNotSecurity] = useState(false);
+  const [successLoading, setSuccessLoading] = useState(false);
+  const [createPasswordLoading, setCreatePasswordLoading] = useState(false);
 
   const backgroundImageRef = createRef();
   const refRBSkipSecuritySheet = useRef(null);
@@ -79,18 +82,23 @@ const CreateWalletScreen = ({navigation}) => {
   }, []);
 
   const onPressCreatePassword = async () => {
-    Engine.Password.savePasswordToStorage(password);
+    setCreatePasswordLoading(true);
+    await Engine.Password.savePasswordToStorage(password);
     setStatus('secure_wallet');
   };
 
   const onPressSuccess = () => {
-    Engine.Mnemonic.saveMnemonic(mnemonic)
-      .then(res => {
+    setSuccessLoading(true);
+    Engine.Mnemonic.saveMnemonic(
+      mnemonic,
+      () => {
+        setSuccessLoading(false);
         navigation.navigate('mainscreen');
-      })
-      .catch(err => {
-        console.log(err);
-      });
+      },
+      () => {
+        setSuccessLoading(false);
+      },
+    );
   };
 
   const checkCanPass = data => {
@@ -144,6 +152,8 @@ const CreateWalletScreen = ({navigation}) => {
                 setStatus('secure_wallet');
               } else if (status === 'secure_wallet') {
                 setStatus('create_password');
+                setCreatePasswordModalVisible(false);
+                setCreatePasswordLoading(false);
               } else if (status === 'create_password') {
                 navigation.goBack();
               }
@@ -245,10 +255,11 @@ const CreateWalletScreen = ({navigation}) => {
               />
               <SecondaryButton
                 onPress={() => {
-                  setCreatePasswordModalVisible(false);
                   onPressCreatePassword();
                 }}
+                style={{width: 200}}
                 text="Yes, I am sure."
+                loading={createPasswordLoading}
               />
             </View>
           </View>
@@ -443,6 +454,7 @@ const CreateWalletScreen = ({navigation}) => {
               onPressCreatePassword();
             }}
             text="Create Password"
+            loading={createPasswordLoading}
           />
         </View>
       </View>
@@ -1025,7 +1037,11 @@ const CreateWalletScreen = ({navigation}) => {
             bottom: 120,
             width: '100%',
           }}>
-          <PrimaryButton onPress={onPressSuccess} text="Success" />
+          <PrimaryButton
+            onPress={onPressSuccess}
+            loading={false}
+            text="Success"
+          />
         </View>
       </View>
     );

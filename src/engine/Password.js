@@ -3,18 +3,14 @@ import bcrypt from 'bcrypt-react-native';
 
 const saltRound = 10;
 
-const savePasswordToStorage = password => {
-  bcrypt
-    .getSalt(saltRound)
-    .then(salt => {
-      bcrypt
-        .hash(salt, password)
-        .then(async hash => {
-          await AsyncStorage.setItem('main_password', hash);
-        })
-        .catch(err => console.log(err));
-    })
-    .catch(err => console.log(err));
+const savePasswordToStorage = async password => {
+  try {
+    const salt = await bcrypt.getSalt(saltRound);
+    const hash = await bcrypt.hash(salt, password);
+    await AsyncStorage.setItem('main_password', hash);
+  } catch (error) {
+    console.log('ERROR!!!!!!: ', error);
+  }
 };
 
 export default {

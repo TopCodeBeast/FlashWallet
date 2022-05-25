@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
 import {
   KeyboardAvoidingView,
@@ -19,8 +19,15 @@ const Tab = createBottomTabNavigator();
 
 import WalletTab from './WalletTab/WalletTab';
 import SettingsTab from './SettingsTab/SettingsTab';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MainScreen = ({navigation}) => {
+  useEffect(async () => {
+    const info = await AsyncStorage.getItem('account_info');
+    let t = JSON.parse(info);
+    console.log(t);
+  }, []);
+
   const tabBar = ({state, descriptors, navigation}) => {
     return (
       <View style={{flexDirection: 'row', marginBottom: 40}}>

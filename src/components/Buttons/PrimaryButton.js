@@ -18,7 +18,8 @@ const PrimaryButton = ({onPress, enableFlag, text, icon, loading}) => {
       onPress={onPress}
       disabled={backgroundDisabled}>
       {icon ? icon : <></>}
-      {!loading && (
+      {((typeof loading === 'boolean' && !loading) ||
+        typeof loading !== 'boolean') && (
         <Text
           style={{
             ...fonts.btn_large_normal,
@@ -32,7 +33,9 @@ const PrimaryButton = ({onPress, enableFlag, text, icon, loading}) => {
           {text}
         </Text>
       )}
-      {loading && <ActivityIndicator size={'small'} color={colors.green5} />}
+      {typeof loading === 'boolean' && loading && (
+        <ActivityIndicator size={'small'} color={colors.green5} />
+      )}
     </TouchableOpacity>
   );
 };
