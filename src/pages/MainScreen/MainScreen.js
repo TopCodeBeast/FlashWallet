@@ -26,6 +26,8 @@ const MainScreen = ({navigation}) => {
     const info = await AsyncStorage.getItem('account_info');
     let t = JSON.parse(info);
     console.log(t);
+    t = await AsyncStorage.getItem('main_mnemonic');
+    console.log(t);
   }, []);
 
   const tabBar = ({state, descriptors, navigation}) => {

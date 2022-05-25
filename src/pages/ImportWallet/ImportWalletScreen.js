@@ -1,19 +1,14 @@
 import React, {useState, useEffect} from 'react';
 import {connect} from 'react-redux';
-import {
-  Image,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-
+import {KeyboardAvoidingView, SafeAreaView, Text, View} from 'react-native';
+import Modal from 'react-native-modal';
+import FontAwesome, {SolidIcons, RegularIcons} from 'react-native-fontawesome';
 import {colors, commonStyles, fonts} from '../../styles';
 import ToggleSwitch from 'toggle-switch-react-native';
 import {SvgXml} from 'react-native-svg';
-import {SecondaryButton} from '../../components/Buttons';
+import {PrimaryButton, SecondaryButton} from '../../components/Buttons';
 import FloatLabelInput from '../../components/FloatLabelInput';
+import bip39 from 'react-native-bip39';
 
 const qrScanSvgXml = `<svg
 width="24"
@@ -58,13 +53,25 @@ xmlns="http://www.w3.org/2000/svg">
 />
 </svg>`;
 
+import {passwordStrength} from 'check-password-strength';
+
+import Constants from '../../constants';
+import {importWallet} from '../../actions/Wallet';
+
+const passwordStrengthCheckOption = Constants.passwordStrengthCheckOption;
+const passwordLevelColor = Constants.passwordLevelColor;
+
 const ImportWalletScreen = ({navigation}) => {
   const [seedPhrase, setSeedPhrase] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [signInWithFaceId, setSignInWithFaceId] = useState(true);
   const [canPass, setCanPass] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [passwordStrengthLabel, setPasswordStrengthLabel] =
+    useState('No Password');
+  const [createPasswordModalVisible, setCreatePasswordModalVisible] =
+    useState(false);
+  const [loading, setLoading] = useState(false);
 
   const checkCanPass = data => {
     if (!data.seedPhrase) {
@@ -79,12 +86,25 @@ const ImportWalletScreen = ({navigation}) => {
       setCanPass(false);
       return;
     }
+    if (!bip39.validateMnemonic(data.seedPhrase)) {
+      setCanPass(false);
+      return;
+    }
     setCanPass(true);
   };
 
   const onImportWallet = () => {
-    if (password.length < 8) {
-    }
+    setLoading(true);
+    importWallet(
+      {mnemonic: seedPhrase, password},
+      () => {
+        setLoading(false);
+        navigation.replace('mainscreen');
+      },
+      () => {
+        setLoading(false);
+      },
+    );
   };
 
   return (
@@ -97,6 +117,47 @@ const ImportWalletScreen = ({navigation}) => {
           paddingTop: 40,
         }}>
         <View style={{paddingHorizontal: 24, marginTop: 40}}>
+          <Modal
+            isVisible={createPasswordModalVisible}
+            style={{
+              justifyContent: 'center',
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'white',
+                padding: 24,
+                borderRadius: 12,
+              }}>
+              <Text style={{color: 'black', textAlign: 'center'}}>
+                <Text style={{...fonts.title2}}>Password is not strong.</Text>
+                {'\n'}Are you sure you want to use this passord?
+              </Text>
+              <View
+                style={{
+                  marginTop: 24,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}>
+                <PrimaryButton
+                  onPress={() => {
+                    setCreatePasswordModalVisible(false);
+                  }}
+                  text={'No, try again.'}
+                />
+                <SecondaryButton
+                  onPress={() => {
+                    onImportWallet();
+                  }}
+                  style={{width: 200}}
+                  text="Yes, I am sure."
+                  loading={loading}
+                />
+              </View>
+            </View>
+          </Modal>
           <View
             style={{
               display: 'flex',
@@ -124,6 +185,29 @@ const ImportWalletScreen = ({navigation}) => {
                 }}
                 multiline
               />
+              {seedPhrase.length > 0 && (
+                <Text
+                  style={{
+                    paddingLeft: 16,
+                    ...fonts.caption_small12_16_regular,
+                    color: bip39.validateMnemonic(seedPhrase)
+                      ? colors.green5
+                      : colors.grey12,
+                  }}>
+                  {bip39.validateMnemonic(seedPhrase)
+                    ? 'Valid Seed Phrase '
+                    : 'Seed Phrase must be valid. '}
+                  {bip39.validateMnemonic(seedPhrase) && (
+                    <FontAwesome
+                      style={{
+                        fontSize: 12,
+                        color: colors.green5,
+                      }}
+                      icon={SolidIcons.check}
+                    />
+                  )}
+                </Text>
+              )}
             </View>
             <View
               style={{
@@ -142,17 +226,38 @@ const ImportWalletScreen = ({navigation}) => {
               onChangeText={value => {
                 setPassword(value);
                 checkCanPass({password: value, passwordConfirm, seedPhrase});
+                setPasswordStrengthLabel(
+                  passwordStrength(value, passwordStrengthCheckOption).value,
+                );
               }}
             />
-
-            <Text
-              style={{
-                paddingLeft: 16,
-                ...fonts.caption_small12_16_regular,
-                color: 'grey',
-              }}>
-              Must be at least 8 characters.
-            </Text>
+            {password.length > 0 && (
+              <>
+                <Text
+                  style={{
+                    paddingLeft: 16,
+                    ...fonts.caption_small12_16_regular,
+                    color: colors.grey12,
+                  }}>
+                  Password strength:{' '}
+                  <Text
+                    style={{color: passwordLevelColor[passwordStrengthLabel]}}>
+                    {passwordStrengthLabel}
+                  </Text>
+                </Text>
+                {password.length < 8 && (
+                  <Text
+                    style={{
+                      paddingLeft: 16,
+                      paddingTop: 4,
+                      ...fonts.caption_small12_16_regular,
+                      color: colors.grey12,
+                    }}>
+                    Must be at least 8 characters.
+                  </Text>
+                )}
+              </>
+            )}
           </View>
           <View style={{marginBottom: 24}}>
             <FloatLabelInput
@@ -164,6 +269,31 @@ const ImportWalletScreen = ({navigation}) => {
                 checkCanPass({password, passwordConfirm: value, seedPhrase});
               }}
             />
+            {passwordConfirm.length > 0 && (
+              <Text
+                style={{
+                  paddingLeft: 16,
+                  ...fonts.caption_small12_16_regular,
+                  color:
+                    password === passwordConfirm
+                      ? colors.green5
+                      : colors.grey12,
+                }}>
+                {password === passwordConfirm
+                  ? 'Password matched. '
+                  : 'Password must match. '}
+                {password === passwordConfirm && (
+                  <FontAwesome
+                    style={{
+                      fontSize: 12,
+                      color: colors.green5,
+                      marginLeft: 12,
+                    }}
+                    icon={SolidIcons.check}
+                  />
+                )}
+              </Text>
+            )}
           </View>
           <View
             style={{
@@ -219,9 +349,16 @@ const ImportWalletScreen = ({navigation}) => {
           <SecondaryButton
             enableFlag={canPass}
             onPress={() => {
+              if (
+                passwordStrength(password, passwordStrengthCheckOption).id < 2
+              ) {
+                setCreatePasswordModalVisible(true);
+                return;
+              }
               onImportWallet();
             }}
             text="Import"
+            loading={loading}
           />
         </View>
       </SafeAreaView>

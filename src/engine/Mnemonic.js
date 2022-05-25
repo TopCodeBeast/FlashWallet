@@ -20,12 +20,13 @@ const saveMnemonic = (mnemonic, successCallback, failCallback) => {
   let wallet = hdwallet.derivePath(path).getWallet();
 
   let address = '0x' + wallet.getAddress().toString('hex');
-  let privateKey = wallet.getPrivateKeyString();
+  let privateKey = wallet.getPrivateKey().toString('hex');
   let accountsInfo = {paths: [], accounts: []};
   accountsInfo.paths.push(path);
   accountsInfo.accounts.push({
     privateKey,
     address,
+    name: 'Account 1',
   });
   AsyncStorage.multiSet([
     ['main_mnemonic', mnemonicString],

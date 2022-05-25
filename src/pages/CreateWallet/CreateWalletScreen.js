@@ -352,7 +352,7 @@ const CreateWalletScreen = ({navigation}) => {
                       : colors.grey12,
                 }}>
                 {password === passwordConfirm
-                  ? 'Password matched.'
+                  ? 'Password matched. '
                   : 'Password must match.'}
                 {password === passwordConfirm && (
                   <FontAwesome
@@ -1039,7 +1039,7 @@ const CreateWalletScreen = ({navigation}) => {
           }}>
           <PrimaryButton
             onPress={onPressSuccess}
-            loading={false}
+            loading={successLoading}
             text="Success"
           />
         </View>
