@@ -12,7 +12,7 @@ import {colors, fonts} from '../styles';
 import FloatLabelInput from '../components/FloatLabelInput';
 import {PrimaryButton} from '../components/Buttons';
 import ToggleSwitch from 'toggle-switch-react-native';
-import {checkAuthentication, saveRememberOption} from '../actions/Auth';
+import {checkAuthentication, saveRememberOption} from '../utils/auth';
 
 //import images
 const logoImage = require('../assets/images/splash/logo.png');
@@ -23,18 +23,32 @@ const LogIn = ({navigation}) => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
 
-  const onPressLogIn = async () => {
+  const onPressLogIn = () => {
     setIsLoading(true);
-    const res = await checkAuthentication(password);
-    if (!res) {
-      setError('Password is wrong.');
-    } else {
-      const res = await saveRememberOption(rememberMe ? 'true' : 'false');
-      if (res) {
-        navigation.replace('mainscreen');
-      }
-    }
-    setIsLoading(false);
+    checkAuthentication(
+      password,
+      () => {
+        saveRememberOption(
+          rememberMe ? 'true' : 'false',
+          () => {
+            setIsLoading(false);
+            navigation.replace('mainscreen');
+          },
+          () => {
+            setIsLoading(false);
+            console.log('Something went wrong in login save rememberme');
+          },
+        );
+      },
+      () => {
+        setIsLoading(false);
+        setError('Password is wrong.');
+      },
+      () => {
+        setIsLoading(false);
+        console.log('Something went wrong in login');
+      },
+    );
   };
 
   useEffect(() => {

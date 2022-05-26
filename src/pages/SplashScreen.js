@@ -18,7 +18,7 @@ const SplashScreen = ({navigation}) => {
   });
 
   const nextSplash = async () => {
-    const savedPassword = await AsyncStorage.getItem('main_password');
+    const savedPassword = await AsyncStorage.getItem('password');
     const rememberMe = await AsyncStorage.getItem('remember_me');
     if (rememberMe === 'true') {
       navigation.replace('mainscreen');
