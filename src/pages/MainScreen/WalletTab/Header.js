@@ -36,7 +36,7 @@ const avatar2Image = require('../../../assets/avatars/avatar2.png');
 const avatar3Image = require('../../../assets/avatars/avatar3.png');
 const avatarBadgeSvgXml = require('../SVGData').avatarBadge;
 
-const Header = () => {
+const Header = ({accounts, currentAccountIndex}) => {
   const refRBNetworkSelectSheet = useRef(null);
   const refRBAccountSelectSheet = useRef(null);
   const [accountStatus, setAccountStatus] = useState('default');
@@ -85,14 +85,13 @@ const Header = () => {
     );
   };
 
-  const renderAccountRow = (
-    accountName,
-    accountBalance,
-    accountIcon,
-    isSelected,
-  ) => {
+  const renderAccountRow = (account, isSelected) => {
+    const accountName = account.name;
+    const accountIcon = <Avatar rounded source={avatar1Image} size={24} />;
+    const accountBalance = account.balance | 0;
     return (
       <TouchableWithoutFeedback
+        key={accountName}
         onPress={() => {
           refRBAccountSelectSheet.current.close();
         }}>
@@ -214,24 +213,9 @@ const Header = () => {
             </Text>
           </View>
           <View style={{marginTop: 24}}>
-            {renderAccountRow(
-              'Account1',
-              9.2362,
-              <Avatar rounded source={avatar1Image} size={24} />,
-              true,
-            )}
-            {renderAccountRow(
-              'Account2',
-              2.43,
-              <Avatar rounded source={avatar2Image} size={24} />,
-              false,
-            )}
-            {renderAccountRow(
-              'Account3',
-              1.27,
-              <Avatar rounded source={avatar3Image} size={24} />,
-              false,
-            )}
+            {accounts.map(account => {
+              return renderAccountRow(account, true);
+            })}
           </View>
           <View style={{marginTop: 24}}>
             <TextButton
@@ -522,4 +506,11 @@ const Header = () => {
   );
 };
 
-export default Header;
+const mapStateToProps = state => ({
+  accounts: state.accounts.accounts,
+  currentAccountIndex: state.accounts.currentAccountIndex,
+  currentNetwork: state.networks.currentNetwork,
+});
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

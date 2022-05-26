@@ -1,6 +1,5 @@
 import React, {useState, useEffect, createRef, useRef} from 'react';
 
-import Engine from '../../engine';
 import {connect} from 'react-redux';
 import {
   Image,
@@ -10,6 +9,7 @@ import {
   View,
   Linking,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
 
 import {
@@ -18,30 +18,28 @@ import {
   SecondaryButton,
 } from '../../components/Buttons';
 import Modal from 'react-native-modal';
-
 import FontAwesome, {SolidIcons, RegularIcons} from 'react-native-fontawesome';
-
 import {colors, fonts} from '../../styles';
 import ToggleSwitch from 'toggle-switch-react-native';
 import CheckBox from 'react-native-check-box';
-
 import ConfirmSeedScreen from './ConfirmSeedScreen';
-
 import {SvgXml} from 'react-native-svg';
 import {BlurView} from '@react-native-community/blur';
 import RBSheet from 'react-native-raw-bottom-sheet';
-
 import createPasswordTitleSvgXml from './createPasswordTitleSVG';
 import secureWalletTitleSvgXml from './secureWalletTitleSVG';
 import infoCircleIconSvgXml from './infoCircleIconSVG';
 import writeSeedTitleSvgXml from './writeSeedTitleSVG';
 import successTitleSvgXml from './successTitleSVG';
 import FloatLabelInput from '../../components/FloatLabelInput';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-
-import {passwordStrength} from 'check-password-strength';
 
 import Constants from '../../constants';
+//import actions
+import {createWallet} from '../../redux/actions/WalletActions';
+
+//import utils
+import {passwordStrength} from 'check-password-strength';
+import {createMnemonic} from '../../utils/mnemonic';
 
 const passwordStrengthCheckOption = Constants.passwordStrengthCheckOption;
 const passwordLevelColor = Constants.passwordLevelColor;
@@ -50,7 +48,7 @@ const image = require('../../assets/images/createwallet2/image.png');
 
 const screenWidth = Dimensions.get('screen').width;
 
-const CreateWalletScreen = ({navigation}) => {
+const CreateWalletScreen = ({navigation, createWallet}) => {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [passwordStrengthLabel, setPasswordStrengthLabel] =
@@ -64,7 +62,6 @@ const CreateWalletScreen = ({navigation}) => {
   const [viewRef, setViewRef] = useState(null);
   const [understandNotSecurity, setUnderstandNotSecurity] = useState(false);
   const [successLoading, setSuccessLoading] = useState(false);
-  const [createPasswordLoading, setCreatePasswordLoading] = useState(false);
 
   const backgroundImageRef = createRef();
   const refRBSkipSecuritySheet = useRef(null);
@@ -75,28 +72,33 @@ const CreateWalletScreen = ({navigation}) => {
   const [mnemonic, setMnemonic] = useState([]);
 
   useEffect(async () => {
-    let phrase = await Engine.Mnemonic.createMnemonic();
+    let phrase = await createMnemonic();
     phrase = phrase.split(' ');
     setMnemonic(phrase);
     return () => {};
   }, []);
 
   const onPressCreatePassword = async () => {
-    setCreatePasswordLoading(true);
-    await Engine.Password.savePasswordToStorage(password);
     setStatus('secure_wallet');
   };
-
   const onPressSuccess = () => {
-    setSuccessLoading(true);
-    Engine.Mnemonic.saveMnemonic(
-      mnemonic,
+    createWallet(
+      {
+        password,
+        mnemonic: mnemonic.join(' '),
+      },
       () => {
+        setSuccessLoading(true);
+      },
+      () => {
+        console.log('success on press success');
         setSuccessLoading(false);
         navigation.navigate('mainscreen');
       },
       () => {
+        console.log('fail on press success');
         setSuccessLoading(false);
+        console.log('ERROR!!!!: fail success press');
       },
     );
   };
@@ -153,7 +155,6 @@ const CreateWalletScreen = ({navigation}) => {
               } else if (status === 'secure_wallet') {
                 setStatus('create_password');
                 setCreatePasswordModalVisible(false);
-                setCreatePasswordLoading(false);
               } else if (status === 'create_password') {
                 navigation.goBack();
               }
@@ -259,7 +260,6 @@ const CreateWalletScreen = ({navigation}) => {
                 }}
                 style={{width: 200}}
                 text="Yes, I am sure."
-                loading={createPasswordLoading}
               />
             </View>
           </View>
@@ -454,7 +454,6 @@ const CreateWalletScreen = ({navigation}) => {
               onPressCreatePassword();
             }}
             text="Create Password"
-            loading={createPasswordLoading}
           />
         </View>
       </View>
@@ -1074,4 +1073,10 @@ const CreateWalletScreen = ({navigation}) => {
   );
 };
 
-export default CreateWalletScreen;
+const mapStateToProps = state => ({});
+const mapDispatchToProps = dispatch => ({
+  createWallet: (data, beforeWork, successCallback, failCallback) =>
+    createWallet(dispatch, data, beforeWork, successCallback, failCallback),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateWalletScreen);

@@ -8,27 +8,16 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {colors, fonts} from '../../styles';
-import FontAwesome, {
-  SolidIcons,
-  RegularIcons,
-  BrandIcons,
-} from 'react-native-fontawesome';
+import FontAwesome, {SolidIcons} from 'react-native-fontawesome';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 const Tab = createBottomTabNavigator();
 
 import WalletTab from './WalletTab/WalletTab';
 import SettingsTab from './SettingsTab/SettingsTab';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MainScreen = ({navigation}) => {
-  useEffect(async () => {
-    const info = await AsyncStorage.getItem('account_info');
-    let t = JSON.parse(info);
-    console.log(t);
-    t = await AsyncStorage.getItem('main_mnemonic');
-    console.log(t);
-  }, []);
+  useEffect(() => {}, []);
 
   const tabBar = ({state, descriptors, navigation}) => {
     return (
@@ -145,4 +134,12 @@ const MainScreen = ({navigation}) => {
   );
 };
 
-export default MainScreen;
+const mapStateToProps = state => ({
+  currentNetwork: state.networks.currentNetwork,
+  accounts: state.accounts.accounts,
+  currentAccountIndex: state.accounts.currentAccountIndex,
+  password: state.wallet.password,
+});
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(MainScreen);

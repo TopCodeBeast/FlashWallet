@@ -1,6 +1,6 @@
 import {StyleSheet} from 'react-native';
 import {theme} from 'galio-framework';
-import {colors} from '.';
+import colors from './colors';
 
 export default StyleSheet.create({
   shadow: {

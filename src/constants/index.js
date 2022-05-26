@@ -1,4 +1,3 @@
-import {color} from 'react-native-reanimated';
 import {colors} from '../styles';
 
 export default {
@@ -34,4 +33,5 @@ export default {
     Medium: colors.blue5,
     Strong: colors.green5,
   },
+  saltRound: 10,
 };

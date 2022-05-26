@@ -2,8 +2,8 @@ import React, {useState, useEffect} from 'react';
 import {connect} from 'react-redux';
 import {KeyboardAvoidingView, SafeAreaView, Text, View} from 'react-native';
 import Modal from 'react-native-modal';
-import FontAwesome, {SolidIcons, RegularIcons} from 'react-native-fontawesome';
-import {colors, commonStyles, fonts} from '../../styles';
+import FontAwesome, {SolidIcons} from 'react-native-fontawesome';
+import {colors, fonts} from '../../styles';
 import ToggleSwitch from 'toggle-switch-react-native';
 import {SvgXml} from 'react-native-svg';
 import {PrimaryButton, SecondaryButton} from '../../components/Buttons';
@@ -56,12 +56,12 @@ xmlns="http://www.w3.org/2000/svg">
 import {passwordStrength} from 'check-password-strength';
 
 import Constants from '../../constants';
-import {importWallet} from '../../actions/Wallet';
-
+import {createWallet} from '../../redux/actions/WalletActions';
 const passwordStrengthCheckOption = Constants.passwordStrengthCheckOption;
 const passwordLevelColor = Constants.passwordLevelColor;
 
-const ImportWalletScreen = ({navigation}) => {
+const ImportWalletScreen = ({navigation, createWallet}) => {
+  useEffect(() => {});
   const [seedPhrase, setSeedPhrase] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -94,15 +94,25 @@ const ImportWalletScreen = ({navigation}) => {
   };
 
   const onImportWallet = () => {
-    setLoading(true);
-    importWallet(
-      {mnemonic: seedPhrase, password},
+    createWallet(
+      {
+        password,
+        mnemonic: seedPhrase,
+      },
       () => {
+        setLoading(true);
+      },
+      () => {
+        console.log('success on press import');
         setLoading(false);
+        setCreatePasswordModalVisible(false);
         navigation.replace('mainscreen');
       },
       () => {
+        console.log('fail on press import');
         setLoading(false);
+        setCreatePasswordModalVisible(false);
+        console.log('ERROR!!!!: fail success import');
       },
     );
   };
@@ -142,6 +152,7 @@ const ImportWalletScreen = ({navigation}) => {
                   justifyContent: 'space-between',
                 }}>
                 <PrimaryButton
+                  enableFlag={!loading}
                   onPress={() => {
                     setCreatePasswordModalVisible(false);
                   }}
@@ -366,4 +377,10 @@ const ImportWalletScreen = ({navigation}) => {
   );
 };
 
-export default ImportWalletScreen;
+const mapStateToProps = state => ({});
+const mapDispatchToProps = dispatch => ({
+  createWallet: (data, beforeWork, successCallback, failCallback) =>
+    createWallet(dispatch, data, beforeWork, successCallback, failCallback),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ImportWalletScreen);
