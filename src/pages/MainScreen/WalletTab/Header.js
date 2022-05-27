@@ -7,15 +7,12 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import {Avatar, Badge} from 'react-native-elements';
 import {colors, fonts} from '../../../styles';
 import {SvgXml} from 'react-native-svg';
-import FontAwesome, {
-  SolidIcons,
-  RegularIcons,
-  BrandIcons,
-} from 'react-native-fontawesome';
+import FontAwesome, {SolidIcons, RegularIcons} from 'react-native-fontawesome';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -27,25 +24,33 @@ import {
   TextButton,
 } from '../../../components/Buttons';
 
-import {FloatingLabelInput} from 'react-native-floating-label-input';
 import FloatLabelInput from '../../../components/FloatLabelInput';
+import BalanceText from '../../../components/BalanceText';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 const avatar1Image = require('../../../assets/avatars/avatar1.png');
 const avatar2Image = require('../../../assets/avatars/avatar2.png');
 const avatar3Image = require('../../../assets/avatars/avatar3.png');
+const icons = [avatar1Image, avatar2Image, avatar3Image];
+
 const avatarBadgeSvgXml = require('../SVGData').avatarBadge;
 
-const Header = ({accounts, currentAccountIndex}) => {
+const Header = ({accounts, currentAccountIndex, currentNetwork, networks}) => {
   const refRBNetworkSelectSheet = useRef(null);
   const refRBAccountSelectSheet = useRef(null);
   const [accountStatus, setAccountStatus] = useState('default');
   const [accountName, setAccountName] = useState('');
   const [importedPrivateKey, setImportedPrivateKey] = useState('');
 
-  const renderNetworkRow = (networkName, networkColor, isSelected) => {
+  useEffect(() => {}, []);
+
+  const renderNetworkRow = (network, isSelected) => {
+    const networkName = network.name;
+    const networkColor = network.color;
+
     return (
       <TouchableWithoutFeedback
+        key={network.chainId || networkName}
         onPress={() => {
           refRBNetworkSelectSheet.current.close();
         }}>
@@ -87,11 +92,13 @@ const Header = ({accounts, currentAccountIndex}) => {
 
   const renderAccountRow = (account, isSelected) => {
     const accountName = account.name;
-    const accountIcon = <Avatar rounded source={avatar1Image} size={24} />;
-    const accountBalance = account.balance | 0;
+    const accountIcon = (
+      <Avatar rounded source={icons[account.icon % 3]} size={24} />
+    );
+
     return (
       <TouchableWithoutFeedback
-        key={accountName}
+        key={account.address}
         onPress={() => {
           refRBAccountSelectSheet.current.close();
         }}>
@@ -126,13 +133,13 @@ const Header = ({accounts, currentAccountIndex}) => {
                 </Text>
               </View>
               <View>
-                <Text
+                <BalanceText
                   style={{
                     ...fonts.caption_small12_18_regular,
                     color: colors.grey9,
-                  }}>
-                  {accountBalance + ' ETH'}
-                </Text>
+                  }}
+                  address={account.address}
+                />
               </View>
             </View>
           </View>
@@ -149,10 +156,12 @@ const Header = ({accounts, currentAccountIndex}) => {
     );
   };
 
+  const networksKeys = Object.keys(networks);
+
   const renderNetworkRBSheet = () => {
     return (
       <RBSheet
-        height={480}
+        height={450}
         ref={refRBNetworkSelectSheet}
         closeOnDragDown={true}
         closeOnPressBack={true}
@@ -168,7 +177,7 @@ const Header = ({accounts, currentAccountIndex}) => {
             backgroundColor: colors.grey24,
           },
         }}>
-        <View>
+        <ScrollView style={{marginBottom: 40}}>
           <View style={{paddingTop: 12}}>
             <Text
               style={{...fonts.title2, color: 'white', textAlign: 'center'}}>
@@ -176,7 +185,9 @@ const Header = ({accounts, currentAccountIndex}) => {
             </Text>
           </View>
           <View style={{paddingTop: 24, paddingHorizontal: 24}}>
-            {renderNetworkRow('Ethereum Main', colors.primary5, true)}
+            {networks &&
+              networks[currentNetwork] &&
+              renderNetworkRow(networks[currentNetwork], true)}
           </View>
 
           <View style={{paddingTop: 24, paddingHorizontal: 24}}>
@@ -184,9 +195,15 @@ const Header = ({accounts, currentAccountIndex}) => {
               Other Network
             </Text>
             <View style={{marginTop: 16}}>
-              {renderNetworkRow('Ropsten Test', colors.red5, false)}
-              {renderNetworkRow('Kovan Test', colors.turquoise5, false)}
-              {renderNetworkRow('Goerli Test', colors.blue5, false)}
+              {networksKeys.map(key => {
+                if (key !== currentNetwork) {
+                  return (
+                    networks &&
+                    networks[key] &&
+                    renderNetworkRow(networks[key], false)
+                  );
+                }
+              })}
             </View>
           </View>
           <View style={{paddingTop: 40}}>
@@ -197,7 +214,7 @@ const Header = ({accounts, currentAccountIndex}) => {
               text="Close"
             />
           </View>
-        </View>
+        </ScrollView>
       </RBSheet>
     );
   };
@@ -213,9 +230,10 @@ const Header = ({accounts, currentAccountIndex}) => {
             </Text>
           </View>
           <View style={{marginTop: 24}}>
-            {accounts.map(account => {
-              return renderAccountRow(account, true);
-            })}
+            {accounts &&
+              accounts.map((account, index) => {
+                return renderAccountRow(account, index === currentAccountIndex);
+              })}
           </View>
           <View style={{marginTop: 24}}>
             <TextButton
@@ -465,7 +483,13 @@ const Header = ({accounts, currentAccountIndex}) => {
         <View style={{height: 36, width: 36}}>
           <Avatar
             rounded
-            source={avatar1Image}
+            source={
+              accounts
+                ? accounts[currentAccountIndex]
+                  ? icons[accounts[currentAccountIndex].icon % 3]
+                  : avatar1Image
+                : avatar1Image
+            }
             size={36}
             overlayContainerStyle={{backgroundColor: colors.grey22}}
           />
@@ -491,7 +515,9 @@ const Header = ({accounts, currentAccountIndex}) => {
               flexDirection: 'row',
             }}>
             <Text style={{...fonts.caption_small12_16_regular, color: 'white'}}>
-              Ethereum Main
+              {networks && currentNetwork
+                ? networks[currentNetwork].name
+                : '...'}
             </Text>
             <FontAwesome
               style={{paddingLeft: 8, fontSize: 16, color: 'white'}}
@@ -510,6 +536,7 @@ const mapStateToProps = state => ({
   accounts: state.accounts.accounts,
   currentAccountIndex: state.accounts.currentAccountIndex,
   currentNetwork: state.networks.currentNetwork,
+  networks: state.networks.networks,
 });
 const mapDispatchToProps = dispatch => ({});
 

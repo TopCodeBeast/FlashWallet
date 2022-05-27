@@ -98,7 +98,6 @@ const CreateWalletScreen = ({navigation, createWallet}) => {
       () => {
         console.log('fail on press success');
         setSuccessLoading(false);
-        console.log('ERROR!!!!: fail success press');
       },
     );
   };

@@ -112,7 +112,6 @@ const ImportWalletScreen = ({navigation, createWallet}) => {
         console.log('fail on press import');
         setLoading(false);
         setCreatePasswordModalVisible(false);
-        console.log('ERROR!!!!: fail success import');
       },
     );
   };

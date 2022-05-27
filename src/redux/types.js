@@ -9,3 +9,9 @@ export const SET_WALLET = 'SET_WALLET';
 //Account Actions
 export const SET_ACCOUNTS_DATA = 'SET_ACCOUNTS_DATA';
 export const SET_INITIAL_ACCOUNT_DATA = 'SET_INITIAL_ACCOUNT_DATA';
+
+//Network Actions
+export const SET_NETWORKS_DATA = 'SET_NETWORKS_DATA';
+
+//balance actions
+export const SET_BALANCE_UPDATED_INFO = 'SET_BALANCE_UPDATED_INFO';

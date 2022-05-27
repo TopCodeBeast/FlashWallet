@@ -21,12 +21,12 @@ export const checkAuthentication = (
           }
         })
         .catch(err => {
-          console.log('ERROR!!!!!!!: ', err);
+          console.log('Auth Utils: ERROR!!!!!!!: ', err);
           errorCallback();
         });
     })
     .catch(err => {
-      console.log('ERROR!!!!!!!: ', err);
+      console.log('Auth Utils: ERROR!!!!!!!: ', err);
       errorCallback();
     });
 };
@@ -41,7 +41,7 @@ export const saveRememberOption = (
       successCallback();
     })
     .catch(err => {
-      console.log('ERROR!!!!!: ', err);
+      console.log('Auth Utils: ERROR!!!!!: ', err);
       errorCallback();
     });
 };

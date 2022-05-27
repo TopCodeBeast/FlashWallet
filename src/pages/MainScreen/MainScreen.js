@@ -15,9 +15,12 @@ const Tab = createBottomTabNavigator();
 
 import WalletTab from './WalletTab/WalletTab';
 import SettingsTab from './SettingsTab/SettingsTab';
+import {watchAccountBalance} from '../../redux/actions/AccountsActions';
 
-const MainScreen = ({navigation}) => {
-  useEffect(() => {}, []);
+const MainScreen = ({navigation, currentNetwork, watchAccountBalance}) => {
+  useEffect(() => {
+    // watchAccountBalance();
+  }, [currentNetwork]);
 
   const tabBar = ({state, descriptors, navigation}) => {
     return (
@@ -138,8 +141,9 @@ const mapStateToProps = state => ({
   currentNetwork: state.networks.currentNetwork,
   accounts: state.accounts.accounts,
   currentAccountIndex: state.accounts.currentAccountIndex,
-  password: state.wallet.password,
 });
-const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  watchAccountBalance: () => watchAccountBalance(dispatch),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainScreen);

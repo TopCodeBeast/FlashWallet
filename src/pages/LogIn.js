@@ -14,14 +14,25 @@ import {PrimaryButton} from '../components/Buttons';
 import ToggleSwitch from 'toggle-switch-react-native';
 import {checkAuthentication, saveRememberOption} from '../utils/auth';
 
+//import actions
+import {loadAccountsDataFromStorage} from '../redux/actions/AccountsActions';
+import {loadNetworksDataFromStorage} from '../redux/actions/NetworkActions';
+
 //import images
 const logoImage = require('../assets/images/splash/logo.png');
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const LogIn = ({navigation}) => {
+const LogIn = ({
+  navigation,
+  loadAccountsDataFromStorage,
+  loadNetworksDataFromStorage,
+}) => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {}, []);
 
   const onPressLogIn = () => {
     setIsLoading(true);
@@ -32,6 +43,8 @@ const LogIn = ({navigation}) => {
           rememberMe ? 'true' : 'false',
           () => {
             setIsLoading(false);
+            loadAccountsDataFromStorage();
+            loadNetworksDataFromStorage();
             navigation.replace('mainscreen');
           },
           () => {
@@ -131,4 +144,9 @@ const LogIn = ({navigation}) => {
   );
 };
 
-export default LogIn;
+const mapStateToProps = state => ({});
+const mapDispatchToProps = dispatch => ({
+  loadAccountsDataFromStorage: () => loadAccountsDataFromStorage(dispatch),
+  loadNetworksDataFromStorage: () => loadNetworksDataFromStorage(dispatch),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(LogIn);

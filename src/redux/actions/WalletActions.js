@@ -5,6 +5,8 @@ import Constants from '../../constants';
 import bip39 from 'react-native-bip39';
 import {createInitialAccountFromMasterSeed} from '../../utils/account';
 
+import {NetworkList, RINKEBY} from '../../engine/constants';
+
 export const createWallet = (
   dispatch,
   data,
@@ -29,11 +31,20 @@ export const createWallet = (
             accounts: [initialAccountData],
             currentAccountIndex: 0,
           };
+          const networksInfo = {
+            networks: NetworkList,
+            currentNetwork: RINKEBY,
+          };
+          const balancesInfo = {
+            [initialAccountData.address]: {main: '0'},
+          };
           AsyncStorage.multiSet([
             ['password', hash],
             ['mnemonic', mnemonic],
             ['master_seed', masterSeedString],
             ['accounts_info', JSON.stringify(accountsInfo)],
+            ['networks_info', JSON.stringify(networksInfo)],
+            ['balances_info', JSON.stringify(balancesInfo)],
           ])
             .then(() => {
               dispatch({
@@ -44,17 +55,17 @@ export const createWallet = (
               successCallback();
             })
             .catch(err => {
-              console.log('ERROR!!!!!: ', err);
+              console.log('Wallet Actions: ERROR!!!!!: ', err);
               failCallback();
             });
         })
         .catch(err => {
-          console.log('ERROR!!!!!: ', err);
+          console.log('Wallet Actions: ERROR!!!!!: ', err);
           failCallback();
         });
     })
     .catch(err => {
-      console.log('ERROR!!!!!: ', err);
+      console.log('Wallet Actions: ERROR!!!!!: ', err);
       failCallback();
     });
 };

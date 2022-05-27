@@ -8,7 +8,7 @@ const initialState = {
 const WalletReducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_WALLET: {
-      console.log('SET WALLET Action');
+      // console.log('SET WALLET Action');
       return {
         ...state,
         password: action.payload.password,
@@ -16,7 +16,7 @@ const WalletReducer = (state = initialState, action) => {
       };
     }
     default: {
-      console.log('WALLET DEFAULT: ', state);
+      // console.log('WALLET DEFAULT: ', state);
       return state;
     }
   }
