@@ -1,4 +1,8 @@
-import {SET_ACCOUNTS_DATA, SET_INITIAL_ACCOUNT_DATA} from '../types';
+import {
+  SET_ACCOUNTS_DATA,
+  SET_CURRENT_ACCOUNT_INDEX,
+  SET_INITIAL_ACCOUNT_DATA,
+} from '../types';
 
 const initialState = {
   accounts: [],
@@ -22,6 +26,12 @@ const AccountsReducer = (state = initialState, action) => {
         accounts: [].concat(action.payload?.accounts || state.accounts),
         currentAccountIndex:
           action.payload?.currentAccountIndex || state.currentAccountIndex,
+      };
+    }
+    case SET_CURRENT_ACCOUNT_INDEX: {
+      return {
+        ...state,
+        currentAccountIndex: parseInt(action.payload),
       };
     }
     default: {

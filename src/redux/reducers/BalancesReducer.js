@@ -5,7 +5,6 @@ const initialState = {};
 const BalancesReducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_BALANCE_UPDATED_INFO: {
-      console.log(action.payload);
       return Object.assign(
         {},
         {

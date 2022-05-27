@@ -29,11 +29,12 @@ import {
   TextButton,
 } from '../../../components/Buttons';
 import TokenShow from './TokenShow/TokenShow';
+import BalanceText from '../../../components/BalanceText';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 const buyIconSvgXml = require('../SVGData').buyIcon;
 
-const WalletTab = ({navigation}) => {
+const WalletTab = ({navigation, accounts, currentAccountIndex}) => {
   const [selectedToken, setSelectedToken] = useState('');
 
   useEffect(() => {
@@ -45,9 +46,25 @@ const WalletTab = ({navigation}) => {
       <View style={{marginLeft: 24, marginTop: 24}}>
         <View>
           <MaskedView
-            maskElement={<Text style={{...fonts.big_type1}}>9.2363 ETH</Text>}>
+            maskElement={
+              accounts && accounts[currentAccountIndex] ? (
+                <BalanceText
+                  style={{...fonts.big_type1}}
+                  address={accounts[currentAccountIndex].address}
+                />
+              ) : (
+                <Text style={{...fonts.big_type1}}>0 ETH</Text>
+              )
+            }>
             <LinearGradient colors={colors.gradient8}>
-              <Text style={{...fonts.big_type1, opacity: 0}}>9.2363 ETH</Text>
+              {accounts && accounts[currentAccountIndex] ? (
+                <BalanceText
+                  style={{...fonts.big_type1, opacity: 0}}
+                  address={accounts[currentAccountIndex].address}
+                />
+              ) : (
+                <Text style={{...fonts.big_type1, opacity: 0}}>0 ETH</Text>
+              )}
             </LinearGradient>
           </MaskedView>
         </View>
@@ -152,4 +169,10 @@ const WalletTab = ({navigation}) => {
   );
 };
 
-export default WalletTab;
+const mapStateToProps = state => ({
+  accounts: state.accounts.accounts,
+  currentAccountIndex: state.accounts.currentAccountIndex,
+});
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(WalletTab);

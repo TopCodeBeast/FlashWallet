@@ -28,10 +28,21 @@ const BalanceText = ({
     provider.on('block', blockNum => {
       provider.getBalance(address).then(res => {
         const value = ethers.utils.formatEther(res);
+        // console.log(
+        //   'Balance of ',
+        //   address,
+        //   'Detail: ',
+        //   balances[address],
+        //   parseFloat(balances[address].main),
+        //   parseFloat(value),
+        //   !balances[address] ||
+        //     !(parseFloat(balances[address].main) === parseFloat(value)),
+        // );
         if (
           !balances[address] ||
           !(parseFloat(balances[address].main) === parseFloat(value))
         ) {
+          console.log('Updating...............');
           updateBalanceInfo({
             address,
             balance: value,
@@ -47,7 +58,9 @@ const BalanceText = ({
   return (
     <Text style={style}>
       {balances[address]
-        ? parseFloat(balances[address].main).toFixed(4) + ' ETH'
+        ? parseFloat(balances[address].main) > 0
+          ? parseFloat(balances[address].main).toFixed(4) + ' ETH'
+          : '0 ETH'
         : '0 ETH'}
     </Text>
   );

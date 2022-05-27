@@ -26,21 +26,32 @@ import {
 
 import FloatLabelInput from '../../../components/FloatLabelInput';
 import BalanceText from '../../../components/BalanceText';
+import {
+  createNewAccount,
+  setCurrentAccountIndex,
+} from '../../../redux/actions/AccountsActions';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
-const avatar1Image = require('../../../assets/avatars/avatar1.png');
-const avatar2Image = require('../../../assets/avatars/avatar2.png');
-const avatar3Image = require('../../../assets/avatars/avatar3.png');
-const icons = [avatar1Image, avatar2Image, avatar3Image];
+
+const avatars = require('../../../constants').default.avatars;
+const avatarsCount = require('../../../constants').default.avatarsCount;
 
 const avatarBadgeSvgXml = require('../SVGData').avatarBadge;
 
-const Header = ({accounts, currentAccountIndex, currentNetwork, networks}) => {
+const Header = ({
+  accounts,
+  currentAccountIndex,
+  currentNetwork,
+  networks,
+  createNewAccount,
+  setCurrentAccountIndex,
+}) => {
   const refRBNetworkSelectSheet = useRef(null);
   const refRBAccountSelectSheet = useRef(null);
   const [accountStatus, setAccountStatus] = useState('default');
   const [accountName, setAccountName] = useState('');
   const [importedPrivateKey, setImportedPrivateKey] = useState('');
+  const [createAccountLoading, setCreateAccountLoading] = useState(false);
 
   useEffect(() => {}, []);
 
@@ -93,14 +104,19 @@ const Header = ({accounts, currentAccountIndex, currentNetwork, networks}) => {
   const renderAccountRow = (account, isSelected) => {
     const accountName = account.name;
     const accountIcon = (
-      <Avatar rounded source={icons[account.icon % 3]} size={24} />
+      <Avatar
+        rounded
+        source={avatars[parseInt(account.icon) % avatarsCount]}
+        size={24}
+      />
     );
 
     return (
-      <TouchableWithoutFeedback
+      <TouchableOpacity
         key={account.address}
         onPress={() => {
           refRBAccountSelectSheet.current.close();
+          setCurrentAccountIndex(account.index);
         }}>
         <View
           style={{
@@ -152,7 +168,7 @@ const Header = ({accounts, currentAccountIndex, currentNetwork, networks}) => {
             </View>
           )}
         </View>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
     );
   };
 
@@ -323,7 +339,24 @@ const Header = ({accounts, currentAccountIndex, currentNetwork, networks}) => {
           </View>
           <View style={{marginTop: 48, marginHorizontal: 24}}>
             <PrimaryButton
-              onPress={() => {}}
+              loading={createAccountLoading}
+              onPress={() => {
+                createNewAccount(
+                  accountName,
+                  () => {
+                    setCreateAccountLoading(true);
+                  },
+                  () => {
+                    console.log('Success create a new Account');
+                    refRBAccountSelectSheet.current.close();
+                    setCreateAccountLoading(false);
+                  },
+                  () => {
+                    setCreateAccountLoading(false);
+                    console.log('ERROR!!!!: ', 'Create A new Account');
+                  },
+                );
+              }}
               enableFlag={accountName.length > 0}
               text="Create"
             />
@@ -486,7 +519,7 @@ const Header = ({accounts, currentAccountIndex, currentNetwork, networks}) => {
             source={
               accounts
                 ? accounts[currentAccountIndex]
-                  ? icons[accounts[currentAccountIndex].icon % 3]
+                  ? avatars[accounts[currentAccountIndex].icon % avatarsCount]
                   : avatar1Image
                 : avatar1Image
             }
@@ -538,6 +571,16 @@ const mapStateToProps = state => ({
   currentNetwork: state.networks.currentNetwork,
   networks: state.networks.networks,
 });
-const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  createNewAccount: (accountName, beforeWork, successCallback, errorCallback) =>
+    createNewAccount(
+      dispatch,
+      accountName,
+      beforeWork,
+      successCallback,
+      errorCallback,
+    ),
+  setCurrentAccountIndex: index => setCurrentAccountIndex(dispatch, index),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);
