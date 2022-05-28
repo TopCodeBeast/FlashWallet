@@ -1,3 +1,12 @@
+// Import the crypto getRandomValues shim (**BEFORE** the shims)
+import 'react-native-get-random-values';
+
+// Import the the ethers shims (**BEFORE** ethers)
+import '@ethersproject/shims';
+
+// Import the ethers library
+import {ethers} from 'ethers';
+
 const shallowEqual = (object1, object2) => {
   const keys1 = Object.keys(object1);
   const keys2 = Object.keys(object2);
@@ -32,4 +41,13 @@ const checkArrayIsSame = (array1, array2) => {
   return isSame;
 };
 
-export {shallowEqual, checkArrayIsSame};
+const isValidPrivateKey = privateKey => {
+  try {
+    let address = ethers.utils.computeAddress('0x' + privateKey);
+    return ethers.utils.isAddress(address);
+  } catch (error) {
+    return false;
+  }
+};
+
+export {shallowEqual, checkArrayIsSame, isValidPrivateKey};

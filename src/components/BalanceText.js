@@ -22,9 +22,7 @@ const BalanceText = ({
 }) => {
   useEffect(() => {
     const network = networks[currentNetwork];
-    const provider = network.networkType
-      ? ethers.getDefaultProvider(network.networkType)
-      : new ethers.providers.JsonRpcProvider(network.rpc);
+    const provider = new ethers.providers.JsonRpcProvider(network.rpc);
     provider.on('block', blockNum => {
       provider.getBalance(address).then(res => {
         const value = ethers.utils.formatEther(res);
@@ -42,7 +40,7 @@ const BalanceText = ({
           !balances[address] ||
           !(parseFloat(balances[address].main) === parseFloat(value))
         ) {
-          console.log('Updating...............');
+          console.log('Updating Balance of ' + address + ' ..............');
           updateBalanceInfo({
             address,
             balance: value,

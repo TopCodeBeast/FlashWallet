@@ -1,4 +1,12 @@
 const hdkey = require('ethereumjs-wallet').hdkey;
+// Import the crypto getRandomValues shim (**BEFORE** the shims)
+import 'react-native-get-random-values';
+
+// Import the the ethers shims (**BEFORE** ethers)
+import '@ethersproject/shims';
+
+// Import the ethers library
+import {ethers} from 'ethers';
 
 const avatarsCount = require('../constants').default.avatarsCount;
 
@@ -33,4 +41,20 @@ const generateNewAccount = (masterSeed, path, accountName, index) => {
   };
 };
 
-export {createInitialAccountFromMasterSeed, generateNewAccount};
+const generateAccountFromPrivateKey = ({privateKey, accountName, index}) => {
+  let address = ethers.utils.computeAddress('0x' + privateKey);
+  return {
+    name: accountName,
+    privateKey,
+    address,
+    icon: Math.floor(Math.random() * avatarsCount) % avatarsCount,
+    index,
+    isImported: true,
+  };
+};
+
+export {
+  createInitialAccountFromMasterSeed,
+  generateNewAccount,
+  generateAccountFromPrivateKey,
+};

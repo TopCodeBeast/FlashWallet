@@ -2,15 +2,15 @@ import React from 'react';
 import {TouchableOpacity, Text, View} from 'react-native';
 import {colors, fonts} from '../../styles';
 
-const TextButton = ({onPress, text, icon}) => {
+const TextButton = ({onPress, text, icon, ...rest}) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <View
-        style={{
+        style={Object.assign(rest.style ? rest.style : {}, {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'center',
-        }}>
+        })}>
         {icon ? icon : <></>}
         <Text
           style={{

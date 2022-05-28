@@ -28,8 +28,10 @@ import FloatLabelInput from '../../../components/FloatLabelInput';
 import BalanceText from '../../../components/BalanceText';
 import {
   createNewAccount,
+  importAccount,
   setCurrentAccountIndex,
 } from '../../../redux/actions/AccountsActions';
+import {isValidPrivateKey} from '../../../utils/common';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 
@@ -45,6 +47,7 @@ const Header = ({
   networks,
   createNewAccount,
   setCurrentAccountIndex,
+  importAccount,
 }) => {
   const refRBNetworkSelectSheet = useRef(null);
   const refRBAccountSelectSheet = useRef(null);
@@ -52,6 +55,8 @@ const Header = ({
   const [accountName, setAccountName] = useState('');
   const [importedPrivateKey, setImportedPrivateKey] = useState('');
   const [createAccountLoading, setCreateAccountLoading] = useState(false);
+  const [importAccountError, setImportAccountError] = useState('');
+  const [importAccountLoading, setImportAccountLoading] = useState(false);
 
   useEffect(() => {}, []);
 
@@ -235,6 +240,15 @@ const Header = ({
     );
   };
 
+  let refinedAccountsArray = [];
+  if (accounts) {
+    refinedAccountsArray = [].concat(accounts);
+    refinedAccountsArray.sort((a, b) => {
+      if (a.isImported && !b.isImported) return 1;
+      else if (!a.isImported && b.isImported) return -1;
+    });
+  }
+
   const renderAccountRBSheet = () => {
     const renderDefaultAccountRBSheet = () => {
       return (
@@ -246,9 +260,12 @@ const Header = ({
             </Text>
           </View>
           <View style={{marginTop: 24}}>
-            {accounts &&
-              accounts.map((account, index) => {
-                return renderAccountRow(account, index === currentAccountIndex);
+            {refinedAccountsArray &&
+              refinedAccountsArray.map(account => {
+                return renderAccountRow(
+                  account,
+                  account.index === currentAccountIndex,
+                );
               })}
           </View>
           <View style={{marginTop: 24}}>
@@ -427,6 +444,7 @@ const Header = ({
           <View style={{marginTop: 16, marginHorizontal: 24}}>
             <TextInput
               onChangeText={value => {
+                setImportAccountError('');
                 setImportedPrivateKey(value);
               }}
               value={importedPrivateKey}
@@ -436,7 +454,8 @@ const Header = ({
               style={{
                 borderWidth: 1,
                 borderRadius: 8,
-                borderColor: colors.grey12,
+                borderColor:
+                  importAccountError.length > 0 ? colors.red5 : colors.grey12,
                 padding: 16,
                 height: 100,
                 color: 'white',
@@ -445,6 +464,16 @@ const Header = ({
               numberOfLines={2}
               multiline
             />
+            {importAccountError.length > 0 && (
+              <Text
+                style={{
+                  paddingLeft: 16,
+                  ...fonts.caption_small12_16_regular,
+                  color: colors.red5,
+                }}>
+                {importAccountError}
+              </Text>
+            )}
           </View>
           <View style={{marginTop: 40}}>
             <View
@@ -458,6 +487,29 @@ const Header = ({
               </View>
               <View>
                 <PrimaryButton
+                  style={{width: 200}}
+                  loading={importAccountLoading}
+                  onPress={() => {
+                    if (!isValidPrivateKey(importedPrivateKey)) {
+                      setImportAccountError('Not a valid private key.');
+                    } else {
+                      importAccount(
+                        importedPrivateKey,
+                        () => {
+                          setImportAccountLoading(true);
+                        },
+                        () => {
+                          refRBAccountSelectSheet.current.close();
+                          setImportAccountLoading(false);
+                          console.log('import account success');
+                        },
+                        failMessage => {
+                          setImportAccountLoading(false);
+                          setImportAccountError(failMessage);
+                        },
+                      );
+                    }
+                  }}
                   text={'Import Account'}
                   enableFlag={importedPrivateKey.length > 0}
                 />
@@ -470,7 +522,7 @@ const Header = ({
 
     return (
       <RBSheet
-        height={500}
+        height={520}
         ref={refRBAccountSelectSheet}
         closeOnDragDown={true}
         closeOnPressBack={true}
@@ -489,9 +541,11 @@ const Header = ({
             backgroundColor: colors.grey24,
           },
         }}>
-        {accountStatus === 'default' && renderDefaultAccountRBSheet()}
-        {accountStatus === 'create_account' && renderCreateAccountRBSheet()}
-        {accountStatus === 'import_account' && renderImportAccountRBSheet()}
+        <ScrollView>
+          {accountStatus === 'default' && renderDefaultAccountRBSheet()}
+          {accountStatus === 'create_account' && renderCreateAccountRBSheet()}
+          {accountStatus === 'import_account' && renderImportAccountRBSheet()}
+        </ScrollView>
       </RBSheet>
     );
   };
@@ -581,6 +635,14 @@ const mapDispatchToProps = dispatch => ({
       errorCallback,
     ),
   setCurrentAccountIndex: index => setCurrentAccountIndex(dispatch, index),
+  importAccount: (privateKey, beforeWork, successCallback, failCallback) =>
+    importAccount(
+      dispatch,
+      privateKey,
+      beforeWork,
+      successCallback,
+      failCallback,
+    ),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

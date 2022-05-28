@@ -2,7 +2,7 @@ import React from 'react';
 import {TouchableOpacity, Text, ActivityIndicator} from 'react-native';
 import {colors, commonStyles, fonts} from '../../styles';
 
-const PrimaryButton = ({onPress, enableFlag, text, icon, loading}) => {
+const PrimaryButton = ({onPress, enableFlag, text, icon, loading, ...rest}) => {
   const backgroundDisabled =
     (typeof enableFlag === 'boolean' && !enableFlag) ||
     (typeof loading === 'boolean' && loading) ||
@@ -10,6 +10,7 @@ const PrimaryButton = ({onPress, enableFlag, text, icon, loading}) => {
   return (
     <TouchableOpacity
       style={Object.assign(
+        rest.style ? rest.style : {},
         {flexDirection: 'row'},
         backgroundDisabled
           ? commonStyles.disabledButton

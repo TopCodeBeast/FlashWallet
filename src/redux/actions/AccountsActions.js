@@ -15,7 +15,10 @@ import {ethers} from 'ethers';
 
 const hardenedOffset = require('../../constants').default.HARDENED_OFFSET;
 //import utils
-import {generateNewAccount} from '../../utils/account';
+import {
+  generateAccountFromPrivateKey,
+  generateNewAccount,
+} from '../../utils/account';
 
 export const loadAccountsDataFromStorage = dispatch => {
   AsyncStorage.getItem('accounts_info')
@@ -40,9 +43,11 @@ export const createNewAccount = (
     .then(res => {
       const masterSeedString = res[0][1];
       let accountsInfo = JSON.parse(res[1][1]);
-      const paths = accountsInfo.accounts.map(item => item.path);
+      const addresses = accountsInfo.accounts.map(item => item.address);
+      const masterSeed = new Buffer(masterSeedString, 'hex');
 
       let path;
+      let newAccount;
       while (1) {
         path =
           "m/44'/60'/" +
@@ -51,19 +56,19 @@ export const createNewAccount = (
           (Math.round(Math.random() * 100000000000) % hardenedOffset) +
           "'/" +
           (Math.round(Math.random() * 100000000000) % hardenedOffset);
-        let foundIndex = paths.findIndex(item => item === path);
+        newAccount = generateNewAccount(
+          masterSeed,
+          path,
+          accountName,
+          accountsInfo.accounts.length,
+        );
+        let foundIndex = addresses.findIndex(
+          item => item === newAccount.address,
+        );
         if (foundIndex < 0) {
           break;
         }
       }
-
-      const masterSeed = new Buffer(masterSeedString, 'hex');
-      const newAccount = generateNewAccount(
-        masterSeed,
-        path,
-        accountName,
-        accountsInfo.accounts.length,
-      );
       accountsInfo.accounts.push(newAccount);
       accountsInfo.currentAccountIndex = accountsInfo.accounts.length - 1;
       const updatedAccountsInfoString = JSON.stringify(accountsInfo);
@@ -102,6 +107,54 @@ export const setCurrentAccountIndex = (dispatch, index) => {
       console.log('AccountsAction: ERROR!!!!: ', err);
     });
   dispatch({type: SET_CURRENT_ACCOUNT_INDEX, payload: index});
+};
+
+export const importAccount = (
+  dispatch,
+  privateKey,
+  beforeWork,
+  successCallback,
+  failCallback,
+) => {
+  beforeWork();
+  AsyncStorage.getItem('accounts_info')
+    .then(res => {
+      let accountsInfo = JSON.parse(res);
+      let foundIndex = accountsInfo.accounts.findIndex(
+        item => item.privateKey === privateKey,
+      );
+      let importedAccountCount = accountsInfo.accounts.filter(
+        item => item.isImported === true,
+      ).length;
+      if (foundIndex >= 0) {
+        failCallback(
+          `That private key is now being used by ${accountsInfo.accounts[foundIndex].name}.`,
+        );
+      } else {
+        const importedAccount = generateAccountFromPrivateKey({
+          privateKey,
+          accountName:
+            'Imported Account ' + (importedAccountCount + 1).toString(),
+          index: accountsInfo.accounts.length,
+        });
+        accountsInfo.accounts.push(importedAccount);
+        accountsInfo.currentAccountIndex = accountsInfo.accounts.length - 1;
+        const updatedAccountsInfoString = JSON.stringify(accountsInfo);
+        AsyncStorage.setItem('accounts_info', updatedAccountsInfoString)
+          .then(() => {
+            dispatch({type: SET_ACCOUNTS_DATA, payload: accountsInfo});
+            successCallback();
+          })
+          .catch(err => {
+            console.log('Accounts Action ERROR!!!!!: ', err);
+            failCallback('ERROR occurs!');
+          });
+      }
+    })
+    .catch(err => {
+      console.log('ERROR!!!!: ', err);
+      failCallback('ERROR occurs!');
+    });
 };
 
 // export const watchAccountBalance = dispatch => {
