@@ -53,6 +53,24 @@ const BalanceText = ({
     };
   }, []);
 
+  useEffect(() => {
+    const network = networks[currentNetwork];
+    const provider = new ethers.providers.JsonRpcProvider(network.rpc);
+    provider.getBalance(address).then(res => {
+      const value = ethers.utils.formatEther(res);
+      if (
+        !balances[address] ||
+        !(parseFloat(balances[address].main) === parseFloat(value))
+      ) {
+        console.log('Updating Balance of ' + address + ' ..............');
+        updateBalanceInfo({
+          address,
+          balance: value,
+        });
+      }
+    });
+  }, [currentNetwork]);
+
   return (
     <Text style={style}>
       {balances[address]

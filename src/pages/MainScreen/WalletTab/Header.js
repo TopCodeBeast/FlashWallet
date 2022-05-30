@@ -31,6 +31,8 @@ import {
   importAccount,
   setCurrentAccountIndex,
 } from '../../../redux/actions/AccountsActions';
+import {setCurrentNetwork} from '../../../redux/actions/NetworkActions';
+
 import {isValidPrivateKey} from '../../../utils/common';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
@@ -48,6 +50,7 @@ const Header = ({
   createNewAccount,
   setCurrentAccountIndex,
   importAccount,
+  setCurrentNetwork,
 }) => {
   const refRBNetworkSelectSheet = useRef(null);
   const refRBAccountSelectSheet = useRef(null);
@@ -65,9 +68,10 @@ const Header = ({
     const networkColor = network.color;
 
     return (
-      <TouchableWithoutFeedback
+      <TouchableOpacity
         key={network.chainId || networkName}
         onPress={() => {
+          setCurrentNetwork(network.chainId.toString());
           refRBNetworkSelectSheet.current.close();
         }}>
         <View
@@ -102,7 +106,7 @@ const Header = ({
             </View>
           )}
         </View>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
     );
   };
 
@@ -519,7 +523,7 @@ const Header = ({
         </View>
       );
     };
-
+    console.log(currentNetwork, networks);
     return (
       <RBSheet
         height={520}
@@ -626,6 +630,7 @@ const mapStateToProps = state => ({
   networks: state.networks.networks,
 });
 const mapDispatchToProps = dispatch => ({
+  //account actions
   createNewAccount: (accountName, beforeWork, successCallback, errorCallback) =>
     createNewAccount(
       dispatch,
@@ -643,6 +648,9 @@ const mapDispatchToProps = dispatch => ({
       successCallback,
       failCallback,
     ),
+
+  //network actions
+  setCurrentNetwork: network => setCurrentNetwork(dispatch, network),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

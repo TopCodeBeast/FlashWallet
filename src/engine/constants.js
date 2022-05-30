@@ -1,10 +1,10 @@
-const infuraApiKey = 'cc543d9266024c99b6f5f91b8b2f3570';
+const infuraApiKey = '9aa3d95b3bc440fa88ea12eaa4456161';
 
-export const MAINNET = 'mainnet';
-export const ROPSTEN = 'ropsten';
-export const KOVAN = 'kovan';
-export const RINKEBY = 'rinkeby';
-export const GOERLI = 'goerli';
+export const MAINNET = '1';
+export const ROPSTEN = '3';
+export const KOVAN = '42';
+export const RINKEBY = '4';
+export const GOERLI = '5';
 export const RPC = 'rpc';
 export const NO_RPC_BLOCK_EXPLORER = 'NO_BLOCK_EXPLORER';
 export const PRIVATENETWORK = 'PRIVATENETWORK';
@@ -59,11 +59,5 @@ export const NetworkList = {
     color: '#3099f2',
     networkType: 'goerli',
     rpc: 'https://goerli.infura.io/v3/' + infuraApiKey,
-  },
-  [RPC]: {
-    name: 'Private Network',
-    shortName: 'Private',
-    color: '#f2f3f4',
-    networkType: 'rpc',
   },
 };

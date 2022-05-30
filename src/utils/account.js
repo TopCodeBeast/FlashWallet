@@ -23,6 +23,7 @@ const createInitialAccountFromMasterSeed = masterSeed => {
     icon: 0,
     path,
     index: 0,
+    isImported: false,
   };
 };
 
@@ -38,6 +39,7 @@ const generateNewAccount = (masterSeed, path, accountName, index) => {
     icon: Math.floor(Math.random() * avatarsCount) % avatarsCount,
     path,
     index,
+    isImported: false,
   };
 };
 

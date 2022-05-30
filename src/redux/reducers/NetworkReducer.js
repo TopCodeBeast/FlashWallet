@@ -1,4 +1,4 @@
-import {SET_NETWORKS_DATA} from '../types';
+import {SET_CURRENT_NETWORK, SET_NETWORKS_DATA} from '../types';
 
 import {NetworkList, RINKEBY} from '../../engine/constants';
 
@@ -17,8 +17,15 @@ const NetworkReducer = (state = initialState, action) => {
         networks: Object.assign({}, action.payload?.networks || state.networks),
       };
     }
+    case SET_CURRENT_NETWORK: {
+      console.log('Network Actions: ', SET_CURRENT_NETWORK);
+      return {
+        ...state,
+        currentNetwork: action.payload,
+      };
+    }
     default:
-      return initialState;
+      return state;
   }
 };
 
