@@ -12,15 +12,22 @@ import '@ethersproject/shims';
 import {ethers} from 'ethers';
 import {updateBalanceInfo} from '../redux/actions/BalancesActions';
 
-const BalanceText = ({
-  style,
-  address,
-  balances,
-  networks,
-  currentNetwork,
-  updateBalanceInfo,
-}) => {
+const BalanceText = props => {
+  const {
+    style,
+    address,
+    balancesInfo,
+    networks,
+    currentNetwork,
+    updateBalanceInfo,
+  } = props;
   useEffect(() => {
+    let beforeBalance = balancesInfo[address]
+      ? balancesInfo[address].main
+        ? parseFloat(balancesInfo[address].main)
+        : 0
+      : 0;
+    console.log('init beforebalance to::::', beforeBalance);
     const network = networks[currentNetwork];
     const provider = new ethers.providers.JsonRpcProvider(network.rpc);
     provider.on('block', blockNum => {
@@ -30,17 +37,20 @@ const BalanceText = ({
         //   'Balance of ',
         //   address,
         //   'Detail: ',
-        //   balances[address],
-        //   parseFloat(balances[address].main),
+        //   balancesInfo[address],
+        //   parseFloat(balancesInfo[address].main),
         //   parseFloat(value),
-        //   !balances[address] ||
-        //     !(parseFloat(balances[address].main) === parseFloat(value)),
+        //   !balancesInfo[address] ||
+        //     !(parseFloat(balancesInfo[address].main) === parseFloat(value)),
         // );
-        if (
-          !balances[address] ||
-          !(parseFloat(balances[address].main) === parseFloat(value))
-        ) {
-          console.log('Updating Balance of ' + address + ' ..............');
+        // console.log('beforeBalance is ::::: ', beforeBalance);
+        if (parseFloat(beforeBalance) !== parseFloat(value)) {
+          console.log(
+            'Updating Balance of ' + address + ' ..............',
+            parseFloat(beforeBalance),
+            parseFloat(value),
+          );
+          beforeBalance = parseFloat(value);
           updateBalanceInfo({
             address,
             balance: value,
@@ -53,40 +63,45 @@ const BalanceText = ({
     };
   }, []);
 
-  useEffect(() => {
-    const network = networks[currentNetwork];
-    const provider = new ethers.providers.JsonRpcProvider(network.rpc);
-    provider.getBalance(address).then(res => {
-      const value = ethers.utils.formatEther(res);
-      if (
-        !balances[address] ||
-        !(parseFloat(balances[address].main) === parseFloat(value))
-      ) {
-        console.log('Updating Balance of ' + address + ' ..............');
-        updateBalanceInfo({
-          address,
-          balance: value,
-        });
-      }
-    });
-  }, [currentNetwork]);
+  // useEffect(() => {
+  //   const network = networks[currentNetwork];
+  //   const provider = new ethers.providers.JsonRpcProvider(network.rpc);
+  //   provider.getBalance(address).then(res => {
+  //     const value = ethers.utils.formatEther(res);
+  //     if (
+  //       balances[address] === undefined ||
+  //       !(parseFloat(balances[address].main) === parseFloat(value))
+  //     ) {
+  //       console.log(
+  //         'Updating Balance of ' + address + ' ..............',
+  //         value,
+  //       );
+  //       updateBalanceInfo({
+  //         address,
+  //         balance: value,
+  //       });
+  //     }
+  //   });
+  // }, [currentNetwork]);
 
   return (
     <Text style={style}>
-      {balances[address]
-        ? parseFloat(balances[address].main) > 0
-          ? parseFloat(balances[address].main).toFixed(4) + ' ETH'
+      {balancesInfo[address]
+        ? parseFloat(balancesInfo[address].main) > 0
+          ? parseFloat(balancesInfo[address].main).toFixed(4) + ' ETH'
           : '0 ETH'
         : '0 ETH'}
     </Text>
   );
 };
 
-const mapStateToProps = state => ({
-  balances: state.balances,
-  networks: state.networks.networks,
-  currentNetwork: state.networks.currentNetwork,
-});
+const mapStateToProps = state => {
+  return {
+    balancesInfo: state.balances.balancesInfo,
+    networks: state.networks.networks,
+    currentNetwork: state.networks.currentNetwork,
+  };
+};
 const mapDispatchToProps = dispatch => ({
   updateBalanceInfo: data => updateBalanceInfo(dispatch, data),
 });

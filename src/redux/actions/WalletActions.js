@@ -38,6 +38,15 @@ export const createWallet = (
           const balancesInfo = {
             [initialAccountData.address]: {main: '0'},
           };
+          const networkKeys = Object.keys(NetworkList);
+          let tokensInfo = {};
+          networkKeys.forEach(key => {
+            tokensInfo[key] = {
+              [initialAccountData.address]: {
+                tokensList: [],
+              },
+            };
+          });
           AsyncStorage.multiSet([
             ['password', hash],
             ['mnemonic', mnemonic],
@@ -45,6 +54,7 @@ export const createWallet = (
             ['accounts_info', JSON.stringify(accountsInfo)],
             ['networks_info', JSON.stringify(networksInfo)],
             ['balances_info', JSON.stringify(balancesInfo)],
+            ['tokens_info', JSON.stringify(tokensInfo)],
           ])
             .then(() => {
               dispatch({

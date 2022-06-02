@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState, useMemo, createRef, useRef} from 'react';
 import {connect} from 'react-redux';
 import {View, Dimensions, Pressable, Animated, ScrollView} from 'react-native';
 import {colors, fonts} from '../../../styles';
@@ -18,9 +18,27 @@ import {TextButton} from '../../../components/Buttons';
 
 import TokenItemRow from './TokenItemRow';
 import CollectibleItemRow from './CollectibleItemRow';
+import {getTokensList} from '../../../redux/actions/TokensActions';
+import TokenAdd from './TokenAdd/TokenAdd';
+import RBSheet from 'react-native-raw-bottom-sheet';
 
-const TokenAndCollectiblesTab = ({navigation, tokenPressed}) => {
+const screenHeight = Dimensions.get('screen').height;
+
+const TokenAndCollectiblesTab = ({
+  navigation,
+  tokenPressed,
+  networks,
+  currentNetwork,
+  balances,
+  accounts,
+  currentAccountIndex,
+  getTokensList,
+  tokens,
+}) => {
   const [curTabIndex, setCurTabIndex] = useState(0);
+
+  const refRBTokenAddSheet = useRef(null);
+
   const [tabRoutes] = useState([
     {
       key: 'first',
@@ -32,47 +50,71 @@ const TokenAndCollectiblesTab = ({navigation, tokenPressed}) => {
     },
   ]);
 
-  const TokenRoute = () => (
-    <View style={{flex: 1}}>
-      <ScrollView>
-        <TokenItemRow
-          onPress={() => {
-            tokenPressed('BNB');
+  const renderTokenAdd = () => {
+    return (
+      <RBSheet
+        height={screenHeight - 100}
+        ref={refRBTokenAddSheet}
+        closeOnDragDown={true}
+        closeOnPressBack={true}
+        closeOnPressMask={true}
+        customStyles={{
+          wrapper: {
+            backgroundColor: '#222531BB',
+          },
+          draggableIcon: {
+            backgroundColor: colors.grey9,
+          },
+          container: {
+            backgroundColor: colors.grey24,
+          },
+        }}>
+        <TokenAdd
+          onCancel={() => {
+            refRBTokenAddSheet.current.close();
           }}
-          name="Binance Coin"
-          balance={19.2371}
-          unit="BNB"
-          usdAmount={226.69}
-          trend={2}
         />
-        <TokenItemRow
-          name="USD Coin"
-          balance={92.3}
-          unit="USDC"
-          usdAmount={1}
-          trend={4.3}
-        />
-        <TokenItemRow
-          name="Synthetix"
-          balance={42.74}
-          unit="SNX"
-          usdAmount={20.83}
-          trend={-1.3}
-        />
-      </ScrollView>
-      <View style={{marginTop: 24}}>
-        <TextButton
-          text="Add Tokens"
-          icon={
-            <FontAwesome
-              style={{fontSize: 24, color: colors.green5, marginRight: 12}}
-              icon={SolidIcons.plus}
-            />
-          }
-        />
+      </RBSheet>
+    );
+  };
+
+  const TokenRoute = () => {
+    const tokensList = tokens[currentNetwork]
+      ? tokens[currentNetwork][currentAccountIndex]
+        ? tokens[currentNetwork][currentAccountIndex].tokensList
+        : []
+      : [];
+    return (
+      <View style={{flex: 1}}>
+        <ScrollView>
+          {tokensList.map(token => {
+            return (
+              <TokenItemRow
+                token={token}
+                onPress={() => {}}
+                key={'tokenRoute_' + token.tokenAddress}
+              />
+            );
+          })}
+        </ScrollView>
+        <View style={{marginTop: 24}}>
+          <TextButton
+            text="Add Tokens"
+            onPress={() => {
+              refRBTokenAddSheet.current.open();
+            }}
+            icon={
+              <FontAwesome
+                style={{fontSize: 24, color: colors.green5, marginRight: 12}}
+                icon={SolidIcons.plus}
+              />
+            }
+          />
+        </View>
+        {renderTokenAdd()}
       </View>
-    </View>
-  );
+    );
+  };
 
   const CollectibleRoute = () => (
     <View style={{flex: 1, backgroundColor: '#673ab7'}} />
@@ -104,7 +146,7 @@ const TokenAndCollectiblesTab = ({navigation, tokenPressed}) => {
 
           return (
             <View
-              key={'tabbar_' + i}
+              key={'tokenandcollectibletabbar_' + i}
               style={{
                 marginHorizontal: 24,
                 borderBottomWidth: curTabIndex === i ? 3 : 0,
@@ -142,4 +184,25 @@ const TokenAndCollectiblesTab = ({navigation, tokenPressed}) => {
   );
 };
 
-export default TokenAndCollectiblesTab;
+const mapStateToProps = state => ({
+  networks: state.networks.networks,
+  currentNetwork: state.networks.currentNetwork,
+  accounts: state.accounts.accounts,
+  currentAccountIndex: state.accounts.currentAccountIndex,
+  balances: state.balances,
+  tokens: state.tokens,
+});
+const mapDispatchToProps = dispatch => ({
+  getTokensList: (currentNetwork, currentAccountIndex, successCallback) =>
+    getTokensList(
+      dispatch,
+      currentNetwork,
+      currentAccountIndex,
+      successCallback,
+    ),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(TokenAndCollectiblesTab);

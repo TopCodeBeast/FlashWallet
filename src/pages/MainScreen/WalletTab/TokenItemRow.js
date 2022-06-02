@@ -1,10 +1,20 @@
 import {View, Text, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {colors, fonts} from '../../../styles';
+import TokenBalanceText from '../../../components/TokenBalanceText';
+import {connect} from 'react-redux';
 
-const TokenItemRow = ({name, unit, balance, trend, usdAmount, onPress}) => {
+const TokenItemRow = ({token, onPress, accounts, currentAccountIndex}) => {
+  const {tokenSymbol, tokenAddress, tokenDecimal} = token;
+  const trend = 1.2;
+  const usdAmount = 123;
   return (
-    <TouchableOpacity style={{padding: 16, marginTop: 24}} onPress={onPress}>
+    <TouchableOpacity
+      style={{padding: 16, marginTop: 24}}
+      onPress={onPress}
+      key={
+        token.address ? token.address.toString() : 'currentToken_onTokenShow'
+      }>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <View
           style={{
@@ -17,13 +27,16 @@ const TokenItemRow = ({name, unit, balance, trend, usdAmount, onPress}) => {
           <View
             style={{flexDirection: 'row', paddingLeft: 16, paddingRight: 56}}>
             <View style={{width: '50%'}}>
-              <Text style={{...fonts.title2, color: 'white'}}>{name}</Text>
+              <Text style={{...fonts.title2, color: 'white'}}>
+                {tokenSymbol}
+              </Text>
             </View>
             <View style={{width: '50%'}}>
-              <Text
-                style={{...fonts.title2, color: 'white', textAlign: 'right'}}>
-                {balance + ' ' + unit}
-              </Text>
+              <TokenBalanceText
+                address={accounts[currentAccountIndex].address}
+                token={token}
+                style={{...fonts.title2, color: 'white', textAlign: 'right'}}
+              />
             </View>
           </View>
           <View
@@ -54,4 +67,10 @@ const TokenItemRow = ({name, unit, balance, trend, usdAmount, onPress}) => {
   );
 };
 
-export default TokenItemRow;
+const mapStateToProps = state => ({
+  accounts: state.accounts.accounts,
+  currentAccountIndex: state.accounts.currentAccountIndex,
+});
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(TokenItemRow);

@@ -523,7 +523,6 @@ const Header = ({
         </View>
       );
     };
-    console.log(currentNetwork, networks);
     return (
       <RBSheet
         height={520}

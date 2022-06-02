@@ -50,4 +50,8 @@ const isValidPrivateKey = privateKey => {
   }
 };
 
-export {shallowEqual, checkArrayIsSame, isValidPrivateKey};
+const isValidAddress = address => {
+  return ethers.utils.isAddress(address);
+};
+
+export {shallowEqual, checkArrayIsSame, isValidPrivateKey, isValidAddress};

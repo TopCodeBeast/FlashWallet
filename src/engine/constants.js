@@ -19,6 +19,7 @@ export const NetworkList = {
     color: '#3cc29e',
     networkType: 'mainnet',
     rpc: 'https://mainnet.infura.io/v3/' + infuraApiKey,
+    unit: 'ETH',
   },
   [ROPSTEN]: {
     name: 'Ropsten Test Network',
@@ -29,6 +30,7 @@ export const NetworkList = {
     color: '#ff4a8d',
     networkType: 'ropsten',
     rpc: 'https://ropsten.infura.io/v3/' + infuraApiKey,
+    unit: 'ETH',
   },
   [KOVAN]: {
     name: 'Kovan Test Network',
@@ -39,6 +41,7 @@ export const NetworkList = {
     color: '#7057ff',
     networkType: 'kovan',
     rpc: 'https://kovan.infura.io/v3/' + infuraApiKey,
+    unit: 'ETH',
   },
   [RINKEBY]: {
     name: 'Rinkeby Test Network',
@@ -49,6 +52,7 @@ export const NetworkList = {
     color: '#f6c343',
     networkType: 'rinkeby',
     rpc: 'https://rinkeby.infura.io/v3/' + infuraApiKey,
+    unit: 'ETH',
   },
   [GOERLI]: {
     name: 'Goerli Test Network',
@@ -59,5 +63,6 @@ export const NetworkList = {
     color: '#3099f2',
     networkType: 'goerli',
     rpc: 'https://goerli.infura.io/v3/' + infuraApiKey,
+    unit: 'ETH',
   },
 };
