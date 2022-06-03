@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {connect} from 'react-redux';
 import {
+  Dimensions,
   Image,
   KeyboardAvoidingView,
   SafeAreaView,
@@ -30,12 +31,16 @@ import {
 } from '../../../components/Buttons';
 import TokenShow from './TokenShow/TokenShow';
 import BalanceText from '../../../components/BalanceText';
+import SendToken from './SendToken/SendToken';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import Toast from 'react-native-toast-message';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 const buyIconSvgXml = require('../SVGData').buyIcon;
 
 const WalletTab = ({navigation, accounts, currentAccountIndex}) => {
   const [selectedToken, setSelectedToken] = useState('');
+  const refRBSendTokenSheet = useRef(null);
 
   useEffect(() => {
     return () => {};
@@ -96,7 +101,9 @@ const WalletTab = ({navigation, accounts, currentAccountIndex}) => {
         }}>
         <View style={{marginRight: 16}}>
           <SecondaryButton
-            onPress={() => {}}
+            onPress={() => {
+              refRBSendTokenSheet.current.open();
+            }}
             text="Send"
             icon={
               <FontAwesome
@@ -108,7 +115,14 @@ const WalletTab = ({navigation, accounts, currentAccountIndex}) => {
         </View>
         <View style={{marginRight: 16}}>
           <SecondaryButton
-            onPress={() => {}}
+            onPress={() => {
+              Toast.show({
+                type: 'error',
+                position: 'bottom',
+                text1: 'Error',
+                text2: 'Hello' + ' 😥',
+              });
+            }}
             text="Receive"
             icon={
               <FontAwesome
@@ -125,12 +139,41 @@ const WalletTab = ({navigation, accounts, currentAccountIndex}) => {
             icon={<SvgXml style={{marginRight: 16}} xml={buyIconSvgXml} />}
           />
         </View>
+        {renderSendTokenRBSheet()}
       </View>
     );
   };
 
   const tokenRowPressed = token => {
     setSelectedToken(token);
+  };
+
+  const renderSendTokenRBSheet = () => {
+    return (
+      <RBSheet
+        height={Dimensions.get('screen').height - 100}
+        ref={refRBSendTokenSheet}
+        closeOnDragDown={true}
+        closeOnPressBack={true}
+        closeOnPressMask={true}
+        customStyles={{
+          wrapper: {
+            backgroundColor: '#222531BB',
+          },
+          draggableIcon: {
+            backgroundColor: colors.grey9,
+          },
+          container: {
+            backgroundColor: colors.grey24,
+          },
+        }}>
+        <SendToken
+          onPressClose={() => {
+            refRBSendTokenSheet.current.close();
+          }}
+        />
+      </RBSheet>
+    );
   };
 
   return (
@@ -143,7 +186,7 @@ const WalletTab = ({navigation, accounts, currentAccountIndex}) => {
         }}>
         {selectedToken.length > 0 && (
           <TokenShow
-            backPressed={() => {
+            onBackPress={() => {
               setSelectedToken('');
             }}
           />
@@ -164,6 +207,7 @@ const WalletTab = ({navigation, accounts, currentAccountIndex}) => {
             />
           </>
         )}
+        <Toast ref={ref => Toast.setRef(ref)} />
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

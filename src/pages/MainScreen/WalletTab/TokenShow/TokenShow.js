@@ -35,7 +35,7 @@ import {
 } from '../../../../components/Buttons';
 import HistoryRow from './HistoryRow';
 import {Avatar} from 'react-native-elements';
-import FloatLabelInput from '../../../../components/FloatLabelInput';
+import SendToken from '../SendToken/SendToken';
 
 const avatar1Image = require('../../../../assets/avatars/avatar1.png');
 const avatar2Image = require('../../../../assets/avatars/avatar2.png');
@@ -47,7 +47,7 @@ const tokenName = 'BNB';
 const tokenBalance = 19.2371;
 const usdAmount = 226.69;
 
-const TokenShow = ({navigation, backPressed}) => {
+const TokenShow = ({navigation, onBackPress}) => {
   const refRBTokenSendSheet = useRef(null);
   const [sendAddress, setSendAddress] = useState('');
 
@@ -247,7 +247,7 @@ const TokenShow = ({navigation, backPressed}) => {
   const renderTokenSendRBSheet = () => {
     return (
       <RBSheet
-        height={800}
+        height={Dimensions.get('screen').height - 100}
         ref={refRBTokenSendSheet}
         closeOnDragDown={true}
         closeOnPressBack={true}
@@ -263,181 +263,19 @@ const TokenShow = ({navigation, backPressed}) => {
             backgroundColor: colors.grey24,
           },
         }}>
-        <View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <View style={{flex: 1}}>
-              <Text
-                style={{...fonts.title2, color: 'white', textAlign: 'center'}}>
-                Send to
-              </Text>
-            </View>
-            <View>
-              <FontAwesome
-                style={{fontSize: 16, color: 'white', marginRight: 16}}
-                icon={SolidIcons.times}
-              />
-            </View>
-          </View>
-          <View style={{marginTop: 24, marginHorizontal: 24}}>
-            <View>
-              <Text style={{...fonts.title2, color: 'white'}}>From</Text>
-            </View>
-            <TouchableOpacity
-              style={{
-                paddingHorizontal: 16,
-                paddingVertical: 24,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: colors.grey23,
-                }}>
-                <View style={{position: 'absolute', left: 0, top: 0}}>
-                  <Avatar rounded source={avatar1Image} size={24} />
-                </View>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginLeft: 16,
-                }}>
-                <View>
-                  <Text style={{...fonts.title2, color: 'white'}}>
-                    Account1
-                  </Text>
-                  <Text
-                    style={{
-                      ...fonts.caption_small12_18_regular,
-                      color: colors.grey9,
-                    }}>
-                    Balance: 19.2371 BNB
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row-reverse',
-                    marginRight: 16,
-                  }}>
-                  <FontAwesome
-                    style={{fontSize: 16, color: 'white', marginRight: 24}}
-                    icon={SolidIcons.chevronRight}
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-          <View style={{marginTop: 24, marginHorizontal: 24}}>
-            <View>
-              <Text style={{...fonts.title2, color: 'white'}}>To</Text>
-            </View>
-            <View
-              style={{
-                marginTop: 16,
-                flexDirection: 'row',
-                alignItems: 'center',
-                borderWidth: 1,
-                borderRadius: 8,
-                borderColor: colors.grey12,
-                paddingHorizontal: 16,
-              }}>
-              <View>
-                <TextInput
-                  style={{
-                    padding: 16,
-                    height: 64,
-                    color: 'white',
-                    ...fonts.para_semibold,
-                    width: Dimensions.get('screen').width - 120,
-                  }}
-                  placeholder={'Search public address (0x) or ENS'}
-                  placeholderTextColor={colors.grey12}
-                  value={sendAddress}
-                  onChangeText={value => {
-                    setSendAddress(value);
-                  }}
-                />
-              </View>
-              <View style={{flex: 1, flexDirection: 'row-reverse'}}>
-                <SvgXml xml={fonts.qrScanSvgXml} />
-              </View>
-            </View>
-          </View>
-          <View style={{marginTop: 24, marginHorizontal: 24}}>
-            <Text style={{...fonts.btn_medium_link, color: colors.blue5}}>
-              Transfer Between My Accounts
-            </Text>
-          </View>
-          <View style={{marginTop: 24, marginHorizontal: 24}}>
-            <Text style={{...fonts.title2, color: colors.grey9}}>Recent</Text>
-            <View style={{marginTop: 16}}>
-              {renderAccountRow(
-                'Beexay',
-                '0xD5cB0bdA7579E9bfb9D670218b8CFe1Ac7024996',
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    backgroundColor: colors.grey23,
-                  }}>
-                  <View style={{position: 'absolute', left: 0, top: 0}}>
-                    <Avatar rounded source={avatar1Image} size={24} />
-                  </View>
-                </View>,
-                () => {},
-              )}
-              {renderAccountRow(
-                'Dasun Bussi',
-                '0xD5cB0bdA7579E9bfb9D670218b8CFe1Ac7024996',
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    backgroundColor: colors.grey23,
-                  }}>
-                  <View style={{position: 'absolute', left: 0, top: 0}}>
-                    <Avatar rounded source={avatar2Image} size={24} />
-                  </View>
-                </View>,
-                () => {},
-              )}
-              {renderAccountRow(
-                'Smart Gevan',
-                '0xD5cB0bdA7579E9bfb9D670218b8CFe1Ac7024996',
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    backgroundColor: colors.grey23,
-                  }}>
-                  <View style={{position: 'absolute', left: 0, top: 0}}>
-                    <Avatar rounded source={avatar3Image} size={24} />
-                  </View>
-                </View>,
-                () => {},
-              )}
-            </View>
-          </View>
-        </View>
+        <SendToken
+          onPressClose={() => {
+            refRBTokenSendSheet.current.close();
+          }}
+          isToken={false}
+        />
       </RBSheet>
     );
   };
 
   return (
     <>
-      <Header tokenName={tokenName} backPressed={backPressed} />
+      <Header tokenName={tokenName} onBackPress={onBackPress} />
       <Image
         source={backImage}
         style={{position: 'absolute', right: '-15%', top: '10%'}}

@@ -1,6 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {SET_NETWORKS_DATA, SET_CURRENT_NETWORK} from '../types';
+import {
+  SET_NETWORKS_DATA,
+  SET_CURRENT_NETWORK,
+  SET_NETWORK_GAS_PRICE,
+} from '../types';
 
 export const loadNetworksDataFromStorage = dispatch => {
   AsyncStorage.getItem('networks_info')
@@ -32,4 +36,8 @@ export const setCurrentNetwork = (dispatch, network) => {
     .catch(err => {
       console.log('Network Actions: ERROR!!!!: ', err);
     });
+};
+
+export const setNetworkGasPrice = (dispatch, price) => {
+  dispatch({type: SET_NETWORK_GAS_PRICE, payload: price});
 };

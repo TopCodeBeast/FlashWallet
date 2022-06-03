@@ -12,15 +12,14 @@ import '@ethersproject/shims';
 import {ethers} from 'ethers';
 import {updateBalanceInfo} from '../redux/actions/BalancesActions';
 
-const BalanceText = props => {
-  const {
-    style,
-    address,
-    balancesInfo,
-    networks,
-    currentNetwork,
-    updateBalanceInfo,
-  } = props;
+const BalanceText = ({
+  style,
+  address,
+  balancesInfo,
+  networks,
+  currentNetwork,
+  updateBalanceInfo,
+}) => {
   useEffect(() => {
     let beforeBalance = balancesInfo[address]
       ? balancesInfo[address].main

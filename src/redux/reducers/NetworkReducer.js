@@ -1,10 +1,15 @@
-import {SET_CURRENT_NETWORK, SET_NETWORKS_DATA} from '../types';
+import {
+  SET_CURRENT_NETWORK,
+  SET_NETWORKS_DATA,
+  SET_NETWORK_GAS_PRICE,
+} from '../types';
 
 import {NetworkList, RINKEBY} from '../../engine/constants';
 
 const initialState = {
   currentNetwork: RINKEBY,
   networks: NetworkList,
+  gasPrice: 0,
 };
 
 const NetworkReducer = (state = initialState, action) => {
@@ -22,6 +27,12 @@ const NetworkReducer = (state = initialState, action) => {
       return {
         ...state,
         currentNetwork: action.payload,
+      };
+    }
+    case SET_NETWORK_GAS_PRICE: {
+      return {
+        ...state,
+        gasPrice: action.payload,
       };
     }
     default:

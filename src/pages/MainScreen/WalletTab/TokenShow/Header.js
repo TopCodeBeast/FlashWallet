@@ -3,7 +3,7 @@ import {Text, View, TouchableOpacity} from 'react-native';
 import {colors, fonts} from '../../../../styles';
 import FontAwesome, {SolidIcons} from 'react-native-fontawesome';
 
-const Header = ({tokenName, backPressed}) => {
+const Header = ({tokenName, onBackPress}) => {
   return (
     <View
       style={{
@@ -18,7 +18,7 @@ const Header = ({tokenName, backPressed}) => {
       <View style={{flex: 1}}>
         <TouchableOpacity
           onPress={() => {
-            backPressed();
+            onBackPress();
           }}
           style={{width: 20}}>
           <FontAwesome
