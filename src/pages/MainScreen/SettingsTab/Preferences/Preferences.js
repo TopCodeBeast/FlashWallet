@@ -12,35 +12,21 @@ import {
   View,
 } from 'react-native';
 
-import {colors, fonts} from '../../../styles';
-import FontAwesome, {
-  SolidIcons,
-  RegularIcons,
-  BrandIcons,
-  parseIconFromClassName,
-} from 'react-native-fontawesome';
-import AntIcon from 'react-native-vector-icons/AntDesign';
-import FeatherIcon from 'react-native-vector-icons/Feather';
-import LinearGradient from 'react-native-linear-gradient';
-import MaskedView from '@react-native-community/masked-view';
+import {colors, fonts} from '../../../../styles';
+import FontAwesome, {SolidIcons} from 'react-native-fontawesome';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 const Tab = createBottomTabNavigator();
 
-import {
-  PrimaryButton,
-  SecondaryButton,
-  TextButton,
-} from '../../../components/Buttons';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import ComboBox from '../../../components/ComboBox';
+import GeneralRBSheet from './GeneralRBSheet';
+import SecurityAndPrivacyRBSheet from './SecurityAndPrivacyRBSheet';
 
-const backImage = require('../../../assets/images/mainscreen/backimage.png');
-const buyIconSvgXml = require('../SVGData').buyIcon;
+const backImage = require('../../../../assets/images/mainscreen/backimage.png');
 
 const Preferences = ({navigation, onGoBack}) => {
   const refRBGeneralSheet = useRef(null);
-  const [privateCurrency, setPrivateCurrency] = useState('native');
+  const refRBSecuritySheet = useRef(null);
 
   useEffect(() => {
     return () => {};
@@ -115,7 +101,7 @@ const Preferences = ({navigation, onGoBack}) => {
   const renderGeneralRBSheet = () => {
     return (
       <RBSheet
-        height={Dimensions.get('screen').height - 150}
+        height={Dimensions.get('screen').height - 120}
         ref={refRBGeneralSheet}
         closeOnDragDown={true}
         closeOnPressBack={true}
@@ -131,92 +117,39 @@ const Preferences = ({navigation, onGoBack}) => {
             backgroundColor: colors.grey24,
           },
         }}>
-        <View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginHorizontal: 24,
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                refRBGeneralSheet.current.close();
-              }}>
-              <FontAwesome
-                style={{
-                  fontSize: 16,
-                  color: 'white',
-                }}
-                icon={SolidIcons.chevronLeft}
-              />
-            </TouchableOpacity>
-            <Text
-              style={{
-                ...fonts.title2,
-                color: 'white',
-                textAlign: 'center',
-                flex: 1,
-              }}>
-              General
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                refRBGeneralSheet.current.close();
-              }}
-              style={{flexDirection: 'row-reverse'}}>
-              <FontAwesome
-                style={{
-                  fontSize: 16,
-                  color: 'white',
-                }}
-                icon={SolidIcons.times}
-              />
-            </TouchableOpacity>
-          </View>
-          <ScrollView style={{marginTop: 40, marginHorizontal: 24}}>
-            <View style={{marginTop: 40}}>
-              <View>
-                <Text style={{...fonts.title2, color: 'white'}}>
-                  Currency Conversion
-                </Text>
-                <Text
-                  style={{
-                    ...fonts.para_regular,
-                    color: colors.grey9,
-                    marginTop: 8,
-                  }}>
-                  Display fiat values in using o specific currency throughout
-                  the application
-                </Text>
-              </View>
-              <View style={{marginTop: 24}}>
-                <ComboBox>
-                  <Text style={{...fonts.para_semibold, color: 'white'}}>
-                    USD-United State Dollar
-                  </Text>
-                </ComboBox>
-              </View>
-            </View>
-            <View style={{marginTop: 40}}>
-              <View>
-                <Text style={{...fonts.title2, color: 'white'}}>
-                  Privacy Currency
-                </Text>
-                <Text
-                  style={{
-                    ...fonts.para_regular,
-                    color: colors.grey9,
-                    marginTop: 8,
-                  }}>
-                  Select Native to prioritize displaying values in the native
-                  currency of the chain (e.g. ETH). Select Fiat to prioritize
-                  displaying values in your selected fiat currency
-                </Text>
-              </View>
-              <View style={{marginTop: 24, flexDirection: 'row'}}></View>
-            </View>
-          </ScrollView>
-        </View>
+        <GeneralRBSheet
+          onPressClose={() => {
+            refRBGeneralSheet.current.close();
+          }}
+        />
+      </RBSheet>
+    );
+  };
+
+  const renderSecurityAndPrivacyRBSheet = () => {
+    return (
+      <RBSheet
+        height={Dimensions.get('screen').height - 120}
+        ref={refRBSecuritySheet}
+        closeOnDragDown={true}
+        closeOnPressBack={true}
+        closeOnPressMask={true}
+        customStyles={{
+          wrapper: {
+            backgroundColor: '#222531BB',
+          },
+          draggableIcon: {
+            backgroundColor: 'transparent',
+          },
+          container: {
+            backgroundColor: colors.grey24,
+          },
+        }}>
+        <SecurityAndPrivacyRBSheet
+          onPressClose={() => {
+            refRBSecuritySheet.current.close();
+          }}
+        />
       </RBSheet>
     );
   };
@@ -251,7 +184,9 @@ const Preferences = ({navigation, onGoBack}) => {
           {renderSettingsRow(
             undefined,
             'Security & Privacy',
-            () => {},
+            () => {
+              refRBSecuritySheet.current.open();
+            },
             'Privacy settings, private key and wallet seed phrase',
           )}
           {renderSettingsRow(
@@ -275,6 +210,7 @@ const Preferences = ({navigation, onGoBack}) => {
           {renderSettingsRow(undefined, 'Experimental', () => {}, 'About DeGe')}
         </View>
         {renderGeneralRBSheet()}
+        {renderSecurityAndPrivacyRBSheet()}
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

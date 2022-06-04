@@ -26,7 +26,6 @@ const BalanceText = ({
         ? parseFloat(balancesInfo[address].main)
         : 0
       : 0;
-    console.log('init beforebalance to::::', beforeBalance);
     const network = networks[currentNetwork];
     const provider = new ethers.providers.JsonRpcProvider(network.rpc);
     provider.on('block', blockNum => {
@@ -62,26 +61,28 @@ const BalanceText = ({
     };
   }, []);
 
-  // useEffect(() => {
-  //   const network = networks[currentNetwork];
-  //   const provider = new ethers.providers.JsonRpcProvider(network.rpc);
-  //   provider.getBalance(address).then(res => {
-  //     const value = ethers.utils.formatEther(res);
-  //     if (
-  //       balances[address] === undefined ||
-  //       !(parseFloat(balances[address].main) === parseFloat(value))
-  //     ) {
-  //       console.log(
-  //         'Updating Balance of ' + address + ' ..............',
-  //         value,
-  //       );
-  //       updateBalanceInfo({
-  //         address,
-  //         balance: value,
-  //       });
-  //     }
-  //   });
-  // }, [currentNetwork]);
+  useEffect(() => {
+    let beforeBalance = balancesInfo[address]
+      ? balancesInfo[address].main
+        ? parseFloat(balancesInfo[address].main)
+        : 0
+      : 0;
+    const network = networks[currentNetwork];
+    const provider = new ethers.providers.JsonRpcProvider(network.rpc);
+    provider.getBalance(address).then(res => {
+      const value = ethers.utils.formatEther(res);
+      if (parseFloat(beforeBalance) !== parseFloat(value)) {
+        console.log(
+          'Updating Balance of ' + address + ' ..............',
+          value,
+        );
+        updateBalanceInfo({
+          address,
+          balance: value,
+        });
+      }
+    });
+  }, [currentNetwork]);
 
   return (
     <Text style={style}>

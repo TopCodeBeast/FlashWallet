@@ -30,64 +30,17 @@ import {
   TextButton,
 } from '../../../components/Buttons';
 import TokenShow from './TokenShow/TokenShow';
-import BalanceText from '../../../components/BalanceText';
 import SendToken from './SendToken/SendToken';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import Toast from 'react-native-toast-message';
+import NetworkBalance from './NetworkBalance';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 const buyIconSvgXml = require('../SVGData').buyIcon;
 
-const WalletTab = ({navigation, accounts, currentAccountIndex}) => {
+const WalletTab = ({navigation, currentNetwork}) => {
   const [selectedToken, setSelectedToken] = useState('');
   const refRBSendTokenSheet = useRef(null);
-
-  useEffect(() => {
-    return () => {};
-  });
-
-  const renderNetworkBalance = () => {
-    return (
-      <View style={{marginLeft: 24, marginTop: 24}}>
-        <View>
-          <MaskedView
-            maskElement={
-              accounts && accounts[currentAccountIndex] ? (
-                <BalanceText
-                  style={{...fonts.big_type1}}
-                  address={accounts[currentAccountIndex].address}
-                />
-              ) : (
-                <Text style={{...fonts.big_type1}}>0 ETH</Text>
-              )
-            }>
-            <LinearGradient colors={colors.gradient8}>
-              {accounts && accounts[currentAccountIndex] ? (
-                <BalanceText
-                  style={{...fonts.big_type1, opacity: 0}}
-                  address={accounts[currentAccountIndex].address}
-                />
-              ) : (
-                <Text style={{...fonts.big_type1, opacity: 0}}>0 ETH</Text>
-              )}
-            </LinearGradient>
-          </MaskedView>
-        </View>
-        <View style={{marginTop: 24, flexDirection: 'row'}}>
-          <View>
-            <Text style={{...fonts.para_regular, color: 'white'}}>
-              $16,858.15
-            </Text>
-          </View>
-          <View style={{marginLeft: 8}}>
-            <Text style={{...fonts.para_regular, color: colors.green5}}>
-              +0.7%
-            </Text>
-          </View>
-        </View>
-      </View>
-    );
-  };
 
   const renderTransactionButtonGroup = () => {
     return (
@@ -199,7 +152,7 @@ const WalletTab = ({navigation, accounts, currentAccountIndex}) => {
               style={{position: 'absolute', right: '-15%', top: '10%'}}
             />
             {/* <View style={{height: '20%'}}></View> */}
-            {renderNetworkBalance()}
+            <NetworkBalance />
             {renderTransactionButtonGroup()}
             <TokenAndCollectiblesTab
               navigation={navigation}
@@ -216,6 +169,7 @@ const WalletTab = ({navigation, accounts, currentAccountIndex}) => {
 const mapStateToProps = state => ({
   accounts: state.accounts.accounts,
   currentAccountIndex: state.accounts.currentAccountIndex,
+  currentNetwork: state.networks.currentNetwork,
 });
 const mapDispatchToProps = dispatch => ({});
 

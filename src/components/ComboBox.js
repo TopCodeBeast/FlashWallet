@@ -1,11 +1,13 @@
 import React from 'react';
-import {View} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import {colors} from '../styles';
 import FontAwesome, {SolidIcons} from 'react-native-fontawesome';
 
 const ComboBox = props => {
+  const onPress = props.onPress;
   return (
-    <View
+    <TouchableOpacity
+      onPress={onPress}
       style={{
         borderRadius: 8,
         borderColor: colors.grey9,
@@ -24,7 +26,7 @@ const ComboBox = props => {
           icon={SolidIcons.chevronDown}
         />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

@@ -196,7 +196,7 @@ const NetworkFeeRBSheet = ({onSave}) => {
 
           return (
             <View
-              key={'tokenandcollectibletabbar_' + i}
+              key={'networkfeerbsheet' + i}
               style={{
                 marginHorizontal: 24,
                 borderBottomWidth: curTabIndex === i ? 3 : 0,

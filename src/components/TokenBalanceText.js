@@ -79,32 +79,35 @@ const TokenBalanceText = ({
     };
   }, []);
 
-  // useEffect(() => {
-  //   const network = networks[currentNetwork];
-  //   const provider = new ethers.providers.JsonRpcProvider(network.rpc);
-  //   const contract = new ethers.Contract(tokenAddress, minABI, provider);
-  //   contract.balanceOf(address).then(res => {
-  //     const value = ethers.utils.formatEther(res);
-  //     if (
-  //       balancesInfo[address] == undefined ||
-  //       !(parseFloat(balancesInfo[address][tokenAddress]) === parseFloat(value))
-  //     ) {
-  //       console.log(
-  //         'Updating Token ' +
-  //           tokenSymbol +
-  //           ' Balance of ' +
-  //           address +
-  //           ' ..............',
-  //         value,
-  //       );
-  //       updateTokenBalanceInfo({
-  //         address,
-  //         balance: value,
-  //         tokenAddress,
-  //       });
-  //     }
-  //   });
-  // }, [currentNetwork]);
+  useEffect(() => {
+    let beforeBalance = balancesInfo[address]
+      ? balancesInfo[address][tokenAddress]
+        ? parseFloat(balancesInfo[address][tokenAddress])
+        : 0
+      : 0;
+    const network = networks[currentNetwork];
+    const provider = new ethers.providers.JsonRpcProvider(network.rpc);
+    const contract = new ethers.Contract(tokenAddress, minABI, provider);
+    contract.balanceOf(address).then(res => {
+      const value = ethers.utils.formatUnits(res, tokenDecimal);
+      if (parseFloat(beforeBalance) !== parseFloat(value)) {
+        console.log(
+          'Updating Token11 ' +
+            tokenSymbol +
+            ' Balance of ' +
+            address +
+            ' ..............',
+          value,
+        );
+        updateTokenBalanceInfo({
+          address,
+          balance: value,
+          tokenAddress,
+        });
+      }
+    });
+  }, [currentNetwork]);
+
   return (
     <Text style={style}>
       {balancesInfo[address] != undefined &&

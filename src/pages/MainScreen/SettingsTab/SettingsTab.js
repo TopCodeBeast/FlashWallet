@@ -10,26 +10,14 @@ import {
 } from 'react-native';
 import {colors, fonts} from '../../../styles';
 import {SvgXml} from 'react-native-svg';
-import FontAwesome, {
-  SolidIcons,
-  RegularIcons,
-  BrandIcons,
-  parseIconFromClassName,
-} from 'react-native-fontawesome';
+import FontAwesome, {SolidIcons, RegularIcons} from 'react-native-fontawesome';
 import AntIcon from 'react-native-vector-icons/AntDesign';
-import FeatherIcon from 'react-native-vector-icons/Feather';
-import LinearGradient from 'react-native-linear-gradient';
-import MaskedView from '@react-native-community/masked-view';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 const Tab = createBottomTabNavigator();
 
-import {
-  PrimaryButton,
-  SecondaryButton,
-  TextButton,
-} from '../../../components/Buttons';
-import Preferences from './Preferences';
+//import tabs
+import Preferences from './Preferences/Preferences';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 const buyIconSvgXml = require('../SVGData').buyIcon;
@@ -112,7 +100,6 @@ const SettingsTab = ({navigation}) => {
             <SvgXml xml={fonts.preferenceIconSvgXml} />,
             'Preferences',
             () => {
-              console.log(showStatus);
               setShowStatus('prefereneces');
             },
           )}
@@ -144,6 +131,10 @@ const SettingsTab = ({navigation}) => {
     );
   };
 
+  const onGoBack = () => {
+    setShowStatus('default');
+  };
+
   return (
     <KeyboardAvoidingView>
       <SafeAreaView
@@ -153,13 +144,7 @@ const SettingsTab = ({navigation}) => {
           height: '100%',
         }}>
         {showStatus === 'default' && <MainSettingsTab />}
-        {showStatus === 'prefereneces' && (
-          <Preferences
-            onGoBack={() => {
-              setShowStatus('default');
-            }}
-          />
-        )}
+        {showStatus === 'prefereneces' && <Preferences onGoBack={onGoBack} />}
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
