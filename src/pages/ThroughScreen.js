@@ -86,24 +86,26 @@ const ThroughScreen = ({navigation}) => {
           <>
             <View
               style={{
-                width: '90%',
-                bottom: '6%',
-                position: 'absolute',
-                left: '5%',
+                flex: 1,
+                flexDirection: 'column-reverse',
+                marginBottom: 60,
+                marginHorizontal: 24,
               }}>
-              <SecondaryButton
-                onPress={() => {
-                  navigation.navigate('importwallet');
-                }}
-                text="Import Using Seed Phrase"
-              />
-              <View style={{height: 15}}></View>
-              <PrimaryButton
-                onPress={() => {
-                  navigation.navigate('createwallet');
-                }}
-                text="Create a New Wallet"
-              />
+              <View>
+                <SecondaryButton
+                  onPress={() => {
+                    navigation.navigate('importwallet');
+                  }}
+                  text="Import Using Seed Phrase"
+                />
+                <View style={{height: 15}}></View>
+                <PrimaryButton
+                  onPress={() => {
+                    navigation.navigate('createwallet');
+                  }}
+                  text="Create a New Wallet"
+                />
+              </View>
             </View>
           </>
         )}

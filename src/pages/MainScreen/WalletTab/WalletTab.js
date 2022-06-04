@@ -165,7 +165,7 @@ const WalletTab = ({navigation, currentNetwork}) => {
         )}
         {!selectedToken && (
           <>
-            <Header />
+            <Header navigation={navigation} />
             <Image
               source={backImage}
               style={{position: 'absolute', right: '-15%', top: '10%'}}

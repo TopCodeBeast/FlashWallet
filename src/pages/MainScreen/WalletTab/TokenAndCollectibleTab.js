@@ -87,6 +87,12 @@ const TokenAndCollectiblesTab = ({
     return (
       <View style={{flex: 1}}>
         <ScrollView>
+          <TokenItemRow
+            token={'main'}
+            onPress={() => {
+              navigation.navigate('tokenshow');
+            }}
+          />
           {tokensList.map(token => {
             return (
               <TokenItemRow
@@ -111,7 +117,6 @@ const TokenAndCollectiblesTab = ({
             }
           />
         </View>
-        {renderTokenAdd()}
       </View>
     );
   };
@@ -173,14 +178,17 @@ const TokenAndCollectiblesTab = ({
   };
 
   return (
-    <TabView
-      style={{marginTop: 40, marginHorizontal: 24, marginBottom: '20%'}}
-      navigationState={{index: curTabIndex, routes: tabRoutes}}
-      renderTabBar={renderTabBar}
-      renderScene={renderScene}
-      onIndexChange={setCurTabIndex}
-      initialLayout={initialLayout}
-    />
+    <>
+      {renderTokenAdd()}
+      <TabView
+        style={{marginTop: 40, marginHorizontal: 24, marginBottom: '20%'}}
+        navigationState={{index: curTabIndex, routes: tabRoutes}}
+        renderTabBar={renderTabBar}
+        renderScene={renderScene}
+        onIndexChange={setCurTabIndex}
+        initialLayout={initialLayout}
+      />
+    </>
   );
 };
 
@@ -190,7 +198,7 @@ const mapStateToProps = state => ({
   accounts: state.accounts.accounts,
   currentAccountIndex: state.accounts.currentAccountIndex,
   balances: state.balances,
-  tokens: state.tokens,
+  tokens: state.tokens.tokensData,
 });
 const mapDispatchToProps = dispatch => ({
   getTokensList: (currentNetwork, currentAccountIndex, successCallback) =>

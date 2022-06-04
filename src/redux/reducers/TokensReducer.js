@@ -1,6 +1,9 @@
-import {SET_TOKENS_DATA} from '../types';
+import {SET_SELECTED_TOKEN, SET_TOKENS_DATA} from '../types';
 
-const initialState = {};
+const initialState = {
+  tokensData: {},
+  selectedToken: 'main',
+};
 
 const TokensReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -8,6 +11,12 @@ const TokensReducer = (state = initialState, action) => {
       return {
         ...state,
         ...action.payload,
+      };
+    }
+    case SET_SELECTED_TOKEN: {
+      return {
+        ...state,
+        selectedToken: action.payload,
       };
     }
     default: {

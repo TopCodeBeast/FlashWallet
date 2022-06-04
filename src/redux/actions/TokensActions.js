@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {SET_TOKENS_DATA} from '../types';
+import {SET_SELECTED_TOKEN, SET_TOKENS_DATA} from '../types';
 
 export const getTokensList = (
   dispatch,
@@ -10,9 +10,11 @@ export const getTokensList = (
   AsyncStorage.getItem('tokens_info')
     .then(res => {
       const data = JSON.parse(res);
-      const tokensList = data[currentNetwork.toString()]
-        ? data[currentNetwork.toString()][currentAccountIndex]
-          ? data[currentNetwork.toString()][currentAccountIndex].tokensList
+      const tokensData = data.tokensData;
+      const tokensList = tokensData[currentNetwork.toString()]
+        ? tokensData[currentNetwork.toString()][currentAccountIndex]
+          ? tokensData[currentNetwork.toString()][currentAccountIndex]
+              .tokensList
           : []
         : [];
       successCallback(tokensList);
@@ -34,7 +36,8 @@ export const addToken = (
   const {token, currentNetwork, currentAccountIndex} = data;
   AsyncStorage.getItem('tokens_info')
     .then(res => {
-      let data = JSON.parse(res);
+      let mainData = JSON.parse(res);
+      let data = mainData.tokensData;
       if (!data[currentNetwork.toString()]) {
         data[currentNetwork.toString()] = {};
       }
@@ -46,9 +49,13 @@ export const addToken = (
       data[currentNetwork.toString()][currentAccountIndex].tokensList.push(
         token,
       );
-      AsyncStorage.setItem('tokens_info', JSON.stringify(data))
+      const storingData = {
+        tokensData: data,
+        selectedToken: mainData.selectedToken || 'main',
+      };
+      AsyncStorage.setItem('tokens_info', JSON.stringify(storingData))
         .then(() => {
-          dispatch({type: SET_TOKENS_DATA, payload: data});
+          dispatch({type: SET_TOKENS_DATA, payload: storingData});
           setTimeout(() => {
             successCallback();
           }, 0);
@@ -62,6 +69,10 @@ export const addToken = (
       console.log('Token actions: ERROR!!!!!: ', err);
       failCallback();
     });
+};
+
+export const setSelectedToken = (dispatch, token) => {
+  dispatch({type: SET_SELECTED_TOKEN, payload: token});
 };
 
 export const loadTokensDataFromStorage = dispatch => {

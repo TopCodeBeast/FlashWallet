@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import {Avatar, Badge} from 'react-native-elements';
 import {colors, fonts} from '../../../styles';
@@ -34,6 +35,7 @@ import {
 import {setCurrentNetwork} from '../../../redux/actions/NetworkActions';
 
 import {isValidPrivateKey} from '../../../utils/common';
+import ScanQRScreen from '../../ScanQRScreen';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 
@@ -51,9 +53,11 @@ const Header = ({
   setCurrentAccountIndex,
   importAccount,
   setCurrentNetwork,
+  navigation,
 }) => {
   const refRBNetworkSelectSheet = useRef(null);
   const refRBAccountSelectSheet = useRef(null);
+  const refRBQRScanSheet = useRef(null);
   const [accountStatus, setAccountStatus] = useState('default');
   const [accountName, setAccountName] = useState('');
   const [importedPrivateKey, setImportedPrivateKey] = useState('');
@@ -387,8 +391,32 @@ const Header = ({
     };
 
     const renderImportAccountRBSheet = () => {
+      const renderQRScanRBSheet = () => {
+        return (
+          <RBSheet
+            height={Dimensions.get('screen').height - 100}
+            ref={refRBQRScanSheet}
+            closeOnDragDown={true}
+            closeOnPressBack={true}
+            closeOnPressMask={true}
+            customStyles={{
+              wrapper: {
+                backgroundColor: '#222531BB',
+              },
+              draggableIcon: {
+                backgroundColor: colors.grey9,
+              },
+              container: {
+                backgroundColor: colors.grey24,
+              },
+            }}>
+            <ScanQRScreen />
+          </RBSheet>
+        );
+      };
       return (
         <View>
+          {renderQRScanRBSheet()}
           <View
             style={{
               paddingTop: 12,
@@ -487,7 +515,12 @@ const Header = ({
                 justifyContent: 'space-evenly',
               }}>
               <View>
-                <TextButton text={'Scan a QR Code'} />
+                <TextButton
+                  text={'Scan a QR Code'}
+                  onPress={() => {
+                    refRBQRScanSheet.current.open();
+                  }}
+                />
               </View>
               <View>
                 <PrimaryButton

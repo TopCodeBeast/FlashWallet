@@ -47,7 +47,7 @@ const tokenName = 'BNB';
 const tokenBalance = 19.2371;
 const usdAmount = 226.69;
 
-const TokenShow = ({navigation, onBackPress}) => {
+const TokenShow = ({navigation}) => {
   const refRBTokenSendSheet = useRef(null);
   const [sendAddress, setSendAddress] = useState('');
 
@@ -274,8 +274,13 @@ const TokenShow = ({navigation, onBackPress}) => {
   };
 
   return (
-    <>
-      <Header tokenName={tokenName} onBackPress={onBackPress} />
+    <View style={{height: '100%', backgroundColor: colors.grey24}}>
+      <Header
+        tokenName={tokenName}
+        onBackPress={() => {
+          navigation.goBack();
+        }}
+      />
       <Image
         source={backImage}
         style={{position: 'absolute', right: '-15%', top: '10%'}}
@@ -284,7 +289,7 @@ const TokenShow = ({navigation, onBackPress}) => {
       {renderTransactionButtonGroup()}
       {renderHistoryPanel()}
       {renderTokenSendRBSheet()}
-    </>
+    </View>
   );
 };
 

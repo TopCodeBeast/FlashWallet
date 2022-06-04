@@ -192,7 +192,7 @@ const ConfirmSeedScreen = ({navigation, successCallback, mnemonic}) => {
         style={{
           flex: 1,
           flexDirection: 'column-reverse',
-          marginBottom: 80,
+          marginBottom: 120,
           marginHorizontal: 24,
         }}>
         <PrimaryButton

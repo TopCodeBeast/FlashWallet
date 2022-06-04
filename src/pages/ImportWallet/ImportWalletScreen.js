@@ -8,7 +8,15 @@ import ToggleSwitch from 'toggle-switch-react-native';
 import {SvgXml} from 'react-native-svg';
 import {PrimaryButton, SecondaryButton} from '../../components/Buttons';
 import FloatLabelInput from '../../components/FloatLabelInput';
-import bip39 from 'react-native-bip39';
+
+// Import the crypto getRandomValues shim (**BEFORE** the shims)
+import 'react-native-get-random-values';
+
+// Import the the ethers shims (**BEFORE** ethers)
+import '@ethersproject/shims';
+
+// Import the ethers library
+import {ethers, utils} from 'ethers';
 
 const qrScanSvgXml = `<svg
 width="24"
@@ -86,7 +94,7 @@ const ImportWalletScreen = ({navigation, createWallet}) => {
       setCanPass(false);
       return;
     }
-    if (!bip39.validateMnemonic(data.seedPhrase)) {
+    if (!utils.isValidMnemonic(data.seedPhrase)) {
       setCanPass(false);
       return;
     }
@@ -200,14 +208,14 @@ const ImportWalletScreen = ({navigation, createWallet}) => {
                   style={{
                     paddingLeft: 16,
                     ...fonts.caption_small12_16_regular,
-                    color: bip39.validateMnemonic(seedPhrase)
+                    color: utils.isValidMnemonic(seedPhrase)
                       ? colors.green5
                       : colors.grey12,
                   }}>
-                  {bip39.validateMnemonic(seedPhrase)
+                  {utils.isValidMnemonic(seedPhrase)
                     ? 'Valid Seed Phrase '
                     : 'Seed Phrase must be valid. '}
-                  {bip39.validateMnemonic(seedPhrase) && (
+                  {utils.isValidMnemonic(seedPhrase) && (
                     <FontAwesome
                       style={{
                         fontSize: 12,
@@ -351,10 +359,10 @@ const ImportWalletScreen = ({navigation, createWallet}) => {
         </View>
         <View
           style={{
-            position: 'absolute',
-            bottom: '6%',
-            width: '90%',
-            left: '5%',
+            flex: 1,
+            flexDirection: 'column-reverse',
+            marginBottom: 60,
+            marginHorizontal: 24,
           }}>
           <SecondaryButton
             enableFlag={canPass}

@@ -2,7 +2,16 @@ import {SET_INITIAL_ACCOUNT_DATA} from '../types';
 import bcrypt from 'bcrypt-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from '../../constants';
-import bip39 from 'react-native-bip39';
+
+// Import the crypto getRandomValues shim (**BEFORE** the shims)
+import 'react-native-get-random-values';
+
+// Import the the ethers shims (**BEFORE** ethers)
+import '@ethersproject/shims';
+
+// Import the ethers library
+import {ethers} from 'ethers';
+
 import {createInitialAccountFromMasterSeed} from '../../utils/account';
 
 import {NetworkList, RINKEBY} from '../../engine/constants';
@@ -20,8 +29,8 @@ export const createWallet = (
     .getSalt(Constants.saltRound)
     .then(salt => {
       const {password, mnemonic} = data;
-      const masterSeed = bip39.mnemonicToSeed(mnemonic);
-      const masterSeedString = masterSeed.toString('hex');
+      const masterSeedString = ethers.utils.mnemonicToSeed(mnemonic).slice(2);
+      const masterSeed = Buffer.from(masterSeedString, 'hex');
       bcrypt
         .hash(salt, password)
         .then(hash => {
@@ -47,6 +56,10 @@ export const createWallet = (
               },
             };
           });
+          const storingTokensInfo = {
+            tokensData: tokensInfo,
+            selectedToken: 'main',
+          };
           AsyncStorage.multiSet([
             ['password', hash],
             ['mnemonic', mnemonic],
@@ -54,7 +67,7 @@ export const createWallet = (
             ['accounts_info', JSON.stringify(accountsInfo)],
             ['networks_info', JSON.stringify(networksInfo)],
             ['balances_info', JSON.stringify(balancesInfo)],
-            ['tokens_info', JSON.stringify(tokensInfo)],
+            ['tokens_info', JSON.stringify(storingTokensInfo)],
           ])
             .then(() => {
               dispatch({

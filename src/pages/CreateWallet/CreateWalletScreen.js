@@ -71,8 +71,8 @@ const CreateWalletScreen = ({navigation, createWallet}) => {
   const [status, setStatus] = useState('create_password');
   const [mnemonic, setMnemonic] = useState([]);
 
-  useEffect(async () => {
-    let phrase = await createMnemonic();
+  useEffect(() => {
+    let phrase = createMnemonic();
     phrase = phrase.split(' ');
     setMnemonic(phrase);
     return () => {};
@@ -436,10 +436,10 @@ const CreateWalletScreen = ({navigation, createWallet}) => {
         </View>
         <View
           style={{
-            position: 'absolute',
-            bottom: 120,
-            width: '90%',
-            left: '5%',
+            flex: 1,
+            flexDirection: 'column-reverse',
+            marginBottom: 120,
+            marginHorizontal: 24,
           }}>
           <PrimaryButton
             enableFlag={canPass}

@@ -31,6 +31,7 @@ import FontAwesome, {
   parseIconFromClassName,
 } from 'react-native-fontawesome';
 import LogIn from '../pages/LogIn';
+import TokenShow from '../pages/MainScreen/WalletTab/TokenShow/TokenShow';
 
 const drawerData = [
   {
@@ -252,6 +253,11 @@ class App extends React.Component {
         <Stack.Screen
           name="mainscreen"
           component={MainScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="tokenshow"
+          component={TokenShow}
           options={{headerShown: false}}
         />
 

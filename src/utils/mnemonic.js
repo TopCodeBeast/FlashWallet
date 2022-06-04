@@ -1,12 +1,21 @@
-import bip39 from 'react-native-bip39';
+// Import the crypto getRandomValues shim (**BEFORE** the shims)
+import 'react-native-get-random-values';
+
+// Import the the ethers shims (**BEFORE** ethers)
+import '@ethersproject/shims';
+
+// Import the ethers library
+import {ethers} from 'ethers';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const createMnemonic = async () => {
-  return await bip39.generateMnemonic();
+const createMnemonic = () => {
+  const mnemonic = ethers.utils.entropyToMnemonic(ethers.utils.randomBytes(16));
+  return mnemonic;
 };
 
 const isValidMnemonic = mnemonic => {
-  return bip39.validateMnemonic(mnemonic);
+  return ethers.utils.isValidMnemonic(mnemonic);
 };
 
 const loadMnemonic = (successCallback, failCallback) => {

@@ -22,8 +22,6 @@ const CanSendTokenList = ({
     : [];
   const refRBTokensListSheet = useRef(null);
 
-  console.log(tokensList);
-
   const TokenRow = ({token, onPress}) => {
     return (
       <TouchableOpacity onPress={onPress}>
@@ -162,7 +160,7 @@ const mapStateToProps = state => ({
   accounts: state.accounts.accounts,
   currentAccountIndex: state.accounts.currentAccountIndex,
   currentNetwork: state.networks.currentNetwork,
-  tokens: state.tokens,
+  tokens: state.tokens.tokensData,
 });
 const mapDispatchToProps = dispatch => ({});
 

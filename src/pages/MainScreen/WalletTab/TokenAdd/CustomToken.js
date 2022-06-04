@@ -193,12 +193,10 @@ const CustomToken = ({
                   },
                   () => {
                     console.log('success on add custom token');
-                    setAddTokenLoading(false);
                     onCancel();
                   },
                   () => {
                     console.log('fail on add custom token');
-                    setAddTokenLoading(false);
                     onCancel();
                   },
                 );
