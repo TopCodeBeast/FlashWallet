@@ -7,6 +7,7 @@ const SecondaryButton = ({
   enableFlag,
   text,
   icon,
+  icon2,
   loading,
   ...rest
 }) => {
@@ -41,6 +42,7 @@ const SecondaryButton = ({
         </Text>
       )}
       {loading && <ActivityIndicator size={'small'} color={colors.green5} />}
+      {icon2 ? icon2 : <></>}
     </TouchableOpacity>
   );
 };

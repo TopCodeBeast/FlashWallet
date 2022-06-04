@@ -18,7 +18,7 @@ import BalanceText from '../../../../components/BalanceText';
 import TokenBalanceText from '../../../../components/TokenBalanceText';
 import {PrimaryButton} from '../../../../components/Buttons';
 import {isValidAddress} from '../../../../utils/common';
-import CanSendTokenList from './CanSendTokenList';
+import CanSendTokenList from '../../../../components/CanSendTokenList';
 import MaskedView from '@react-native-community/masked-view';
 import LinearGradient from 'react-native-linear-gradient';
 import RBSheet from 'react-native-raw-bottom-sheet';

@@ -1,11 +1,11 @@
 import React, {useRef} from 'react';
 import {connect} from 'react-redux';
 import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import {colors, fonts} from '../../../../styles';
+import {colors, fonts} from '../styles';
 import FontAwesome, {SolidIcons} from 'react-native-fontawesome';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import BalanceText from '../../../../components/BalanceText';
-import TokenBalanceText from '../../../../components/TokenBalanceText';
+import BalanceText from './BalanceText';
+import TokenBalanceText from './TokenBalanceText';
 
 const CanSendTokenList = ({
   accounts,

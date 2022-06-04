@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import Toast from 'react-native-toast-message';
 import FontAwesome, {RegularIcons} from 'react-native-fontawesome';
@@ -61,7 +61,17 @@ const toastConfig = {
 };
 
 const CustomToast = () => {
-  return <Toast config={toastConfig} ref={ref => Toast.setRef(ref)} />;
+  useEffect(() => {
+    Toast.hide();
+  }, []);
+
+  return (
+    <Toast
+      config={toastConfig}
+      ref={ref => Toast.setRef(ref)}
+      style={{marginTop: -120}}
+    />
+  );
 };
 
 export default CustomToast;

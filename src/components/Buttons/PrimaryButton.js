@@ -2,7 +2,15 @@ import React from 'react';
 import {TouchableOpacity, Text, ActivityIndicator} from 'react-native';
 import {colors, commonStyles, fonts} from '../../styles';
 
-const PrimaryButton = ({onPress, enableFlag, text, icon, loading, ...rest}) => {
+const PrimaryButton = ({
+  onPress,
+  enableFlag,
+  text,
+  icon,
+  icon2,
+  loading,
+  ...rest
+}) => {
   const backgroundDisabled =
     (typeof enableFlag === 'boolean' && !enableFlag) ||
     (typeof loading === 'boolean' && loading) ||
@@ -37,6 +45,7 @@ const PrimaryButton = ({onPress, enableFlag, text, icon, loading, ...rest}) => {
       {typeof loading === 'boolean' && loading && (
         <ActivityIndicator size={'small'} color={colors.green5} />
       )}
+      {icon2 ? icon2 : <></>}
     </TouchableOpacity>
   );
 };

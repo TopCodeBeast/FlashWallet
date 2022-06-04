@@ -15,8 +15,6 @@ import FontAwesome, {
   RegularIcons,
   BrandIcons,
 } from 'react-native-fontawesome';
-import LinearGradient from 'react-native-linear-gradient';
-import MaskedView from '@react-native-community/masked-view';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 const Tab = createBottomTabNavigator();
@@ -32,8 +30,8 @@ import {
 import TokenShow from './TokenShow/TokenShow';
 import SendToken from './SendToken/SendToken';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import Toast from 'react-native-toast-message';
 import NetworkBalance from './NetworkBalance';
+import ReceiveToken from './ReceiveToken/ReceiveToken';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 const buyIconSvgXml = require('../SVGData').buyIcon;
@@ -41,6 +39,31 @@ const buyIconSvgXml = require('../SVGData').buyIcon;
 const WalletTab = ({navigation, currentNetwork}) => {
   const [selectedToken, setSelectedToken] = useState('');
   const refRBSendTokenSheet = useRef(null);
+  const refRBReceiveTokenSheet = useRef(null);
+
+  const renderReceiveTokenRBSheet = () => {
+    return (
+      <RBSheet
+        height={600}
+        ref={refRBReceiveTokenSheet}
+        closeOnDragDown={true}
+        closeOnPressBack={true}
+        closeOnPressMask={true}
+        customStyles={{
+          wrapper: {
+            backgroundColor: '#222531BB',
+          },
+          draggableIcon: {
+            backgroundColor: colors.grey9,
+          },
+          container: {
+            backgroundColor: colors.grey24,
+          },
+        }}>
+        <ReceiveToken token={'main'} />
+      </RBSheet>
+    );
+  };
 
   const renderTransactionButtonGroup = () => {
     return (
@@ -69,12 +92,7 @@ const WalletTab = ({navigation, currentNetwork}) => {
         <View style={{marginRight: 16}}>
           <SecondaryButton
             onPress={() => {
-              Toast.show({
-                type: 'error',
-                position: 'bottom',
-                text1: 'Error',
-                text2: 'Hello' + ' 😥',
-              });
+              refRBReceiveTokenSheet.current.open();
             }}
             text="Receive"
             icon={
@@ -93,6 +111,7 @@ const WalletTab = ({navigation, currentNetwork}) => {
           />
         </View>
         {renderSendTokenRBSheet()}
+        {renderReceiveTokenRBSheet()}
       </View>
     );
   };
@@ -160,7 +179,6 @@ const WalletTab = ({navigation, currentNetwork}) => {
             />
           </>
         )}
-        <Toast ref={ref => Toast.setRef(ref)} />
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
