@@ -26,6 +26,7 @@ const BalanceText = ({
         ? parseFloat(balancesInfo[address].main)
         : 0
       : 0;
+    console.log('init beforeBalance:::: ', beforeBalance);
     const network = networks[currentNetwork];
     const provider = new ethers.providers.JsonRpcProvider(network.rpc);
     provider.on('block', blockNum => {

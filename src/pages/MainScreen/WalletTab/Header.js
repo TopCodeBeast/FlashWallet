@@ -577,7 +577,7 @@ const Header = ({
             backgroundColor: colors.grey24,
           },
         }}>
-        <ScrollView>
+        <ScrollView style={{height: '100%', marginBottom: 40}}>
           {accountStatus === 'default' && renderDefaultAccountRBSheet()}
           {accountStatus === 'create_account' && renderCreateAccountRBSheet()}
           {accountStatus === 'import_account' && renderImportAccountRBSheet()}

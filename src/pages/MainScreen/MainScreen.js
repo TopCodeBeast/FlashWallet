@@ -15,9 +15,12 @@ const Tab = createBottomTabNavigator();
 
 import WalletTab from './WalletTab/WalletTab';
 import SettingsTab from './SettingsTab/SettingsTab';
+import {getFeeData} from '../../redux/actions/EngineAction';
 
-const MainScreen = ({navigation, currentNetwork}) => {
-  useEffect(() => {}, [currentNetwork]);
+const MainScreen = ({navigation, networks, currentNetwork, getFeeData}) => {
+  useEffect(() => {
+    getFeeData(networks[currentNetwork].rpc);
+  }, [currentNetwork]);
 
   const tabBar = ({state, descriptors, navigation}) => {
     return (
@@ -135,10 +138,13 @@ const MainScreen = ({navigation, currentNetwork}) => {
 };
 
 const mapStateToProps = state => ({
+  networks: state.networks.networks,
   currentNetwork: state.networks.currentNetwork,
   accounts: state.accounts.accounts,
   currentAccountIndex: state.accounts.currentAccountIndex,
 });
-const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  getFeeData: currentNetworkRPC => getFeeData(dispatch, currentNetworkRPC),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainScreen);

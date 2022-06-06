@@ -66,3 +66,12 @@ export const NetworkList = {
     unit: 'ETH',
   },
 };
+
+export const feeRatio = {
+  lowFeeRatio: 0.939999999,
+  highFeeRatio: 1.333333334,
+};
+
+export const transferETHGasLimit = 21000;
+export const estimateGasRatio = 1.5;
+export const gettingFeeDataTimerInterval = 5000; //ms

@@ -32,6 +32,7 @@ import SendToken from './SendToken/SendToken';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import NetworkBalance from './NetworkBalance';
 import ReceiveToken from './ReceiveToken/ReceiveToken';
+import BuyToken from './BuyToken/BuyToken';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 const buyIconSvgXml = require('../SVGData').buyIcon;
@@ -40,6 +41,35 @@ const WalletTab = ({navigation, currentNetwork}) => {
   const [selectedToken, setSelectedToken] = useState('');
   const refRBSendTokenSheet = useRef(null);
   const refRBReceiveTokenSheet = useRef(null);
+  const refRBBuySheet = useRef(null);
+
+  const renderBuyRBSheet = () => {
+    return (
+      <RBSheet
+        height={Dimensions.get('screen').height - 150}
+        ref={refRBBuySheet}
+        closeOnDragDown={true}
+        closeOnPressBack={true}
+        closeOnPressMask={true}
+        customStyles={{
+          wrapper: {
+            backgroundColor: '#222531BB',
+          },
+          draggableIcon: {
+            backgroundColor: colors.grey9,
+          },
+          container: {
+            backgroundColor: colors.grey24,
+          },
+        }}>
+        <BuyToken
+          onPressClose={() => {
+            refRBBuySheet.current.close();
+          }}
+        />
+      </RBSheet>
+    );
+  };
 
   const renderReceiveTokenRBSheet = () => {
     return (
@@ -105,13 +135,13 @@ const WalletTab = ({navigation, currentNetwork}) => {
         </View>
         <View>
           <SecondaryButton
-            onPress={() => {}}
+            onPress={() => {
+              refRBBuySheet.current.open();
+            }}
             text="Buy"
             icon={<SvgXml style={{marginRight: 16}} xml={buyIconSvgXml} />}
           />
         </View>
-        {renderSendTokenRBSheet()}
-        {renderReceiveTokenRBSheet()}
       </View>
     );
   };
@@ -165,6 +195,9 @@ const WalletTab = ({navigation, currentNetwork}) => {
         )}
         {!selectedToken && (
           <>
+            {renderSendTokenRBSheet()}
+            {renderReceiveTokenRBSheet()}
+            {renderBuyRBSheet()}
             <Header navigation={navigation} />
             <Image
               source={backImage}

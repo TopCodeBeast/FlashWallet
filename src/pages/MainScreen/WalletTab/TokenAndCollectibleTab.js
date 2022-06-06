@@ -18,7 +18,10 @@ import {TextButton} from '../../../components/Buttons';
 
 import TokenItemRow from './TokenItemRow';
 import CollectibleItemRow from './CollectibleItemRow';
-import {getTokensList} from '../../../redux/actions/TokensActions';
+import {
+  getTokensList,
+  setSelectedToken,
+} from '../../../redux/actions/TokensActions';
 import TokenAdd from './TokenAdd/TokenAdd';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
@@ -34,6 +37,7 @@ const TokenAndCollectiblesTab = ({
   currentAccountIndex,
   getTokensList,
   tokens,
+  setSelectedToken,
 }) => {
   const [curTabIndex, setCurTabIndex] = useState(0);
 
@@ -90,6 +94,7 @@ const TokenAndCollectiblesTab = ({
           <TokenItemRow
             token={'main'}
             onPress={() => {
+              setSelectedToken('main');
               navigation.navigate('tokenshow');
             }}
           />
@@ -97,7 +102,10 @@ const TokenAndCollectiblesTab = ({
             return (
               <TokenItemRow
                 token={token}
-                onPress={() => {}}
+                onPress={() => {
+                  setSelectedToken(token);
+                  navigation.navigate('tokenshow');
+                }}
                 key={'tokenRoute_' + token.tokenAddress}
               />
             );
@@ -208,6 +216,7 @@ const mapDispatchToProps = dispatch => ({
       currentAccountIndex,
       successCallback,
     ),
+  setSelectedToken: token => setSelectedToken(dispatch, token),
 });
 
 export default connect(

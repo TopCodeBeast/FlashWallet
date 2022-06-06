@@ -22,11 +22,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import LinearGradient from 'react-native-linear-gradient';
 import MaskedView from '@react-native-community/masked-view';
 
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-const Tab = createBottomTabNavigator();
-
 import Header from './Header';
-import TokenAndCollectiblesTab from '../TokenAndCollectibleTab';
 
 import {
   PrimaryButton,
@@ -36,106 +32,93 @@ import {
 import HistoryRow from './HistoryRow';
 import {Avatar} from 'react-native-elements';
 import SendToken from '../SendToken/SendToken';
+import BalanceText from '../../../../components/BalanceText';
+import TokenBalanceText from '../../../../components/TokenBalanceText';
 
-const avatar1Image = require('../../../../assets/avatars/avatar1.png');
-const avatar2Image = require('../../../../assets/avatars/avatar2.png');
-const avatar3Image = require('../../../../assets/avatars/avatar3.png');
 const backImage = require('../../../../assets/images/mainscreen/backimage.png');
-const buyIconSvgXml = require('../../SVGData').buyIcon;
 
-const tokenName = 'BNB';
 const tokenBalance = 19.2371;
 const usdAmount = 226.69;
 
-const TokenShow = ({navigation}) => {
+const TokenShow = ({
+  navigation,
+  networks,
+  currentNetwork,
+  accounts,
+  currentAccountIndex,
+  selectedToken,
+}) => {
   const refRBTokenSendSheet = useRef(null);
   const [sendAddress, setSendAddress] = useState('');
 
   useEffect(() => {
+    console.log(selectedToken);
     return () => {};
   });
 
-  const renderAccountRow = (
-    accountName,
-    accountAddress,
-    accountIcon,
-    onPress,
-  ) => {
-    return (
-      <TouchableOpacity onPress={onPress}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 16,
-          }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: colors.grey23,
-                marginRight: 16,
-              }}>
-              <View style={{position: 'absolute', left: 0, top: 0}}>
-                {accountIcon}
-              </View>
-            </View>
-            <View>
-              <View>
-                <Text style={{...fonts.title2, color: 'white'}}>
-                  {accountName}
-                </Text>
-              </View>
-              <View>
-                <Text
-                  style={{
-                    ...fonts.caption_small12_18_regular,
-                    color: colors.grey9,
-                  }}>
-                  {accountAddress.slice(0, 6) +
-                    '...' +
-                    accountAddress.slice(-4)}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  const currentAccount = accounts[currentAccountIndex];
 
   const renderNetworkBalance = () => {
     return (
-      <View style={{marginLeft: 24, marginTop: 24}}>
-        <View>
-          <MaskedView
-            maskElement={
-              <Text style={{...fonts.big_type1}}>
-                {tokenBalance + ' ' + tokenName}
+      <>
+        {selectedToken === 'main' ? (
+          <View style={{marginLeft: 24, marginTop: 24}}>
+            <View>
+              <MaskedView
+                maskElement={
+                  <BalanceText
+                    style={{...fonts.big_type1}}
+                    address={currentAccount.address}
+                  />
+                }>
+                <LinearGradient colors={colors.gradient8}>
+                  <BalanceText
+                    style={{...fonts.big_type1, opacity: 0}}
+                    address={currentAccount.address}
+                  />
+                </LinearGradient>
+              </MaskedView>
+            </View>
+            <View style={{marginTop: 24}}>
+              <Text style={{...fonts.para_regular, color: 'white'}}>
+                {'$' +
+                  parseFloat(tokenBalance * usdAmount)
+                    .toFixed(4)
+                    .toString()}
               </Text>
-            }>
-            <LinearGradient colors={colors.gradient8}>
-              <Text style={{...fonts.big_type1, opacity: 0}}>
-                {tokenBalance + ' ' + tokenName}
+            </View>
+          </View>
+        ) : (
+          <View style={{marginLeft: 24, marginTop: 24}}>
+            <View>
+              <MaskedView
+                maskElement={
+                  <TokenBalanceText
+                    address={currentAccount.address}
+                    token={selectedToken}
+                    style={{...fonts.big_type1}}
+                  />
+                }>
+                <LinearGradient colors={colors.gradient8}>
+                  <TokenBalanceText
+                    address={currentAccount.address}
+                    token={selectedToken}
+                    style={{...fonts.big_type1, opacity: 0}}
+                  />
+                </LinearGradient>
+              </MaskedView>
+            </View>
+            <View style={{marginTop: 24}}>
+              <Text style={{...fonts.para_regular, color: 'white'}}>
+                {'$' +
+                  parseFloat(tokenBalance * usdAmount)
+                    .toFixed(4)
+                    .toString()}
               </Text>
-            </LinearGradient>
-          </MaskedView>
-        </View>
-        <View style={{marginTop: 24}}>
-          <Text style={{...fonts.para_regular, color: 'white'}}>
-            {'$' +
-              parseFloat(tokenBalance * usdAmount)
-                .toFixed(4)
-                .toString()}
-          </Text>
-        </View>
-      </View>
+            </View>
+          </View>
+        )}
+      </>
     );
   };
 
@@ -276,7 +259,7 @@ const TokenShow = ({navigation}) => {
   return (
     <View style={{height: '100%', backgroundColor: colors.grey24}}>
       <Header
-        tokenName={tokenName}
+        tokenName={selectedToken === 'main' ? 'ETH' : selectedToken.tokenSymbol}
         onBackPress={() => {
           navigation.goBack();
         }}
@@ -293,4 +276,13 @@ const TokenShow = ({navigation}) => {
   );
 };
 
-export default TokenShow;
+const mapStateToProps = state => ({
+  networks: state.networks.networks,
+  currentNetwork: state.networks.currentNetwork,
+  accounts: state.accounts.accounts,
+  currentAccountIndex: state.accounts.currentAccountIndex,
+  selectedToken: state.tokens.selectedToken,
+});
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(TokenShow);

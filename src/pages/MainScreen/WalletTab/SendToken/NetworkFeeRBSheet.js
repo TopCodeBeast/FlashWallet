@@ -8,34 +8,110 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {connect} from 'react-redux';
-import FontAwesome, {SolidIcons} from 'react-native-fontawesome';
+import FontAwesome, {RegularIcons, SolidIcons} from 'react-native-fontawesome';
 import {fonts, colors} from '../../../../styles';
-import {TabView, SceneMap} from 'react-native-tab-view';
-import {useColorModeValue} from 'native-base';
 import {PrimaryButton} from '../../../../components/Buttons';
 import FloatLabelInput from '../../../../components/FloatLabelInput';
 
-//actions
+// Import the crypto getRandomValues shim (**BEFORE** the shims)
+import 'react-native-get-random-values';
 
-const NetworkFeeRBSheet = ({onSave}) => {
-  const [curTabIndex, setCurTabIndex] = useState(0);
-  const [tabRoutes] = useState([
-    {
-      key: 'first',
-      title: 'Basic',
-    },
-    {
-      key: 'second',
-      title: 'Advanced',
-    },
-  ]);
+// Import the the ethers shims (**BEFORE** ethers)
+import '@ethersproject/shims';
 
-  const [gasLimit, setGasLimit] = useState('21000');
-  const [gasPrice, setGasPrice] = useState('');
+// Import the ethers library
+import {ethers, utils} from 'ethers';
+import {transferETHGasLimit} from '../../../../engine/constants';
 
-  const BasicRoute = () => {
+const NetworkFeeRBSheet = props => {
+  const {onSave, feeData} = props;
+  const propsMaxFee = utils.formatUnits(props.maxFee, 'gwei');
+  const propsMaxPriorityFee = utils.formatUnits(props.maxPriorityFee, 'gwei');
+  const propsGasLimit = props.gasLimit.toString();
+  const [networkFeeType, setNetworkFeeType] = useState(props.networkFeeType);
+
+  const [showStatus, setShowStatus] = useState(
+    props.networkFeeType === 'advanced' ? 'advanced' : 'basic',
+  );
+
+  const [gasLimit, setGasLimit] = useState(propsGasLimit);
+  const [maxPriorityFee, setMaxPriorityFee] = useState(propsMaxPriorityFee);
+  const [maxFee, setMaxFee] = useState(propsMaxFee);
+  const [error, setError] = useState({});
+
+  const onPressSave = () => {
+    if (Number(gasLimit) !== parseInt(gasLimit)) {
+      setError({...error, gasLimit: 'Must be valid Integer.'});
+      return;
+    }
+    if (Number(maxFee) !== Number(maxFee)) {
+      setError({...error, maxFee: 'Must be valid Number.'});
+      return;
+    }
+    if (Number(maxPriorityFee) !== Number(maxPriorityFee)) {
+      setError({...error, maxPriorityFee: 'Must be valid Number.'});
+      return;
+    }
+    if (Number(gasLimit) < transferETHGasLimit) {
+      setError({...error, gasLimit: 'Must be bigger than 21000.'});
+      return;
+    }
+    if (parseFloat(maxFee) < parseFloat(maxPriorityFee)) {
+      setError({
+        ...error,
+        maxFee: 'Max Fee cannot be lower than Max Priority Fee.',
+      });
+      return;
+    }
+    if (
+      parseFloat(maxFee) < utils.formatUnits(feeData.low.maxFeePerGas, 'gwei')
+    ) {
+      setError({
+        ...error,
+        maxFee: 'Max Fee is lower than the current network condition.',
+      });
+    }
+    if (
+      parseFloat(maxPriorityFee) <
+      utils.formatUnits(feeData.low.maxPriorityFeePerGas, 'gwei')
+    ) {
+      setError({
+        ...error,
+        maxPriorityFee:
+          'Max Priority Fee is lower than the current network condition.',
+      });
+    }
+    if (
+      parseFloat(maxFee) > utils.formatUnits(feeData.high.maxFeePerGas, 'gwei')
+    ) {
+      setError({...error, maxFee: 'Max Fee is higher than necessary.'});
+    }
+    if (
+      parseFloat(maxPriorityFee) >
+      utils.formatUnits(feeData.high.maxPriorityFeePerGas, 'gwei')
+    ) {
+      setError({
+        ...error,
+        maxPriorityFee: 'Max Priority Fee is higher than necessary.',
+      });
+    }
+    if (showStatus === 'basic') {
+      onSave({type: networkFeeType, data: {gasLimit}});
+    } else if (showStatus === 'advanced') {
+      onSave({
+        type: 'advanced',
+        data: {
+          gasLimit,
+          maxFee,
+          maxPriorityFee,
+        },
+      });
+    }
+  };
+
+  const renderBasicStatus = () => {
     return (
-      <View style={{flex: 1}}>
+      <View>
         <View
           style={{
             borderWidth: 1,
@@ -50,15 +126,23 @@ const NetworkFeeRBSheet = ({onSave}) => {
               padding: 16,
             }}>
             <TouchableOpacity
+              onPress={() => {
+                setNetworkFeeType('low');
+              }}
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
               }}>
               <View style={{width: '35%'}}>
-                <Text style={{...fonts.title2, color: 'white'}}>Slow</Text>
+                <Text style={{...fonts.title2, color: 'white'}}>Low</Text>
               </View>
-              <View style={{width: '65%'}}>
-                <Text style={{...fonts.title2, color: 'white'}}>0.08</Text>
+              <View style={{width: '60%'}}>
+                <Text style={{...fonts.title2, color: 'white'}}>
+                  {(
+                    parseFloat(utils.formatEther(feeData.low.maxFeePerGas)) *
+                    gasLimit
+                  ).toFixed(8) + ' ETH'}
+                </Text>
                 <Text
                   style={{
                     ...fonts.caption_small12_18_regular,
@@ -67,6 +151,12 @@ const NetworkFeeRBSheet = ({onSave}) => {
                   $ 19.23
                 </Text>
               </View>
+              {networkFeeType === 'low' && (
+                <FontAwesome
+                  style={{fontSize: 16, color: colors.green5, marginRight: 24}}
+                  icon={RegularIcons.checkCircle}
+                />
+              )}
             </TouchableOpacity>
           </View>
           <View
@@ -76,15 +166,23 @@ const NetworkFeeRBSheet = ({onSave}) => {
               padding: 16,
             }}>
             <TouchableOpacity
+              onPress={() => {
+                setNetworkFeeType('medium');
+              }}
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
               }}>
               <View style={{width: '35%'}}>
-                <Text style={{...fonts.title2, color: 'white'}}>Average</Text>
+                <Text style={{...fonts.title2, color: 'white'}}>Medium</Text>
               </View>
-              <View style={{width: '65%'}}>
-                <Text style={{...fonts.title2, color: 'white'}}>0.08</Text>
+              <View style={{width: '60%'}}>
+                <Text style={{...fonts.title2, color: 'white'}}>
+                  {(
+                    parseFloat(utils.formatEther(feeData.medium.maxFeePerGas)) *
+                    gasLimit
+                  ).toFixed(8) + ' ETH'}
+                </Text>
                 <Text
                   style={{
                     ...fonts.caption_small12_18_regular,
@@ -93,6 +191,12 @@ const NetworkFeeRBSheet = ({onSave}) => {
                   $ 19.23
                 </Text>
               </View>
+              {networkFeeType === 'medium' && (
+                <FontAwesome
+                  style={{fontSize: 16, color: colors.green5, marginRight: 24}}
+                  icon={RegularIcons.checkCircle}
+                />
+              )}
             </TouchableOpacity>
           </View>
           <View
@@ -100,15 +204,23 @@ const NetworkFeeRBSheet = ({onSave}) => {
               padding: 16,
             }}>
             <TouchableOpacity
+              onPress={() => {
+                setNetworkFeeType('high');
+              }}
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
               }}>
               <View style={{width: '35%'}}>
-                <Text style={{...fonts.title2, color: 'white'}}>Fast</Text>
+                <Text style={{...fonts.title2, color: 'white'}}>High</Text>
               </View>
-              <View style={{width: '65%'}}>
-                <Text style={{...fonts.title2, color: 'white'}}>0.08</Text>
+              <View style={{width: '60%'}}>
+                <Text style={{...fonts.title2, color: 'white'}}>
+                  {(
+                    parseFloat(utils.formatEther(feeData.high.maxFeePerGas)) *
+                    gasLimit
+                  ).toFixed(8) + ' ETH'}
+                </Text>
                 <Text
                   style={{
                     ...fonts.caption_small12_18_regular,
@@ -117,6 +229,12 @@ const NetworkFeeRBSheet = ({onSave}) => {
                   $ 19.23
                 </Text>
               </View>
+              {networkFeeType === 'high' && (
+                <FontAwesome
+                  style={{fontSize: 16, color: colors.green5, marginRight: 24}}
+                  icon={RegularIcons.checkCircle}
+                />
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -130,9 +248,9 @@ const NetworkFeeRBSheet = ({onSave}) => {
     );
   };
 
-  const AdvancedRoute = () => {
+  const renderAdvancedStatus = () => {
     return (
-      <View style={{flex: 1}}>
+      <View>
         <View
           style={{flexDirection: 'row', alignItems: 'center', marginTop: 24}}>
           <View>
@@ -148,7 +266,13 @@ const NetworkFeeRBSheet = ({onSave}) => {
                 ...fonts.title2,
                 color: 'white',
               }}>
-              0.0001241 ETH
+              {(
+                parseFloat(
+                  utils.formatEther(
+                    utils.parseUnits(parseFloat(maxFee).toFixed(9), 'gwei'),
+                  ),
+                ) * gasLimit
+              ).toFixed(8) + ' ETH'}
             </Text>
           </View>
         </View>
@@ -156,71 +280,66 @@ const NetworkFeeRBSheet = ({onSave}) => {
           <FloatLabelInput
             value={gasLimit}
             label="Gas Limit"
-            onChangeText={value => setGasLimit(value)}
+            onChangeText={value => {
+              setError({...error, gasLimit: undefined});
+              setGasLimit(value);
+            }}
           />
+          {error.gasLimit && (
+            <Text
+              style={{
+                paddingLeft: 16,
+                ...fonts.caption_small12_16_regular,
+                color: colors.red5,
+              }}>
+              {error.gasLimit}
+            </Text>
+          )}
         </View>
         <View style={{marginTop: 16}}>
           <FloatLabelInput
-            value={gasPrice}
-            label="Gas Price:(GWEI)"
-            onChangeText={value => setGasPrice(value)}
+            value={maxPriorityFee}
+            label="Max Priority Fee (GWEI)"
+            onChangeText={value => {
+              setError({...error, maxPriorityFee: undefined});
+              setMaxPriorityFee(value);
+            }}
           />
+          {error.maxPriorityFee && (
+            <Text
+              style={{
+                paddingLeft: 16,
+                ...fonts.caption_small12_16_regular,
+                color: colors.red5,
+              }}>
+              {error.maxPriorityFee}
+            </Text>
+          )}
+        </View>
+        <View style={{marginTop: 16}}>
+          <FloatLabelInput
+            value={maxFee}
+            label="Max Fee (GWEI)"
+            onChangeText={value => {
+              setError({...error, maxFee: undefined});
+              setMaxFee(value);
+            }}
+          />
+          {error.maxFee && (
+            <Text
+              style={{
+                paddingLeft: 16,
+                ...fonts.caption_small12_16_regular,
+                color: colors.red5,
+              }}>
+              {error.maxFee}
+            </Text>
+          )}
         </View>
       </View>
     );
   };
 
-  const initialLayout = {
-    width: Dimensions.get('window').width,
-  };
-  const renderScene = SceneMap({
-    first: BasicRoute,
-    second: AdvancedRoute,
-  });
-
-  const renderTabBar = props => {
-    const inputRange = props.navigationState.routes.map((x, i) => i);
-    return (
-      <View style={{flexDirection: 'row'}}>
-        {props.navigationState.routes.map((route, i) => {
-          const opacity = props.position.interpolate({
-            inputRange,
-            outputRange: inputRange.map(inputIndex =>
-              inputIndex === i ? 1 : 0.5,
-            ),
-          });
-          const color =
-            curTabIndex === i
-              ? useColorModeValue('white', colors.grey12)
-              : useColorModeValue(colors.grey12, colors.grey12);
-
-          return (
-            <View
-              key={'networkfeerbsheet' + i}
-              style={{
-                marginHorizontal: 24,
-                borderBottomWidth: curTabIndex === i ? 3 : 0,
-                borderColor: 'white',
-                flex: 1,
-                alignItems: 'center',
-              }}>
-              <Pressable
-                onPress={() => {
-                  setCurTabIndex(i);
-                }}>
-                <Animated.Text
-                  style={{
-                    color,
-                  }}>
-                  {route.title}
-                </Animated.Text>
-              </Pressable>
-            </View>
-          );
-        })}
-      </View>
-    );
-  };
   return (
     <>
       <View style={{marginTop: 12}}>
@@ -228,19 +347,68 @@ const NetworkFeeRBSheet = ({onSave}) => {
           Edit Network Fee
         </Text>
       </View>
-      <TabView
-        style={{marginTop: 40, marginHorizontal: 24, marginBottom: '10%'}}
-        navigationState={{index: curTabIndex, routes: tabRoutes}}
-        renderTabBar={renderTabBar}
-        renderScene={renderScene}
-        onIndexChange={setCurTabIndex}
-        initialLayout={initialLayout}
-      />
+      <View style={{marginTop: 40, marginHorizontal: 24, marginBottom: '10%'}}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <TouchableOpacity
+            onPress={() => {
+              setShowStatus('basic');
+            }}
+            style={{
+              paddingHorizontal: 16,
+              borderColor: 'white',
+              borderBottomWidth: showStatus === 'basic' ? 3 : 0,
+            }}>
+            <Text
+              style={{
+                ...fonts.title2,
+                color: showStatus === 'basic' ? 'white' : colors.grey12,
+              }}>
+              Basic
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setShowStatus('advanced');
+            }}
+            style={{
+              paddingHorizontal: 16,
+              borderColor: 'white',
+              borderBottomWidth: showStatus === 'advanced' ? 3 : 0,
+            }}>
+            <Text
+              style={{
+                ...fonts.title2,
+                color: showStatus === 'advanced' ? 'white' : colors.grey12,
+              }}>
+              Advanced
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {showStatus === 'basic' && renderBasicStatus()}
+        {showStatus === 'advanced' && renderAdvancedStatus()}
+      </View>
       <View style={{padding: 24, marginBottom: 20}}>
-        <PrimaryButton onPress={() => {}} text="Save" />
+        <PrimaryButton
+          enableFlag={
+            showStatus === 'basic' ||
+            (showStatus === 'advanced' &&
+              gasLimit.length > 0 &&
+              maxFee.length > 0 &&
+              maxPriorityFee.length > 0)
+          }
+          onPress={() => {
+            onPressSave();
+          }}
+          text="Save"
+        />
       </View>
     </>
   );
 };
 
-export default NetworkFeeRBSheet;
+const mapStateToProps = state => ({
+  feeData: state.engine.feeData,
+});
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(NetworkFeeRBSheet);

@@ -23,3 +23,7 @@ export const SET_TOKEN_BALANCE_UPDATED_INFO = 'SET_TOKEN_BALANCE_UPDATED_INFO';
 //tokens actions
 export const SET_TOKENS_DATA = 'SET_TOKENS_DATA';
 export const SET_SELECTED_TOKEN = 'SET_SELECTED_TOKEN';
+
+//engine actions
+export const SET_FEE_DATA = 'SET_FEE_DATA';
+export const SET_GETTING_FEE_DATA_TIMER_ID = 'SET_GETTING_FEE_DATA_TIMER_ID';

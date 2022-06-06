@@ -10,7 +10,7 @@ import {
   Animated,
 } from 'react-native';
 import {connect} from 'react-redux';
-import FontAwesome, {SolidIcons} from 'react-native-fontawesome';
+import FontAwesome, {RegularIcons, SolidIcons} from 'react-native-fontawesome';
 import {fonts, colors} from '../../../../styles';
 import {Avatar} from 'react-native-elements';
 import {SvgXml} from 'react-native-svg';
@@ -30,15 +30,23 @@ import 'react-native-get-random-values';
 import '@ethersproject/shims';
 
 // Import the ethers library
-import {ethers} from 'ethers';
+import {ethers, utils} from 'ethers';
 
 //actions
-import {setNetworkGasPrice} from '../../../../redux/actions/NetworkActions';
 import {sendTransaction} from '../../../../redux/actions/TransactionActions';
 import {setCurrentAccountIndex} from '../../../../redux/actions/AccountsActions';
 import NetworkFeeRBSheet from './NetworkFeeRBSheet';
 
 import Toast from 'react-native-toast-message';
+import {
+  transferETHGasLimit,
+  gettingFeeDataTimerInterval,
+} from '../../../../engine/constants';
+import {getEstimatedGasLimit} from '../../../../engine/gas';
+import {
+  getFeeData,
+  setGettingFeeDataTimerId,
+} from '../../../../redux/actions/EngineAction';
 
 const avatars = require('../../../../constants').default.avatars;
 const avatarsCount = require('../../../../constants').default.avatarsCount;
@@ -52,10 +60,11 @@ const SendToken = ({
   balancesInfo,
   networks,
   currentNetwork,
-  gasPrice,
-  setNetworkGasPrice,
   sendTransaction,
   setCurrentAccountIndex,
+  feeData,
+  getFeeData,
+  setGettingFeeDataTimerId,
 }) => {
   const refRBNetworkFeeSheet = useRef(null);
   const refRBAccountsListSheet = useRef(null);
@@ -64,31 +73,77 @@ const SendToken = ({
   const [status, setStatus] = useState('default');
   const [selectedToken, setSelectedToken] = useState(isToken ? token : 'main');
   const [sendValue, setSendValue] = useState('');
+  const [gasLimit, setGasLimit] = useState('');
   const [error, setError] = useState('');
   const [foundAccount, setFoundAccount] = useState(undefined);
+  const [amountLoading, setAmountLoading] = useState(false);
   const [sendTransactionLoading, setSendTransactionLoading] = useState(false);
   const [showMyAccounts, setShowMyAccounts] = useState(false);
+  const [maxPriorityFee, setMaxPriorityFee] = useState(
+    feeData.medium.maxPriorityFeePerGas,
+  );
+  const [maxFee, setMaxFee] = useState(feeData.medium.maxFeePerGas);
+  const [networkFeeType, setNetworkFeeType] = useState('medium');
 
   const currentAccount = accounts[currentAccountIndex];
 
   useEffect(() => {
-    const provider = new ethers.providers.JsonRpcProvider(
-      networks[currentNetwork].rpc,
-    );
-
-    provider
-      .getGasPrice()
-      .then(gasPrice => {
-        setNetworkGasPrice(
-          parseFloat(ethers.utils.formatEther(gasPrice).toString()),
-        );
-      })
-      .catch(err => {
-        setNetworkGasPrice(parseFloat(0));
-      });
+    const timerId = setInterval(() => {
+      console.log('Getting Feedata');
+      getFeeData(networks[currentNetwork].rpc);
+    }, gettingFeeDataTimerInterval);
+    setGettingFeeDataTimerId(timerId);
+    return () => {
+      clearTimeout(timerId);
+    };
   }, []);
 
-  let sendingEthGasFee = gasPrice * 21000;
+  useEffect(() => {
+    if (networkFeeType !== 'advanced') {
+      if (networkFeeType === 'low') {
+        if (feeData.low.maxFeePerGas.toString() !== maxFee.toString()) {
+          setMaxFee(feeData.low.maxFeePerGas);
+        }
+        if (
+          feeData.low.maxPriorityFeePerGas.toString() !==
+          maxPriorityFee.toString()
+        ) {
+          setMaxPriorityFee(feeData.low.maxPriorityFeePerGas);
+        }
+      } else if (networkFeeType === 'medium') {
+        if (feeData.medium.maxFeePerGas.toString() !== maxFee.toString()) {
+          setMaxFee(feeData.medium.maxFeePerGas);
+        }
+        if (
+          feeData.medium.maxPriorityFeePerGas.toString() !==
+          maxPriorityFee.toString()
+        ) {
+          setMaxPriorityFee(feeData.medium.maxPriorityFeePerGas);
+        }
+      } else if (networkFeeType === 'high') {
+        if (feeData.high.maxFeePerGas.toString() !== maxFee.toString()) {
+          setMaxFee(feeData.high.maxFeePerGas);
+        }
+        if (
+          feeData.high.maxPriorityFeePerGas.toString() !==
+          maxPriorityFee.toString()
+        ) {
+          setMaxPriorityFee(feeData.high.maxPriorityFeePerGas);
+        }
+      }
+    }
+  }, [feeData, networkFeeType]);
+
+  const getSendingEtherGasFee = () => {
+    return parseFloat(utils.formatEther(maxFee)) * transferETHGasLimit;
+  };
+
+  const getSendingEtherMaxGasFee = () => {
+    return (
+      parseFloat(utils.formatEther(feeData.high.maxFeePerGas)) *
+      transferETHGasLimit
+    );
+  };
 
   const findAccountNameFromAddress = address => {
     const foundIndex = accounts.findIndex(
@@ -117,11 +172,49 @@ const SendToken = ({
           )
         : 0
       : 0;
-    if (parseFloat(curBalance) < sendingEthGasFee + parseFloat(sendValue)) {
+    if (selectedToken === 'main') {
+      if (
+        parseFloat(curBalance) <
+        getSendingEtherGasFee() + parseFloat(sendValue)
+      ) {
+        setError('Insufficient Funds');
+      } else {
+        setGasLimit(transferETHGasLimit);
+        setStatus('confirm');
+      }
+      return;
+    }
+    if (parseFloat(curBalance) < parseFloat(sendValue)) {
       setError('Insufficient Funds');
       return;
     }
-    setStatus('confirm');
+    const mainBalance = balancesInfo[currentAccount.address]
+      ? balancesInfo[currentAccount.address]['main']
+      : 0;
+    setAmountLoading(true);
+    getEstimatedGasLimit(
+      currentAccount.privateKey,
+      networks[currentNetwork].rpc,
+      sendValue,
+      sendAddress,
+      selectedToken,
+    )
+      .then(res => {
+        console.log('RES::::::: ', res);
+        if (parseFloat(mainBalance) < res * utils.formatEther(maxFee)) {
+          setError('Insufficient ETH to send token');
+          setAmountLoading(false);
+        } else {
+          setAmountLoading(false);
+          setGasLimit(res);
+          setStatus('confirm');
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        setError('Cannot send (maybe insufficient ETH to send token)');
+        setAmountLoading(false);
+      });
   };
 
   const onSendTransaction = () => {
@@ -131,6 +224,7 @@ const SendToken = ({
         fromPrivateKey: currentAccount.privateKey,
         toAddress: sendAddress,
         value: sendValue,
+        token: selectedToken,
       },
       () => {
         setSendTransactionLoading(true);
@@ -206,7 +300,7 @@ const SendToken = ({
               <View style={{flex: 1, flexDirection: 'row-reverse'}}>
                 <FontAwesome
                   style={{fontSize: 16, color: colors.green5}}
-                  icon={SolidIcons.checkCircle}
+                  icon={RegularIcons.checkCircle}
                 />
               </View>
             )}
@@ -589,11 +683,10 @@ const SendToken = ({
         </ScrollView>
         <View
           style={{
-            position: 'absolute',
-            left: 0,
-            bottom: 60,
-            width: '100%',
-            paddingHorizontal: 24,
+            flex: 1,
+            flexDirection: 'column-reverse',
+            marginBottom: 80,
+            marginHorizontal: 24,
           }}>
           <PrimaryButton
             onPress={() => {
@@ -626,7 +719,27 @@ const SendToken = ({
             backgroundColor: colors.grey24,
           },
         }}>
-        <NetworkFeeRBSheet />
+        <NetworkFeeRBSheet
+          networkFeeType={networkFeeType}
+          maxFee={maxFee}
+          maxPriorityFee={maxPriorityFee}
+          gasLimit={gasLimit}
+          onSave={({type, data}) => {
+            // console.log(type, data);
+            if (type !== 'advanced') {
+              setNetworkFeeType(type);
+              setMaxFee(feeData[type].maxFeePerGas);
+              setMaxPriorityFee(feeData[type].maxPriorityFeePerGas);
+              setGasLimit(parseInt(data.gasLimit));
+            } else {
+              setNetworkFeeType('advanced');
+              setMaxFee(utils.parseUnits(data.maxFee, 'gwei'));
+              setMaxPriorityFee(utils.parseUnits(data.maxPriorityFee, 'gwei'));
+              setGasLimit(parseInt(data.gasLimit));
+            }
+            refRBNetworkFeeSheet.current.close();
+          }}
+        />
       </RBSheet>
     );
   };
@@ -646,6 +759,8 @@ const SendToken = ({
                 setSendAddress('');
                 setFoundAccount(undefined);
                 setShowMyAccounts(false);
+                setError('');
+                setSendValue('');
               }}
               style={{fontSize: 16, color: 'white', marginRight: 16}}
               icon={SolidIcons.chevronLeft}
@@ -681,6 +796,7 @@ const SendToken = ({
               selectedToken={selectedToken}
               onSelectToken={token => {
                 setSelectedToken(token);
+                setSendValue('');
               }}
             />
           </View>
@@ -703,7 +819,11 @@ const SendToken = ({
                   : 0
                 : 0;
               setSendValue(
-                parseFloat(curBalance - sendingEthGasFee).toString(),
+                parseFloat(
+                  selectedToken === 'main'
+                    ? curBalance - getSendingEtherGasFee()
+                    : curBalance,
+                ).toString(),
               );
             }}>
             <Text style={{...fonts.btn_medium_normal, color: colors.green5}}>
@@ -752,20 +872,36 @@ const SendToken = ({
           </Text>
         )}
         <View style={{marginTop: 40}}>
-          <BalanceText
-            address={currentAccount.address}
-            style={{...fonts.para_regular, color: 'white', textAlign: 'center'}}
-          />
+          {selectedToken === 'main' ? (
+            <BalanceText
+              address={currentAccount.address}
+              style={{
+                ...fonts.para_regular,
+                color: 'white',
+                textAlign: 'center',
+              }}
+            />
+          ) : (
+            <TokenBalanceText
+              address={currentAccount.address}
+              style={{
+                ...fonts.para_regular,
+                color: 'white',
+                textAlign: 'center',
+              }}
+              token={selectedToken}
+            />
+          )}
         </View>
         <View
           style={{
-            position: 'absolute',
-            left: 0,
-            bottom: 60,
-            width: '100%',
-            paddingHorizontal: 24,
+            flex: 1,
+            flexDirection: 'column-reverse',
+            marginBottom: 80,
+            marginHorizontal: 24,
           }}>
           <PrimaryButton
+            loading={amountLoading}
             onPress={onAmountConfirm}
             text="Next"
             enableFlag={sendValue.length > 0}
@@ -776,6 +912,9 @@ const SendToken = ({
   };
 
   const renderConfirmStatus = () => {
+    console.log(maxFee, gasLimit);
+    const totalGasFee = parseFloat(utils.formatEther(maxFee)) * gasLimit;
+    console.log(totalGasFee);
     return (
       <View style={{height: '100%'}}>
         {renderNetworkFeeRBSheet()}
@@ -788,8 +927,6 @@ const SendToken = ({
             <FontAwesome
               onPress={() => {
                 setStatus('selected');
-                setSendAddress('');
-                setFoundAccount(undefined);
               }}
               style={{fontSize: 16, color: 'white', marginRight: 16}}
               icon={SolidIcons.chevronLeft}
@@ -823,17 +960,17 @@ const SendToken = ({
           <MaskedView
             maskElement={
               <Text style={{textAlign: 'center', ...fonts.big_type1}}>
-                {isToken
-                  ? sendValue + ' ' + token.tokenSymbol
-                  : sendValue + ' ETH'}
+                {selectedToken === 'main'
+                  ? sendValue + ' ETH'
+                  : sendValue + ' ' + selectedToken.tokenSymbol}
               </Text>
             }>
             <LinearGradient colors={colors.gradient8}>
               <Text
                 style={{textAlign: 'center', ...fonts.big_type1, opacity: 0}}>
-                {isToken
-                  ? sendValue + ' ' + token.tokenSymbol
-                  : sendValue + ' ETH'}
+                {selectedToken === 'main'
+                  ? sendValue + ' ETH'
+                  : sendValue + ' ' + selectedToken.tokenSymbol}
               </Text>
             </LinearGradient>
           </MaskedView>
@@ -883,7 +1020,11 @@ const SendToken = ({
             </View>
             <View style={{flex: 1, alignItems: 'flex-end'}}>
               <Text style={{...fonts.para_regular, color: 'white'}}>
-                {sendValue + ' ' + (isToken ? token.tokenSymbol : 'ETH')}
+                {sendValue +
+                  ' ' +
+                  (selectedToken === 'main'
+                    ? 'ETH'
+                    : selectedToken.tokenSymbol)}
               </Text>
             </View>
           </View>
@@ -913,9 +1054,7 @@ const SendToken = ({
             </View>
             <View style={{flex: 1, alignItems: 'flex-end'}}>
               <Text style={{...fonts.para_regular, color: 'white'}}>
-                {sendingEthGasFee.toFixed(6) +
-                  ' ' +
-                  (isToken ? token.tokenSymbol : 'ETH')}
+                {totalGasFee + ' ' + 'ETH'}
               </Text>
             </View>
           </View>
@@ -934,25 +1073,27 @@ const SendToken = ({
           <View>
             <Text style={{...fonts.title2, color: 'white'}}>Total Amount</Text>
           </View>
-          <View style={{flex: 1, alignItems: 'flex-end'}}>
+          <View style={{flex: 1, alignItems: 'flex-end', marginLeft: 30}}>
             <View>
               <Text style={{...fonts.title2, color: 'white'}}>
-                {(parseFloat(sendValue) + parseFloat(sendingEthGasFee)).toFixed(
-                  6,
-                ) +
-                  ' ' +
-                  (isToken ? token.tokenSymbol : 'ETH')}
+                {selectedToken === 'main'
+                  ? (parseFloat(sendValue) + totalGasFee).toString() + ' ETH'
+                  : sendValue +
+                    ' ' +
+                    selectedToken.tokenSymbol +
+                    ' + ' +
+                    totalGasFee +
+                    ' ETH'}
               </Text>
             </View>
           </View>
         </View>
         <View
           style={{
-            position: 'absolute',
-            left: 0,
-            bottom: 80,
-            right: 0,
-            paddingHorizontal: 24,
+            flex: 1,
+            flexDirection: 'column-reverse',
+            marginBottom: 80,
+            marginHorizontal: 24,
           }}>
           <PrimaryButton
             onPress={() => {
@@ -981,13 +1122,15 @@ const mapStateToProps = state => ({
   balancesInfo: state.balances.balancesInfo,
   networks: state.networks.networks,
   currentNetwork: state.networks.currentNetwork,
-  gasPrice: state.networks.gasPrice,
+  feeData: state.engine.feeData,
 });
 const mapDispatchToProps = dispatch => ({
-  setNetworkGasPrice: price => setNetworkGasPrice(dispatch, price),
   sendTransaction: (data, beforeWork, successCallback, failCallback) =>
     sendTransaction(dispatch, data, beforeWork, successCallback, failCallback),
   setCurrentAccountIndex: index => setCurrentAccountIndex(dispatch, index),
+  getFeeData: currentNetworkRPC => getFeeData(dispatch, currentNetworkRPC),
+  setGettingFeeDataTimerId: timerId =>
+    setGettingFeeDataTimerId(dispatch, timerId),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SendToken);
