@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   SafeAreaView,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {colors, fonts} from '../../../styles';
@@ -33,6 +34,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import NetworkBalance from './NetworkBalance';
 import ReceiveToken from './ReceiveToken/ReceiveToken';
 import BuyToken from './BuyToken/BuyToken';
+import Toast from 'react-native-toast-message';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 const buyIconSvgXml = require('../SVGData').buyIcon;
@@ -42,6 +44,12 @@ const WalletTab = ({navigation, currentNetwork}) => {
   const refRBSendTokenSheet = useRef(null);
   const refRBReceiveTokenSheet = useRef(null);
   const refRBBuySheet = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      // console.warn('wallet tab is gone');
+    };
+  });
 
   const renderBuyRBSheet = () => {
     return (
@@ -173,6 +181,30 @@ const WalletTab = ({navigation, currentNetwork}) => {
           onPressClose={() => {
             refRBSendTokenSheet.current.close();
           }}
+          onSubmitTxn={resTxn => {
+            console.log('Wallet tab: ', resTxn);
+            const resTxnTemp = {...resTxn};
+            refRBSendTokenSheet.current.close();
+            Toast.show({
+              type: 'txnSubmitted',
+              position: 'bottom',
+              bottomOffset: 120,
+              props: {
+                transaction: {...resTxnTemp},
+              },
+            });
+            resTxn.wait().then(receipt => {
+              console.log('receipt:::: ', receipt);
+              Toast.show({
+                type: 'txnCompleted',
+                position: 'bottom',
+                bottomOffset: 120,
+                props: {
+                  transaction: {...resTxnTemp},
+                },
+              });
+            });
+          }}
         />
       </RBSheet>
     );
@@ -186,6 +218,18 @@ const WalletTab = ({navigation, currentNetwork}) => {
           width: '100%',
           height: '100%',
         }}>
+        {/* <TouchableOpacity
+          style={{width: 100, height: 100, backgroundColor: 'red'}}
+          onPress={() => {
+            Toast.show({
+              type: 'txnCancelled',
+              position: 'bottom',
+              bottomOffset: 120,
+              props: {
+                transaction: {},
+              },
+            });
+          }}></TouchableOpacity> */}
         {selectedToken.length > 0 && (
           <TokenShow
             onBackPress={() => {

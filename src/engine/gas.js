@@ -36,7 +36,7 @@ export const getEstimatedGasLimit = (
           utils.parseUnits(sendingValue.toString(), token.tokenDecimal),
         );
         const gasLimit = await wallet.estimateGas(rawTx);
-        resolve(gasLimit.toNumber() * estimateGasRatio);
+        resolve(parseInt(gasLimit.toNumber() * estimateGasRatio));
       } catch (err) {
         reject(err);
       }

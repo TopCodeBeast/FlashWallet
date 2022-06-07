@@ -11,7 +11,6 @@ import {connect} from 'react-redux';
 import FontAwesome, {RegularIcons, SolidIcons} from 'react-native-fontawesome';
 import {fonts, colors} from '../../../../styles';
 import Toast from 'react-native-toast-message';
-import CustomToast from '../../../../components/CustomToast';
 import QRCode from 'react-native-qrcode-svg';
 import {
   PrimaryButton,
@@ -24,6 +23,7 @@ import MaskedView from '@react-native-community/masked-view';
 import LinearGradient from 'react-native-linear-gradient';
 import {SvgXml} from 'react-native-svg';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import {toastConfig} from '../../../../components/utils/CustomToastConfig';
 
 const SendLink = ({token, onPressClose}) => {
   const [status, setStatus] = useState('check_amount');
@@ -32,6 +32,7 @@ const SendLink = ({token, onPressClose}) => {
   const [error, setError] = useState('');
 
   const refRBQRCodeSheet = useRef(null);
+  const toastRef = useRef(null);
 
   const onPressNext = () => {
     if (Number(amount) !== parseFloat(amount)) {
@@ -261,15 +262,17 @@ const SendLink = ({token, onPressClose}) => {
                 Clipboard.setString(
                   'https://dege.app.link/send/0xBBB6A12945aC14C84185a17C6BD2eAe96e/value=21jq',
                 );
-                Toast.show({
-                  type: 'copy',
-                  text1: 'Link copied to clipboard',
-                  props: {
-                    color: colors.blue5,
-                  },
-                  position: 'top',
-                  topOffset: 160,
-                });
+                if (toastRef) {
+                  toastRef.current.show({
+                    type: 'copy',
+                    text1: 'Link copied to clipboard',
+                    props: {
+                      color: colors.blue5,
+                    },
+                    position: 'top',
+                    topOffset: 80,
+                  });
+                }
               }}
             />
             <TextButton
@@ -318,7 +321,11 @@ const SendLink = ({token, onPressClose}) => {
       </View>
       {status === 'check_amount' && renderCheckAmount()}
       {status === 'send_link' && renderSendLink()}
-      <CustomToast />
+      <Toast
+        ref={toastRef}
+        config={toastConfig({hasRef: true, toastRef})}
+        style={{marginTop: -40}}
+      />
     </View>
   );
 };

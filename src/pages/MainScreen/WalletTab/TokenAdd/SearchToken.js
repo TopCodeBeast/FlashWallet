@@ -45,13 +45,13 @@ const SearchToken = ({onCancel}) => {
           Select Token
         </Text>
       </View>
-      <View style={{position: 'absolute', bottom: 0, left: 0}}>
+      <View
+        style={{flex: 1, flexDirection: 'column-reverse', marginBottom: 32}}>
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'space-evenly',
-            marginTop: 40,
+            justifyContent: 'space-around',
             width: '100%',
           }}>
           <TextButton text="Cancel" style={{width: 160}} onPress={onCancel} />

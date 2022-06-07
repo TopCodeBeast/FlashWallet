@@ -17,19 +17,22 @@ export const sendTransaction = (
   failCallback,
 ) => {
   beforeWork();
-  const {currentNetworkRPC, fromPrivateKey, toAddress, value, token} = data;
+  const {currentNetworkRPC, fromPrivateKey, toAddress, value, token, feeInfo} =
+    data;
   const provider = new ethers.providers.JsonRpcProvider(currentNetworkRPC);
   const wallet = new ethers.Wallet(fromPrivateKey, provider);
   if (token === 'main') {
     const tx = {
       to: toAddress,
       value: ethers.utils.parseEther(value.toString()),
+      ...feeInfo,
     };
+    console.log(tx);
     wallet
       .sendTransaction(tx)
-      .then(receipt => {
-        console.log(receipt);
-        successCallback(receipt);
+      .then(resTxn => {
+        console.log('transaction action:::::', resTxn);
+        successCallback(resTxn);
       })
       .catch(err => {
         console.log('Transaction Action Error:::::: ', err);
@@ -46,10 +49,10 @@ export const sendTransaction = (
       .then(rawTx => {
         console.log('Transaction actions raw tx: ', rawTx);
         wallet
-          .sendTransaction(rawTx)
-          .then(receipt => {
-            console.log(receipt);
-            successCallback(receipt);
+          .sendTransaction({...rawTx, ...feeInfo})
+          .then(resTxn => {
+            console.log(resTxn);
+            successCallback(resTxn);
           })
           .catch(err => {
             console.log('Transaction Action Error:::::: ', err);

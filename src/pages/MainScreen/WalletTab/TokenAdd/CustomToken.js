@@ -151,13 +151,13 @@ const CustomToken = ({
       }}>
       {step === 0 && renderStep0()}
       {step === 1 && renderStep1()}
-      <View style={{position: 'absolute', bottom: 0, left: 0}}>
+      <View
+        style={{flex: 1, flexDirection: 'column-reverse', marginBottom: 32}}>
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-evenly',
-            marginTop: 40,
             width: '100%',
           }}>
           <TextButton

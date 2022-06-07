@@ -250,7 +250,8 @@ const TokenShow = ({
           onPressClose={() => {
             refRBTokenSendSheet.current.close();
           }}
-          isToken={false}
+          isToken={selectedToken === 'main' ? false : true}
+          token={selectedToken}
         />
       </RBSheet>
     );

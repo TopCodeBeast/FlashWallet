@@ -10,13 +10,11 @@ import {
 import {colors, fonts} from '../../../../styles';
 import FontAwesome, {RegularIcons, SolidIcons} from 'react-native-fontawesome';
 import {PrimaryButton} from '../../../../components/Buttons';
-import ToggleSwitch from 'toggle-switch-react-native';
 import FloatLabelInput from '../../../../components/FloatLabelInput';
 import {checkAuthentication} from '../../../../utils/auth';
 import {TabView, SceneMap} from 'react-native-tab-view';
 import {useColorModeValue} from 'native-base';
 import QRCode from 'react-native-qrcode-svg';
-import CustomToast from '../../../../components/CustomToast';
 import Toast from 'react-native-toast-message';
 import {loadMnemonic} from '../../../../utils/mnemonic';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -293,7 +291,6 @@ const RevealSeedRBSheet = ({onPressDone}) => {
           )}
         </View>
       </View>
-      <CustomToast />
     </>
   );
 };

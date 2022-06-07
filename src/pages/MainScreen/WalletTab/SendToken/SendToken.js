@@ -37,7 +37,6 @@ import {sendTransaction} from '../../../../redux/actions/TransactionActions';
 import {setCurrentAccountIndex} from '../../../../redux/actions/AccountsActions';
 import NetworkFeeRBSheet from './NetworkFeeRBSheet';
 
-import Toast from 'react-native-toast-message';
 import {
   transferETHGasLimit,
   gettingFeeDataTimerInterval,
@@ -64,7 +63,9 @@ const SendToken = ({
   setCurrentAccountIndex,
   feeData,
   getFeeData,
+  gettingFeeDataTimerId,
   setGettingFeeDataTimerId,
+  onSubmitTxn,
 }) => {
   const refRBNetworkFeeSheet = useRef(null);
   const refRBAccountsListSheet = useRef(null);
@@ -84,6 +85,7 @@ const SendToken = ({
   );
   const [maxFee, setMaxFee] = useState(feeData.medium.maxFeePerGas);
   const [networkFeeType, setNetworkFeeType] = useState('medium');
+  const [sendTxnError, setSendTxnError] = useState('');
 
   const currentAccount = accounts[currentAccountIndex];
 
@@ -135,7 +137,10 @@ const SendToken = ({
   }, [feeData, networkFeeType]);
 
   const getSendingEtherGasFee = () => {
-    return parseFloat(utils.formatEther(maxFee)) * transferETHGasLimit;
+    return (
+      parseFloat(utils.formatEther(feeData.high.maxFeePerGas)) *
+      transferETHGasLimit
+    );
   };
 
   const getSendingEtherMaxGasFee = () => {
@@ -192,6 +197,7 @@ const SendToken = ({
       ? balancesInfo[currentAccount.address]['main']
       : 0;
     setAmountLoading(true);
+    clearTimeout(gettingFeeDataTimerId);
     getEstimatedGasLimit(
       currentAccount.privateKey,
       networks[currentNetwork].rpc,
@@ -209,15 +215,44 @@ const SendToken = ({
           setGasLimit(res);
           setStatus('confirm');
         }
+        const timerId = setInterval(() => {
+          console.log('Getting Feedata');
+          getFeeData(networks[currentNetwork].rpc);
+        }, gettingFeeDataTimerInterval);
+        setGettingFeeDataTimerId(timerId);
       })
       .catch(err => {
         console.log(err);
         setError('Cannot send (maybe insufficient ETH to send token)');
         setAmountLoading(false);
+        const timerId = setInterval(() => {
+          console.log('Getting Feedata');
+          getFeeData(networks[currentNetwork].rpc);
+        }, gettingFeeDataTimerInterval);
+        setGettingFeeDataTimerId(timerId);
       });
   };
 
   const onSendTransaction = () => {
+    const mainBalance = balancesInfo[currentAccount.address]
+      ? balancesInfo[currentAccount.address]['main']
+      : 0;
+    const totalGasFee = parseFloat(utils.formatEther(maxFee)) * gasLimit;
+    if (selectedToken === 'main') {
+      const totalAmount = parseFloat(sendValue) + totalGasFee;
+      if (totalAmount > mainBalance) {
+        setSendTxnError('Not enough ETH to send this transaction.');
+        return;
+      }
+    } else {
+      if (totalGasFee > mainBalance) {
+        setSendTxnError('Not enough ETH to send this transaction.');
+        return;
+      }
+    }
+    if (sendTxnError.length > 0) {
+      setSendTxnError('');
+    }
     sendTransaction(
       {
         currentNetworkRPC: networks[currentNetwork].rpc,
@@ -225,13 +260,19 @@ const SendToken = ({
         toAddress: sendAddress,
         value: sendValue,
         token: selectedToken,
+        feeInfo: {
+          maxFeePerGas: maxFee,
+          maxPriorityFeePerGas: maxPriorityFee,
+          gasLimit: ethers.BigNumber.from(gasLimit),
+        },
       },
       () => {
         setSendTransactionLoading(true);
       },
-      receipt => {
+      resTxn => {
+        console.log('From Send Token:::::: ', resTxn);
         setSendTransactionLoading(false);
-        onPressClose();
+        onSubmitTxn(resTxn);
       },
       () => {
         setSendTransactionLoading(false);
@@ -423,7 +464,7 @@ const SendToken = ({
                 ) : (
                   <TokenBalanceText
                     address={currentAccount.address}
-                    token={token}
+                    token={selectedToken}
                     style={{
                       ...fonts.caption_small12_18_regular,
                       color: colors.grey9,
@@ -912,9 +953,7 @@ const SendToken = ({
   };
 
   const renderConfirmStatus = () => {
-    console.log(maxFee, gasLimit);
     const totalGasFee = parseFloat(utils.formatEther(maxFee)) * gasLimit;
-    console.log(totalGasFee);
     return (
       <View style={{height: '100%'}}>
         {renderNetworkFeeRBSheet()}
@@ -1088,6 +1127,17 @@ const SendToken = ({
             </View>
           </View>
         </View>
+        {sendTxnError.length > 0 && (
+          <Text
+            style={{
+              marginLeft: 40,
+              marginTop: 12,
+              ...fonts.caption_small12_16_regular,
+              color: colors.red5,
+            }}>
+            {sendTxnError}
+          </Text>
+        )}
         <View
           style={{
             flex: 1,
@@ -1123,6 +1173,7 @@ const mapStateToProps = state => ({
   networks: state.networks.networks,
   currentNetwork: state.networks.currentNetwork,
   feeData: state.engine.feeData,
+  gettingFeeDataTimerId: state.engine.gettingFeeDataTimerId,
 });
 const mapDispatchToProps = dispatch => ({
   sendTransaction: (data, beforeWork, successCallback, failCallback) =>
