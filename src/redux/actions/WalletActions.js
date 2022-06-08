@@ -14,7 +14,7 @@ import {ethers} from 'ethers';
 
 import {createInitialAccountFromMasterSeed} from '../../utils/account';
 
-import {NetworkList, RINKEBY} from '../../engine/constants';
+import {initialSettings, NetworkList, RINKEBY} from '../../engine/constants';
 
 export const createWallet = (
   dispatch,
@@ -68,6 +68,7 @@ export const createWallet = (
             ['networks_info', JSON.stringify(networksInfo)],
             ['balances_info', JSON.stringify(balancesInfo)],
             ['tokens_info', JSON.stringify(storingTokensInfo)],
+            ['settings_info', JSON.stringify(initialSettings)],
           ])
             .then(() => {
               dispatch({

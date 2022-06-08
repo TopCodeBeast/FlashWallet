@@ -242,7 +242,7 @@ const HistoryRow = ({
                 marginHorizontal: 24,
                 borderWidth: 1,
                 borderRadius: 8,
-                borderColor: colors.grey9,
+                borderColor: colors.grey22,
                 flexDirection: 'row',
               }}>
               <View>
@@ -278,7 +278,7 @@ const HistoryRow = ({
                   borderWidth: 1,
                   borderTopLeftRadius: 8,
                   borderTopRightRadius: 8,
-                  borderColor: colors.grey9,
+                  borderColor: colors.grey22,
                 }}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <View>
@@ -317,7 +317,7 @@ const HistoryRow = ({
                   borderWidth: 1,
                   borderBottomLeftRadius: 8,
                   borderBottomRightRadius: 8,
-                  borderColor: colors.grey9,
+                  borderColor: colors.grey22,
                   borderTopColor: 'transparent',
                   flexDirection: 'row',
                 }}>

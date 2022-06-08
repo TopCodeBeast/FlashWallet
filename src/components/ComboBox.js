@@ -10,7 +10,7 @@ const ComboBox = props => {
       onPress={onPress}
       style={{
         borderRadius: 8,
-        borderColor: colors.grey9,
+        borderColor: colors.grey22,
         borderWidth: 1,
         flexDirection: 'row',
         alignItems: 'center',

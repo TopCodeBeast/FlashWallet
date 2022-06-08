@@ -5,10 +5,18 @@ import TokenBalanceText from '../../../components/TokenBalanceText';
 import BalanceText from '../../../components/BalanceText';
 import {connect} from 'react-redux';
 
-const TokenItemRow = ({token, onPress, accounts, currentAccountIndex}) => {
+const TokenItemRow = ({
+  token,
+  onPress,
+  accounts,
+  currentAccountIndex,
+  networks,
+  currentNetwork,
+}) => {
   const {tokenSymbol, tokenAddress, tokenDecimal} = token;
   const trend = 1.2;
   const usdAmount = 123;
+  const currentNetworkSymbol = networks[currentNetwork].symbol;
   return (
     <TouchableOpacity
       style={{padding: 16, marginTop: 24}}
@@ -29,7 +37,9 @@ const TokenItemRow = ({token, onPress, accounts, currentAccountIndex}) => {
             <View
               style={{flexDirection: 'row', paddingLeft: 16, paddingRight: 56}}>
               <View style={{width: '50%'}}>
-                <Text style={{...fonts.title2, color: 'white'}}>ETH</Text>
+                <Text style={{...fonts.title2, color: 'white'}}>
+                  {currentNetworkSymbol}
+                </Text>
               </View>
               <View style={{width: '50%'}}>
                 <BalanceText
@@ -119,6 +129,8 @@ const TokenItemRow = ({token, onPress, accounts, currentAccountIndex}) => {
 const mapStateToProps = state => ({
   accounts: state.accounts.accounts,
   currentAccountIndex: state.accounts.currentAccountIndex,
+  networks: state.networks.networks,
+  currentNetwork: state.networks.currentNetwork,
 });
 const mapDispatchToProps = dispatch => ({});
 

@@ -18,6 +18,7 @@ import {checkAuthentication, saveRememberOption} from '../utils/auth';
 import {loadAccountsDataFromStorage} from '../redux/actions/AccountsActions';
 import {loadNetworksDataFromStorage} from '../redux/actions/NetworkActions';
 import {loadTokensDataFromStorage} from '../redux/actions/TokensActions';
+import {loadSettingsDataFromStorage} from '../redux/actions/SettingsAction';
 
 //import images
 const logoImage = require('../assets/images/splash/logo.png');
@@ -28,6 +29,7 @@ const LogIn = ({
   loadAccountsDataFromStorage,
   loadNetworksDataFromStorage,
   loadTokensDataFromStorage,
+  loadSettingsDataFromStorage,
 }) => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -48,6 +50,7 @@ const LogIn = ({
             loadAccountsDataFromStorage();
             loadNetworksDataFromStorage();
             loadTokensDataFromStorage();
+            loadSettingsDataFromStorage();
             navigation.replace('mainscreen');
           },
           () => {
@@ -152,5 +155,6 @@ const mapDispatchToProps = dispatch => ({
   loadAccountsDataFromStorage: () => loadAccountsDataFromStorage(dispatch),
   loadNetworksDataFromStorage: () => loadNetworksDataFromStorage(dispatch),
   loadTokensDataFromStorage: () => loadTokensDataFromStorage(dispatch),
+  loadSettingsDataFromStorage: () => loadSettingsDataFromStorage(dispatch),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(LogIn);

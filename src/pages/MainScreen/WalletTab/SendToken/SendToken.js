@@ -88,6 +88,7 @@ const SendToken = ({
   const [sendTxnError, setSendTxnError] = useState('');
 
   const currentAccount = accounts[currentAccountIndex];
+  const currentNetworkSymbol = networks[currentNetwork].symbol;
 
   useEffect(() => {
     const timerId = setInterval(() => {
@@ -1000,7 +1001,7 @@ const SendToken = ({
             maskElement={
               <Text style={{textAlign: 'center', ...fonts.big_type1}}>
                 {selectedToken === 'main'
-                  ? sendValue + ' ETH'
+                  ? sendValue + ' ' + currentNetworkSymbol
                   : sendValue + ' ' + selectedToken.tokenSymbol}
               </Text>
             }>
@@ -1008,7 +1009,7 @@ const SendToken = ({
               <Text
                 style={{textAlign: 'center', ...fonts.big_type1, opacity: 0}}>
                 {selectedToken === 'main'
-                  ? sendValue + ' ETH'
+                  ? sendValue + ' ' + currentNetworkSymbol
                   : sendValue + ' ' + selectedToken.tokenSymbol}
               </Text>
             </LinearGradient>
@@ -1049,7 +1050,7 @@ const SendToken = ({
             borderWidth: 1,
             borderTopLeftRadius: 8,
             borderTopRightRadius: 8,
-            borderColor: colors.grey9,
+            borderColor: colors.grey22,
           }}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <View>
@@ -1062,7 +1063,7 @@ const SendToken = ({
                 {sendValue +
                   ' ' +
                   (selectedToken === 'main'
-                    ? 'ETH'
+                    ? '' + currentNetworkSymbol
                     : selectedToken.tokenSymbol)}
               </Text>
             </View>
@@ -1093,7 +1094,7 @@ const SendToken = ({
             </View>
             <View style={{flex: 1, alignItems: 'flex-end'}}>
               <Text style={{...fonts.para_regular, color: 'white'}}>
-                {totalGasFee + ' ' + 'ETH'}
+                {totalGasFee + ' ' + currentNetworkSymbol}
               </Text>
             </View>
           </View>
@@ -1105,7 +1106,7 @@ const SendToken = ({
             borderWidth: 1,
             borderBottomLeftRadius: 8,
             borderBottomRightRadius: 8,
-            borderColor: colors.grey9,
+            borderColor: colors.grey22,
             borderTopColor: 'transparent',
             flexDirection: 'row',
           }}>
@@ -1116,13 +1117,16 @@ const SendToken = ({
             <View>
               <Text style={{...fonts.title2, color: 'white'}}>
                 {selectedToken === 'main'
-                  ? (parseFloat(sendValue) + totalGasFee).toString() + ' ETH'
+                  ? (parseFloat(sendValue) + totalGasFee).toString() +
+                    ' ' +
+                    currentNetworkSymbol
                   : sendValue +
                     ' ' +
                     selectedToken.tokenSymbol +
                     ' + ' +
                     totalGasFee +
-                    ' ETH'}
+                    ' ' +
+                    currentNetworkSymbol}
               </Text>
             </View>
           </View>

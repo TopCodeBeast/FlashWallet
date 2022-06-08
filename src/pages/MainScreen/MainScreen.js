@@ -16,11 +16,22 @@ const Tab = createBottomTabNavigator();
 import WalletTab from './WalletTab/WalletTab';
 import SettingsTab from './SettingsTab/SettingsTab';
 import {getFeeData} from '../../redux/actions/EngineAction';
+import SwapTab from './SwapTab/SwapTab';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+// import {initialSettings} from '../../engine/constants';
 
 const MainScreen = ({navigation, networks, currentNetwork, getFeeData}) => {
   useEffect(() => {
     getFeeData(networks[currentNetwork].rpc);
   }, [currentNetwork]);
+
+  // useEffect(() => {
+  //   AsyncStorage.setItem('settings_info', JSON.stringify(initialSettings)).then(
+  //     res => {
+  //       console.log('asdfasfd');
+  //     },
+  //   );
+  // }, []);
 
   const tabBar = ({state, descriptors, navigation}) => {
     return (
@@ -117,11 +128,7 @@ const MainScreen = ({navigation, networks, currentNetwork, getFeeData}) => {
           width: '100%',
           height: '100%',
         }}>
-        <Tab.Navigator
-          backBehavior={() => {
-            navigation.goBack();
-          }}
-          tabBar={tabBar}>
+        <Tab.Navigator backBehavior="history" tabBar={tabBar}>
           <Tab.Screen
             name="Wallet"
             component={WalletTab}
@@ -129,8 +136,20 @@ const MainScreen = ({navigation, networks, currentNetwork, getFeeData}) => {
               tabBarLabel: 'Wallet',
             }}
           />
-          <Tab.Screen name="Swap" component={WalletTab} />
-          <Tab.Screen name="Settings" component={SettingsTab} />
+          <Tab.Screen
+            name="Swap"
+            component={SwapTab}
+            options={{
+              tabBarLabel: 'Swap',
+            }}
+          />
+          <Tab.Screen
+            name="Settings"
+            component={SettingsTab}
+            options={{
+              tabBarLabel: 'Settings',
+            }}
+          />
         </Tab.Navigator>
       </SafeAreaView>
     </KeyboardAvoidingView>

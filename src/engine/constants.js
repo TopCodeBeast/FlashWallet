@@ -1,4 +1,5 @@
-const infuraApiKey = '9aa3d95b3bc440fa88ea12eaa4456161';
+export const infuraApiKey = '9aa3d95b3bc440fa88ea12eaa4456161';
+export const coinmarketcapApiKey = '35b4830d-54a6-45f1-802e-29dc8647e044';
 
 export const MAINNET = '1';
 export const ROPSTEN = '3';
@@ -19,7 +20,7 @@ export const NetworkList = {
     color: '#3cc29e',
     networkType: 'mainnet',
     rpc: 'https://mainnet.infura.io/v3/' + infuraApiKey,
-    unit: 'ETH',
+    symbol: 'ETH',
   },
   [ROPSTEN]: {
     name: 'Ropsten Test Network',
@@ -30,7 +31,7 @@ export const NetworkList = {
     color: '#ff4a8d',
     networkType: 'ropsten',
     rpc: 'https://ropsten.infura.io/v3/' + infuraApiKey,
-    unit: 'ETH',
+    symbol: 'ETH',
   },
   [KOVAN]: {
     name: 'Kovan Test Network',
@@ -41,7 +42,7 @@ export const NetworkList = {
     color: '#7057ff',
     networkType: 'kovan',
     rpc: 'https://kovan.infura.io/v3/' + infuraApiKey,
-    unit: 'ETH',
+    symbol: 'ETH',
   },
   [RINKEBY]: {
     name: 'Rinkeby Test Network',
@@ -52,7 +53,7 @@ export const NetworkList = {
     color: '#f6c343',
     networkType: 'rinkeby',
     rpc: 'https://rinkeby.infura.io/v3/' + infuraApiKey,
-    unit: 'ETH',
+    symbol: 'ETH',
   },
   [GOERLI]: {
     name: 'Goerli Test Network',
@@ -63,7 +64,7 @@ export const NetworkList = {
     color: '#3099f2',
     networkType: 'goerli',
     rpc: 'https://goerli.infura.io/v3/' + infuraApiKey,
-    unit: 'ETH',
+    symbol: 'ETH',
   },
 };
 
@@ -75,3 +76,11 @@ export const feeRatio = {
 export const transferETHGasLimit = 21000;
 export const estimateGasRatio = 1.5;
 export const gettingFeeDataTimerInterval = 5000; //ms
+
+export const initialSettings = {
+  baseCurrency: 'USD',
+  currentLanguage: 'en',
+  searchEngine: 'duckduckgo',
+  privacyCurrency: 'native',
+  autoLockTime: 60, //s
+};

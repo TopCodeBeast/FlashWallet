@@ -14,6 +14,8 @@ const CanSendTokenList = ({
   onSelectToken,
   selectedToken,
   currentNetwork,
+  containerStyle,
+  networks,
 }) => {
   const tokensList = tokens[currentNetwork.toString()]
     ? tokens[currentNetwork.toString()][currentAccountIndex]
@@ -21,7 +23,7 @@ const CanSendTokenList = ({
       : []
     : [];
   const refRBTokensListSheet = useRef(null);
-
+  const currentNetworkSymbol = networks[currentNetwork].symbol;
   const TokenRow = ({token, onPress}) => {
     return (
       <TouchableOpacity onPress={onPress}>
@@ -47,7 +49,9 @@ const CanSendTokenList = ({
             <View>
               <View>
                 <Text style={{...fonts.title2, color: 'white'}}>
-                  {token.tokenAddress === 'main' ? 'ETH' : token.tokenSymbol}
+                  {token.tokenAddress === 'main'
+                    ? currentNetworkSymbol
+                    : token.tokenSymbol}
                 </Text>
               </View>
             </View>
@@ -127,22 +131,28 @@ const CanSendTokenList = ({
 
   return (
     <TouchableOpacity
-      style={{
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: colors.grey22,
-        height: 60,
-        width: 150,
-        flexDirection: 'row',
-        alignItems: 'center',
-      }}
+      style={
+        containerStyle
+          ? containerStyle
+          : {
+              paddingHorizontal: 16,
+              paddingVertical: 12,
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: colors.grey22,
+              height: 60,
+              width: 150,
+              flexDirection: 'row',
+              alignItems: 'center',
+            }
+      }
       onPress={() => {
         refRBTokensListSheet.current.open();
       }}>
       <Text style={{...fonts.para_semibold, color: 'white'}}>
-        {selectedToken === 'main' ? 'ETH' : selectedToken.tokenSymbol}
+        {selectedToken === 'main'
+          ? currentNetworkSymbol
+          : selectedToken.tokenSymbol}
       </Text>
       <View style={{flex: 1, marginRight: 16, flexDirection: 'row-reverse'}}>
         <FontAwesome
@@ -159,6 +169,7 @@ const CanSendTokenList = ({
 const mapStateToProps = state => ({
   accounts: state.accounts.accounts,
   currentAccountIndex: state.accounts.currentAccountIndex,
+  networks: state.networks.networks,
   currentNetwork: state.networks.currentNetwork,
   tokens: state.tokens.tokensData,
 });

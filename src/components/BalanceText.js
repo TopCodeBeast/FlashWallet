@@ -85,13 +85,16 @@ const BalanceText = ({
     });
   }, [currentNetwork]);
 
+  const currentNetworkSymbol = networks[currentNetwork].symbol;
   return (
     <Text style={style}>
       {balancesInfo[address]
         ? parseFloat(balancesInfo[address].main) > 0
-          ? parseFloat(balancesInfo[address].main).toFixed(4) + ' ETH'
-          : '0 ETH'
-        : '0 ETH'}
+          ? parseFloat(balancesInfo[address].main).toFixed(4) +
+            ' ' +
+            currentNetworkSymbol
+          : '0 ' + currentNetworkSymbol
+        : '0 ' + currentNetworkSymbol}
     </Text>
   );
 };

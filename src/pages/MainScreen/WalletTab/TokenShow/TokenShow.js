@@ -257,10 +257,15 @@ const TokenShow = ({
     );
   };
 
+  const currentNetworkSymbol = networks[currentNetwork].symbol;
   return (
     <View style={{height: '100%', backgroundColor: colors.grey24}}>
       <Header
-        tokenName={selectedToken === 'main' ? 'ETH' : selectedToken.tokenSymbol}
+        tokenName={
+          selectedToken === 'main'
+            ? currentNetworkSymbol
+            : selectedToken.tokenSymbol
+        }
         onBackPress={() => {
           navigation.goBack();
         }}

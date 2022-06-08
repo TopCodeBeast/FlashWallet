@@ -29,6 +29,7 @@ const NetworkFeeRBSheet = props => {
   const propsMaxPriorityFee = utils.formatUnits(props.maxPriorityFee, 'gwei');
   const propsGasLimit = props.gasLimit.toString();
   const [networkFeeType, setNetworkFeeType] = useState(props.networkFeeType);
+  const {networks, currentNetwork} = props;
 
   const [showStatus, setShowStatus] = useState(
     props.networkFeeType === 'advanced' ? 'advanced' : 'basic',
@@ -38,6 +39,8 @@ const NetworkFeeRBSheet = props => {
   const [maxPriorityFee, setMaxPriorityFee] = useState(propsMaxPriorityFee);
   const [maxFee, setMaxFee] = useState(propsMaxFee);
   const [error, setError] = useState({});
+
+  const currentNetworkSymbol = networks[currentNetwork].symbol;
 
   const onPressSave = () => {
     if (Number(gasLimit) !== parseInt(gasLimit)) {
@@ -115,14 +118,14 @@ const NetworkFeeRBSheet = props => {
         <View
           style={{
             borderWidth: 1,
-            borderColor: colors.grey9,
+            borderColor: colors.grey22,
             borderRadius: 8,
             marginTop: 24,
           }}>
           <View
             style={{
               borderBottomWidth: 1,
-              borderColor: colors.grey9,
+              borderColor: colors.grey22,
               padding: 16,
             }}>
             <TouchableOpacity
@@ -141,7 +144,9 @@ const NetworkFeeRBSheet = props => {
                   {(
                     parseFloat(utils.formatEther(feeData.low.maxFeePerGas)) *
                     gasLimit
-                  ).toFixed(8) + ' ETH'}
+                  ).toFixed(8) +
+                    ' ' +
+                    currentNetworkSymbol}
                 </Text>
                 <Text
                   style={{
@@ -162,7 +167,7 @@ const NetworkFeeRBSheet = props => {
           <View
             style={{
               borderBottomWidth: 1,
-              borderColor: colors.grey9,
+              borderColor: colors.grey22,
               padding: 16,
             }}>
             <TouchableOpacity
@@ -181,7 +186,9 @@ const NetworkFeeRBSheet = props => {
                   {(
                     parseFloat(utils.formatEther(feeData.medium.maxFeePerGas)) *
                     gasLimit
-                  ).toFixed(8) + ' ETH'}
+                  ).toFixed(8) +
+                    ' ' +
+                    currentNetworkSymbol}
                 </Text>
                 <Text
                   style={{
@@ -219,7 +226,9 @@ const NetworkFeeRBSheet = props => {
                   {(
                     parseFloat(utils.formatEther(feeData.high.maxFeePerGas)) *
                     gasLimit
-                  ).toFixed(8) + ' ETH'}
+                  ).toFixed(8) +
+                    ' ' +
+                    currentNetworkSymbol}
                 </Text>
                 <Text
                   style={{
@@ -272,7 +281,9 @@ const NetworkFeeRBSheet = props => {
                     utils.parseUnits(parseFloat(maxFee).toFixed(9), 'gwei'),
                   ),
                 ) * gasLimit
-              ).toFixed(8) + ' ETH'}
+              ).toFixed(8) +
+                ' ' +
+                currentNetworkSymbol}
             </Text>
           </View>
         </View>
@@ -408,6 +419,8 @@ const NetworkFeeRBSheet = props => {
 
 const mapStateToProps = state => ({
   feeData: state.engine.feeData,
+  networks: state.networks.networks,
+  currentNetwork: state.networks.currentNetwork,
 });
 const mapDispatchToProps = dispatch => ({});
 

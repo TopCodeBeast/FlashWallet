@@ -7,7 +7,14 @@ import MaskedView from '@react-native-community/masked-view';
 
 import BalanceText from '../../../components/BalanceText';
 
-const NetworkBalance = ({navigation, accounts, currentAccountIndex}) => {
+const NetworkBalance = ({
+  navigation,
+  accounts,
+  currentAccountIndex,
+  networks,
+  currentNetwork,
+}) => {
+  const currentNetworkSymbol = networks[currentNetwork].symbol;
   return (
     <View style={{marginLeft: 24, marginTop: 24}}>
       <View>
@@ -19,7 +26,9 @@ const NetworkBalance = ({navigation, accounts, currentAccountIndex}) => {
                 address={accounts[currentAccountIndex].address}
               />
             ) : (
-              <Text style={{...fonts.big_type1}}>0 ETH</Text>
+              <Text style={{...fonts.big_type1}}>
+                {0 + ' ' + currentNetworkSymbol}
+              </Text>
             )
           }>
           <LinearGradient colors={colors.gradient8}>
@@ -29,7 +38,9 @@ const NetworkBalance = ({navigation, accounts, currentAccountIndex}) => {
                 address={accounts[currentAccountIndex].address}
               />
             ) : (
-              <Text style={{...fonts.big_type1, opacity: 0}}>0 ETH</Text>
+              <Text style={{...fonts.big_type1, opacity: 0}}>
+                {0 + ' ' + currentNetworkSymbol}
+              </Text>
             )}
           </LinearGradient>
         </MaskedView>
@@ -53,6 +64,8 @@ const NetworkBalance = ({navigation, accounts, currentAccountIndex}) => {
 const mapStateToProps = state => ({
   accounts: state.accounts.accounts,
   currentAccountIndex: state.accounts.currentAccountIndex,
+  networks: state.networks.networks,
+  currentNetwork: state.networks.currentNetwork,
 });
 const mapDispatchToProps = dispatch => ({});
 
