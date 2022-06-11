@@ -18,6 +18,7 @@ import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-toast-message';
 import {loadMnemonic} from '../../../../utils/mnemonic';
 import Clipboard from '@react-native-clipboard/clipboard';
+import {toastConfig} from '../../../../components/utils/CustomToastConfig';
 
 const RevealSeedRBSheet = ({onPressDone}) => {
   const [status, setStatus] = useState('check');
@@ -26,7 +27,8 @@ const RevealSeedRBSheet = ({onPressDone}) => {
   const [error, setError] = useState('');
   const [nextLoading, setNextLoading] = useState(false);
 
-  const [seedPhrase, setSeedPhrase] = useState('asdfasdfasdfsafd');
+  const [seedPhrase, setSeedPhrase] = useState('seed phrase goes here');
+  const toastRef = useRef(null);
 
   const [curTabIndex, setCurTabIndex] = useState(0);
   const [tabRoutes] = useState([
@@ -70,11 +72,11 @@ const RevealSeedRBSheet = ({onPressDone}) => {
 
   const onPressCopy = () => {
     Clipboard.setString(seedPhrase);
-    Toast.show({
+    toastRef.current.show({
       type: 'copy',
       position: 'bottom',
       text1: 'Copied on the clipboard',
-      bottomOffset: 120,
+      bottomOffset: 50,
       props: {
         color: colors.green5,
       },
@@ -173,11 +175,17 @@ const RevealSeedRBSheet = ({onPressDone}) => {
               </Text>
             </TouchableOpacity>
           </View>
+          <Toast
+            ref={toastRef}
+            config={toastConfig({hasRef: true, toastRef})}
+            style={{marginTop: -40}}
+          />
         </View>
       );
     };
 
     const QRCodeRoute = () => {
+      console.log(seedPhrase);
       return (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <QRCode value={seedPhrase} size={200} />

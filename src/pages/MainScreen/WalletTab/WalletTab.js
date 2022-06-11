@@ -5,6 +5,7 @@ import {
   Image,
   KeyboardAvoidingView,
   SafeAreaView,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -35,15 +36,49 @@ import NetworkBalance from './NetworkBalance';
 import ReceiveToken from './ReceiveToken/ReceiveToken';
 import BuyToken from './BuyToken/BuyToken';
 import Toast from 'react-native-toast-message';
+import moment from 'moment';
+import TxnRBSheet from './TxnRBSheet';
+import {ethers, utils} from 'ethers';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 const buyIconSvgXml = require('../SVGData').buyIcon;
 
-const WalletTab = ({navigation, currentNetwork}) => {
+const WalletTab = ({
+  navigation,
+  currentNetwork,
+  networks,
+  gettingFeeDataTimerId,
+  accounts,
+  currentAccountIndex,
+}) => {
+  const tempTxn = {
+    type: 2,
+    chainId: 4,
+    nonce: 56,
+    maxPriorityFeePerGas: utils.parseEther('0.0000000015'),
+    maxFeePerGas: utils.parseEther('0.000000001500000016'),
+    gasPrice: null,
+    gasLimit: ethers.BigNumber.from(21000),
+    to: '0xB1e50315BbDa7D9Fd7e4F030e26eEC585A1Efc0c',
+    value: utils.parseEther('0.001'),
+    data: '0x',
+    accessList: [],
+    hash: '0xde8f5411d2d531817747a1ddab3ef4f25ffc721edb9f7ad3eed5dba864b27f84',
+    v: 0,
+    r: '0x60d1134a116991601e9f02d08c45f9e7c72bc738d58f5e46f3a4e232f40cf92d',
+    s: '0x353d211b728e8a67ffdebe3fa5aedabb62c444c8a93816870fb17976b78d9da3',
+    from: '0x632Bd9a598cd5c52F1625c850A6c46ECd4Cb7829',
+    confirmations: 0,
+  };
   const [selectedToken, setSelectedToken] = useState('');
+  const [submittedTxn, setSubmittedTxn] = useState(tempTxn);
+  const [submittedTxnTime, setSubmittedTxnTime] = useState('');
+  const [submittedAccount, setSubmittedAccount] = useState(undefined);
   const refRBSendTokenSheet = useRef(null);
   const refRBReceiveTokenSheet = useRef(null);
   const refRBBuySheet = useRef(null);
+
+  const refTxnRBSheet = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -55,6 +90,9 @@ const WalletTab = ({navigation, currentNetwork}) => {
     return (
       <RBSheet
         height={Dimensions.get('screen').height - 150}
+        onClose={() => {
+          clearTimeout(gettingFeeDataTimerId);
+        }}
         ref={refRBBuySheet}
         closeOnDragDown={true}
         closeOnPressBack={true}
@@ -99,6 +137,34 @@ const WalletTab = ({navigation, currentNetwork}) => {
           },
         }}>
         <ReceiveToken token={'main'} />
+      </RBSheet>
+    );
+  };
+
+  const renderTxnRBSheet = () => {
+    // console.log(networks[currentNetwork].symbol, selectedToken);
+    return (
+      <RBSheet
+        height={620}
+        ref={refTxnRBSheet}
+        closeOnDragDown={true}
+        closeOnPressBack={true}
+        closeOnPressMask={true}
+        customStyles={{
+          wrapper: {
+            backgroundColor: '#222531BB',
+          },
+          draggableIcon: {
+            backgroundColor: colors.grey9,
+          },
+          container: {
+            backgroundColor: colors.grey24,
+          },
+        }}>
+        <TxnRBSheet
+          submittedTxn={submittedTxn}
+          submittedTxnTime={submittedTxnTime}
+        />
       </RBSheet>
     );
   };
@@ -178,19 +244,28 @@ const WalletTab = ({navigation, currentNetwork}) => {
           },
         }}>
         <SendToken
+          isToken={false}
           onPressClose={() => {
             refRBSendTokenSheet.current.close();
           }}
           onSubmitTxn={resTxn => {
-            console.log('Wallet tab: ', resTxn);
-            const resTxnTemp = {...resTxn};
+            setSubmittedAccount(accounts[currentAccountIndex]);
+            console.log('Submit Txn::::::::::::::::', resTxn);
+            setSubmittedTxn({...resTxn});
+            const timeString = moment(new Date().valueOf())
+              .format('MMM DD [at] hh:mm a')
+              .toString();
+            setSubmittedTxnTime(timeString);
             refRBSendTokenSheet.current.close();
             Toast.show({
               type: 'txnSubmitted',
               position: 'bottom',
               bottomOffset: 120,
               props: {
-                transaction: {...resTxnTemp},
+                transaction: {...resTxn},
+                onPress: () => {
+                  refTxnRBSheet.current.open();
+                },
               },
             });
             resTxn.wait().then(receipt => {
@@ -200,9 +275,22 @@ const WalletTab = ({navigation, currentNetwork}) => {
                 position: 'bottom',
                 bottomOffset: 120,
                 props: {
-                  transaction: {...resTxnTemp},
+                  transaction: {...resTxn},
                 },
               });
+            });
+          }}
+          onErrorOccured={error => {
+            console.log(error);
+            refRBSendTokenSheet.current.close();
+            Toast.show({
+              type: 'error',
+              position: 'bottom',
+              bottomOffset: 120,
+              text1: 'Transaction failed',
+              props: {
+                error: error,
+              },
             });
           }}
         />
@@ -218,7 +306,7 @@ const WalletTab = ({navigation, currentNetwork}) => {
           width: '100%',
           height: '100%',
         }}>
-        {/* <TouchableOpacity
+        <TouchableOpacity
           style={{width: 100, height: 100, backgroundColor: 'red'}}
           onPress={() => {
             Toast.show({
@@ -227,9 +315,18 @@ const WalletTab = ({navigation, currentNetwork}) => {
               bottomOffset: 120,
               props: {
                 transaction: {},
+                onPress: () => {
+                  setSubmittedTxn(tempTxn);
+                  const timeString = moment(new Date().valueOf())
+                    .format('MMM DD [at] hh:mm a')
+                    .toString();
+                  console.log(timeString);
+                  setSubmittedTxnTime(timeString);
+                  refTxnRBSheet.current.open();
+                },
               },
             });
-          }}></TouchableOpacity> */}
+          }}></TouchableOpacity>
         {selectedToken.length > 0 && (
           <TokenShow
             onBackPress={() => {
@@ -256,6 +353,7 @@ const WalletTab = ({navigation, currentNetwork}) => {
             />
           </>
         )}
+        {renderTxnRBSheet()}
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
@@ -264,7 +362,9 @@ const WalletTab = ({navigation, currentNetwork}) => {
 const mapStateToProps = state => ({
   accounts: state.accounts.accounts,
   currentAccountIndex: state.accounts.currentAccountIndex,
+  networks: state.networks.networks,
   currentNetwork: state.networks.currentNetwork,
+  gettingFeeDataTimerId: state.engine.gettingFeeDataTimerId,
 });
 const mapDispatchToProps = dispatch => ({});
 

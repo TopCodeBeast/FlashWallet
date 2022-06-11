@@ -49,6 +49,7 @@
     "events": "^1.0.0",
     "galio-framework": "^0.8.0",
     "https-browserify": "~0.0.0",
+    "moment": "^2.29.3",
     "moralis": "^1.8.0",
     "native-base": "^3.4.5",
     "node-fetch": "^3.2.5",

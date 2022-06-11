@@ -66,6 +66,7 @@ const SendToken = ({
   gettingFeeDataTimerId,
   setGettingFeeDataTimerId,
   onSubmitTxn,
+  onErrorOccured,
 }) => {
   const refRBNetworkFeeSheet = useRef(null);
   const refRBAccountsListSheet = useRef(null);
@@ -275,8 +276,9 @@ const SendToken = ({
         setSendTransactionLoading(false);
         onSubmitTxn(resTxn);
       },
-      () => {
+      error => {
         setSendTransactionLoading(false);
+        onErrorOccured(error);
       },
     );
   };

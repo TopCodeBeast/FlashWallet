@@ -24,9 +24,7 @@ export const SET_TOKEN_BALANCE_UPDATED_INFO = 'SET_TOKEN_BALANCE_UPDATED_INFO';
 export const SET_TOKENS_DATA = 'SET_TOKENS_DATA';
 export const SET_SELECTED_TOKEN = 'SET_SELECTED_TOKEN';
 
-//price actions
-export const SET_MAIN_PRICE = 'SET_MAIN_PRICE';
-export const SET_TOKEN_PRICE = 'SET_TOKEN_PRICE';
+//quote actions
 
 //engine actions
 export const SET_FEE_DATA = 'SET_FEE_DATA';

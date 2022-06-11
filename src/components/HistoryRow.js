@@ -9,14 +9,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {colors, fonts} from '../../../../styles';
+import {colors, fonts} from '../styles';
 import FontAwesome, {
   SolidIcons,
   RegularIcons,
   BrandIcons,
 } from 'react-native-fontawesome';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import {TextButton} from '../../../../components/Buttons';
+import {TextButton} from './Buttons';
 
 const usdAmount = 226.69;
 

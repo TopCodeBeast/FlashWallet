@@ -1,24 +1,17 @@
 import React from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import Toast from 'react-native-toast-message';
-import FontAwesome, {RegularIcons} from 'react-native-fontawesome';
+import FontAwesome, {RegularIcons, SolidIcons} from 'react-native-fontawesome';
 import Feather from 'react-native-vector-icons/Feather';
 import {colors, fonts} from '../../styles';
 
 export const toastConfig = ({hasRef, toastRef}) => {
   return {
     txnSubmitted: props => {
-      const {transaction} = props.props;
-      console.log('From Toast: ', transaction);
+      const {transaction, onPress} = props.props;
       return (
         <TouchableOpacity
-          onPress={() => {
-            if (hasRef) {
-              toastRef.current.hide();
-            } else {
-              Toast.hide();
-            }
-          }}
+          onPress={onPress}
           style={{
             height: 80,
             width: '90%',
@@ -54,11 +47,9 @@ export const toastConfig = ({hasRef, toastRef}) => {
     },
     txnCompleted: props => {
       const {transaction} = props.props;
-      console.log('From Toast: ', transaction);
       return (
         <TouchableOpacity
           onPress={() => {
-            console.log('Tap completed Transaction:::: ', transaction);
             if (hasRef) {
               toastRef.current.hide();
             } else {
@@ -99,16 +90,10 @@ export const toastConfig = ({hasRef, toastRef}) => {
       );
     },
     txnCancelled: props => {
-      const {transaction} = props.props;
+      const {transaction, onPress} = props.props;
       return (
         <TouchableOpacity
-          onPress={() => {
-            if (hasRef) {
-              toastRef.current.hide();
-            } else {
-              Toast.hide();
-            }
-          }}
+          onPress={onPress}
           style={{
             height: 80,
             width: '90%',
@@ -142,10 +127,46 @@ export const toastConfig = ({hasRef, toastRef}) => {
     },
     error: props => {
       const {text1} = props;
+      const {error} = props.props;
+      console.log(error);
       return (
-        <View style={{height: 60, width: '100%', backgroundColor: 'blue'}}>
-          <Text>{text1}</Text>
-        </View>
+        <TouchableOpacity
+          onPress={() => {
+            if (hasRef) {
+              toastRef.current.hide();
+            } else {
+              Toast.hide();
+            }
+          }}
+          style={{
+            height: 80,
+            width: '90%',
+            backgroundColor: colors.red5 + '44',
+            padding: 16,
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderRadius: 8,
+            zIndex: 100,
+          }}>
+          <FontAwesome
+            style={{
+              fontSize: 40,
+              color: colors.red5,
+              marginRight: 12,
+            }}
+            icon={RegularIcons.timesCircle}
+          />
+          <View>
+            <Text style={{...fonts.title2, color: 'white'}}>{text1}</Text>
+            <Text
+              style={{
+                ...fonts.caption_small12_18_regular,
+                color: colors.grey9,
+              }}>
+              Tap to hide
+            </Text>
+          </View>
+        </TouchableOpacity>
       );
     },
     warning: props => {

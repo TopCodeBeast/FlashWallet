@@ -29,11 +29,14 @@ import {
   SecondaryButton,
   TextButton,
 } from '../../../../components/Buttons';
-import HistoryRow from './HistoryRow';
+import HistoryRow from '../../../../components/HistoryRow';
 import {Avatar} from 'react-native-elements';
 import SendToken from '../SendToken/SendToken';
 import BalanceText from '../../../../components/BalanceText';
 import TokenBalanceText from '../../../../components/TokenBalanceText';
+import Toast from 'react-native-toast-message';
+import TxnRBSheet from '../TxnRBSheet';
+import moment from 'moment';
 
 const backImage = require('../../../../assets/images/mainscreen/backimage.png');
 
@@ -48,8 +51,12 @@ const TokenShow = ({
   currentAccountIndex,
   selectedToken,
 }) => {
-  const refRBTokenSendSheet = useRef(null);
+  const refRBSendTokenSheet = useRef(null);
   const [sendAddress, setSendAddress] = useState('');
+  const [submittedTxn, setSubmittedTxn] = useState(undefined);
+  const [submittedTxnTime, setSubmittedTxnTime] = useState('');
+  const [submittedAccount, setSubmittedAccount] = useState(undefined);
+  const refTxnRBSheet = useRef(null);
 
   useEffect(() => {
     console.log(selectedToken);
@@ -133,7 +140,7 @@ const TokenShow = ({
         <View style={{marginRight: 16}}>
           <SecondaryButton
             onPress={() => {
-              refRBTokenSendSheet.current.open();
+              refRBSendTokenSheet.current.open();
             }}
             text="Send"
             icon={
@@ -227,11 +234,39 @@ const TokenShow = ({
     );
   };
 
+  const renderTxnRBSheet = () => {
+    // console.log(networks[currentNetwork].symbol, selectedToken);
+    return (
+      <RBSheet
+        height={620}
+        ref={refTxnRBSheet}
+        closeOnDragDown={true}
+        closeOnPressBack={true}
+        closeOnPressMask={true}
+        customStyles={{
+          wrapper: {
+            backgroundColor: '#222531BB',
+          },
+          draggableIcon: {
+            backgroundColor: colors.grey9,
+          },
+          container: {
+            backgroundColor: colors.grey24,
+          },
+        }}>
+        <TxnRBSheet
+          submittedTxn={submittedTxn}
+          submittedTxnTime={submittedTxnTime}
+          submittedAccount={submittedAccount}
+        />
+      </RBSheet>
+    );
+  };
   const renderTokenSendRBSheet = () => {
     return (
       <RBSheet
         height={Dimensions.get('screen').height - 100}
-        ref={refRBTokenSendSheet}
+        ref={refRBSendTokenSheet}
         closeOnDragDown={true}
         closeOnPressBack={true}
         closeOnPressMask={true}
@@ -247,11 +282,55 @@ const TokenShow = ({
           },
         }}>
         <SendToken
-          onPressClose={() => {
-            refRBTokenSendSheet.current.close();
-          }}
           isToken={selectedToken === 'main' ? false : true}
           token={selectedToken}
+          onPressClose={() => {
+            refRBSendTokenSheet.current.close();
+          }}
+          onSubmitTxn={resTxn => {
+            setSubmittedTxn({...resTxn});
+            const timeString = moment(new Date().valueOf())
+              .format('MMM DD [at] hh:mm a')
+              .toString();
+            setSubmittedTxnTime(timeString);
+            setSubmittedAccount(currentAccount);
+            refRBSendTokenSheet.current.close();
+            Toast.show({
+              type: 'txnSubmitted',
+              position: 'bottom',
+              bottomOffset: 120,
+              props: {
+                transaction: {...resTxn},
+                onPress: () => {
+                  refTxnRBSheet.current.open();
+                },
+              },
+            });
+            resTxn.wait().then(receipt => {
+              console.log('receipt:::: ', receipt);
+              Toast.show({
+                type: 'txnCompleted',
+                position: 'bottom',
+                bottomOffset: 120,
+                props: {
+                  transaction: {...resTxn},
+                },
+              });
+            });
+          }}
+          onErrorOccured={error => {
+            console.log(error);
+            refRBSendTokenSheet.current.close();
+            Toast.show({
+              type: 'error',
+              position: 'bottom',
+              bottomOffset: 120,
+              text1: 'Transaction failed',
+              props: {
+                error: error,
+              },
+            });
+          }}
         />
       </RBSheet>
     );
@@ -278,6 +357,7 @@ const TokenShow = ({
       {renderTransactionButtonGroup()}
       {renderHistoryPanel()}
       {renderTokenSendRBSheet()}
+      {renderTxnRBSheet()}
     </View>
   );
 };
