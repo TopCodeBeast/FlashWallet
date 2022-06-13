@@ -33,10 +33,10 @@ const EngineReducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_FEE_DATA: {
       if (checkIfSame(action.payload, state.feeData)) {
-        console.log('Equal::::::::::');
+        // console.log('Equal::::::::::');
         return state;
       } else {
-        console.log('Not Equal::::::::::: ');
+        // console.log('Not Equal::::::::::: ');
         return {
           ...state,
           feeData: action.payload,

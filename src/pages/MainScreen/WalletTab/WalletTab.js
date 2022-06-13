@@ -74,6 +74,7 @@ const WalletTab = ({
   const [submittedTxn, setSubmittedTxn] = useState(tempTxn);
   const [submittedTxnTime, setSubmittedTxnTime] = useState('');
   const [submittedAccount, setSubmittedAccount] = useState(undefined);
+  const [submittedNetworkRPC, setSubmittedNetworkRPC] = useState('');
   const refRBSendTokenSheet = useRef(null);
   const refRBReceiveTokenSheet = useRef(null);
   const refRBBuySheet = useRef(null);
@@ -85,6 +86,8 @@ const WalletTab = ({
       // console.warn('wallet tab is gone');
     };
   });
+
+  const currentAccount = accounts[currentAccountIndex];
 
   const renderBuyRBSheet = () => {
     return (
@@ -142,7 +145,6 @@ const WalletTab = ({
   };
 
   const renderTxnRBSheet = () => {
-    // console.log(networks[currentNetwork].symbol, selectedToken);
     return (
       <RBSheet
         height={620}
@@ -164,6 +166,38 @@ const WalletTab = ({
         <TxnRBSheet
           submittedTxn={submittedTxn}
           submittedTxnTime={submittedTxnTime}
+          submittedAccount={submittedAccount}
+          submittedNetworkRPC={submittedNetworkRPC}
+          onClose={() => {
+            refTxnRBSheet.current.close();
+          }}
+          onSubmittedNewTxn={(text1, text2) => {
+            Toast.show({
+              type: 'submitted',
+              position: 'bottom',
+              bottomOffset: 120,
+              text1: text1,
+              text2: text2,
+            });
+          }}
+          onSuccessNewTxn={(text1, text2) => {
+            Toast.show({
+              type: 'success',
+              position: 'bottom',
+              bottomOffset: 120,
+              text1: text1,
+              text2: text2,
+            });
+          }}
+          onFailNewTxn={(text1, text2) => {
+            Toast.show({
+              type: 'error',
+              position: 'bottom',
+              bottomOffset: 120,
+              text1: text1,
+              text2: text2,
+            });
+          }}
         />
       </RBSheet>
     );
@@ -248,40 +282,28 @@ const WalletTab = ({
           onPressClose={() => {
             refRBSendTokenSheet.current.close();
           }}
-          onSubmitTxn={resTxn => {
-            setSubmittedAccount(accounts[currentAccountIndex]);
-            console.log('Submit Txn::::::::::::::::', resTxn);
-            setSubmittedTxn({...resTxn});
+          onSubmitTxn={originTxn => {
+            setSubmittedNetworkRPC(networks[currentNetwork].rpc);
+            setSubmittedTxn({...originTxn});
             const timeString = moment(new Date().valueOf())
               .format('MMM DD [at] hh:mm a')
               .toString();
             setSubmittedTxnTime(timeString);
+            setSubmittedAccount(currentAccount);
             refRBSendTokenSheet.current.close();
             Toast.show({
               type: 'txnSubmitted',
               position: 'bottom',
               bottomOffset: 120,
               props: {
-                transaction: {...resTxn},
+                transaction: {...originTxn},
                 onPress: () => {
                   refTxnRBSheet.current.open();
                 },
               },
             });
-            resTxn.wait().then(receipt => {
-              console.log('receipt:::: ', receipt);
-              Toast.show({
-                type: 'txnCompleted',
-                position: 'bottom',
-                bottomOffset: 120,
-                props: {
-                  transaction: {...resTxn},
-                },
-              });
-            });
           }}
           onErrorOccured={error => {
-            console.log(error);
             refRBSendTokenSheet.current.close();
             Toast.show({
               type: 'error',
@@ -306,7 +328,7 @@ const WalletTab = ({
           width: '100%',
           height: '100%',
         }}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{width: 100, height: 100, backgroundColor: 'red'}}
           onPress={() => {
             Toast.show({
@@ -320,22 +342,25 @@ const WalletTab = ({
                   const timeString = moment(new Date().valueOf())
                     .format('MMM DD [at] hh:mm a')
                     .toString();
-                  console.log(timeString);
                   setSubmittedTxnTime(timeString);
+                  setSubmittedAccount(accounts[currentAccountIndex]);
                   refTxnRBSheet.current.open();
                 },
               },
             });
-          }}></TouchableOpacity>
+          }}></TouchableOpacity> */}
         {selectedToken.length > 0 && (
-          <TokenShow
-            onBackPress={() => {
-              setSelectedToken('');
-            }}
-          />
+          <>
+            <TokenShow
+              onBackPress={() => {
+                setSelectedToken('');
+              }}
+            />
+          </>
         )}
         {!selectedToken && (
           <>
+            {renderTxnRBSheet()}
             {renderSendTokenRBSheet()}
             {renderReceiveTokenRBSheet()}
             {renderBuyRBSheet()}
@@ -353,7 +378,6 @@ const WalletTab = ({
             />
           </>
         )}
-        {renderTxnRBSheet()}
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

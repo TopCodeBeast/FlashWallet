@@ -8,6 +8,7 @@ import '@ethersproject/shims';
 import {ethers} from 'ethers';
 
 import erc20ABI from '../../abis/erc20ABI.json';
+import Toast from 'react-native-toast-message';
 
 export const sendTransaction = (
   dispatch,
@@ -22,17 +23,51 @@ export const sendTransaction = (
   const provider = new ethers.providers.JsonRpcProvider(currentNetworkRPC);
   const wallet = new ethers.Wallet(fromPrivateKey, provider);
   if (token === 'main') {
-    const tx = {
+    const rawTx = {
       to: toAddress,
       value: ethers.utils.parseEther(value.toString()),
       ...feeInfo,
     };
-    console.log(tx);
     wallet
-      .sendTransaction(tx)
-      .then(resTxn => {
-        console.log('transaction action:::::', resTxn);
-        successCallback(resTxn);
+      .populateTransaction(rawTx)
+      .then(tx => {
+        console.log('Transaction Action send Main: ', tx);
+        successCallback(tx);
+        wallet
+          .sendTransaction(tx)
+          .then(resTxn => {
+            console.log('transaction action:::::', resTxn);
+            resTxn
+              .wait()
+              .then(receipt => {
+                Toast.show({
+                  type: 'txnCompleted',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  props: {
+                    transaction: {...resTxn},
+                  },
+                });
+              })
+              .catch(err => {
+                console.log(err, err.reason);
+                if (err.reason != 'cancelled') {
+                  Toast.show({
+                    type: 'error',
+                    position: 'bottom',
+                    bottomOffset: 120,
+                    text1: 'Error occured',
+                    props: {
+                      error: err,
+                    },
+                  });
+                }
+              });
+          })
+          .catch(err => {
+            console.log('Transaction Action Error:::::: ', err);
+            failCallback();
+          });
       })
       .catch(err => {
         console.log('Transaction Action Error:::::: ', err);
@@ -48,11 +83,40 @@ export const sendTransaction = (
       .transfer(toAddress, ethers.utils.parseEther(value.toString()))
       .then(rawTx => {
         console.log('Transaction actions raw tx: ', rawTx);
+        successCallback({...rawTx, ...feeInfo});
         wallet
           .sendTransaction({...rawTx, ...feeInfo})
           .then(resTxn => {
-            console.log(resTxn);
-            successCallback(resTxn);
+            console.log(
+              'Token send Transaction actions;;;;;;; Res txn:::: ',
+              resTxn,
+            );
+            resTxn
+              .wait()
+              .then(receipt => {
+                Toast.show({
+                  type: 'txnCompleted',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  props: {
+                    transaction: {...resTxn},
+                  },
+                });
+              })
+              .catch(err => {
+                console.log(err, err.reason);
+                if (err.reason != 'cancelled') {
+                  Toast.show({
+                    type: 'error',
+                    position: 'bottom',
+                    bottomOffset: 120,
+                    text1: 'Error occured',
+                    props: {
+                      error: err,
+                    },
+                  });
+                }
+              });
           })
           .catch(err => {
             console.log('Transaction Action Error:::::: ', err);

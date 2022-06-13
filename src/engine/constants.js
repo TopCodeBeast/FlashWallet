@@ -77,6 +77,9 @@ export const transferETHGasLimit = 21000;
 export const estimateGasRatio = 1.5;
 export const gettingFeeDataTimerInterval = 5000; //ms
 
+export const numeratorForNewTxn = 12;
+export const denominatorForNewTxn = 10;
+
 export const initialSettings = {
   baseCurrency: 'USD',
   currentLanguage: 'en',

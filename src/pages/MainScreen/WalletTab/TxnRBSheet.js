@@ -1,46 +1,115 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {connect} from 'react-redux';
-import {
-  Dimensions,
-  Image,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ScrollView, Text, View} from 'react-native';
 import {colors, fonts} from '../../../styles';
-import {SvgXml} from 'react-native-svg';
-import FontAwesome, {
-  SolidIcons,
-  RegularIcons,
-  BrandIcons,
-} from 'react-native-fontawesome';
 
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-const Tab = createBottomTabNavigator();
-
-import Header from './Header';
-import TokenAndCollectiblesTab from './TokenAndCollectibleTab';
-
-import {
-  PrimaryButton,
-  SecondaryButton,
-  TextButton,
-} from '../../../components/Buttons';
-import TokenShow from './TokenShow/TokenShow';
-import SendToken from './SendToken/SendToken';
+import {PrimaryButton, TextButton} from '../../../components/Buttons';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import NetworkBalance from './NetworkBalance';
-import ReceiveToken from './ReceiveToken/ReceiveToken';
-import BuyToken from './BuyToken/BuyToken';
-import Toast from 'react-native-toast-message';
 import {ethers, utils} from 'ethers';
 
-const TxnRBSheet = ({submittedTxn, submittedTxnTime, submittedAccount}) => {
+const TxnRBSheet = ({
+  submittedTxn,
+  submittedTxnTime,
+  submittedAccount,
+  submittedNetworkRPC,
+  onClose,
+  onSubmittedNewTxn,
+  onSuccessNewTxn,
+  onFailNewTxn,
+}) => {
   const refCancelRBSheet = useRef(null);
   const refSpeedUpRBSheet = useRef(null);
+  const [speedLoading, setSpeedLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
+
+  const provider = new ethers.providers.JsonRpcProvider(submittedNetworkRPC);
+  const wallet = new ethers.Wallet(submittedAccount.privateKey, provider);
+
+  console.log('Txn RB Sheet - submittedTxn:::::: ', submittedTxn);
+
+  /*Txn RB Sheet - submittedTxn::::::  {"chainId": 4, "from": "0x632Bd9a598cd5c52F1625c850A6c46ECd4Cb7829", "gasLimit": {"hex": "0x5208", "type": "BigNumber"}, "maxFeePerGas": {"hex": "0x957cebf6", "type": "BigNumber"}, "maxPriorityFeePerGas": {"hex": "0x540ae47f", "type": "BigNumber"}, "nonce": 81, "to": "0xB1e50315BbDa7D9Fd7e4F030e26eEC585A1Efc0c", "type": 2, "value": {"hex": "0xb5e620f48000", "type": "BigNumber"}}*/
+
+  const speedUpTxn = () => {
+    console.log('Starting new');
+    const newTxn = {
+      ...submittedTxn,
+      maxFeePerGas: submittedTxn.maxFeePerGas.div(10).mul(13),
+      maxPriorityFeePerGas: submittedTxn.maxPriorityFeePerGas.div(10).mul(13),
+    };
+    console.log('new Txn: ', newTxn);
+    setSpeedLoading(true);
+    wallet
+      .sendTransaction(newTxn)
+      .then(newTxnRes => {
+        // setSpeedLoading(false);
+        if (refSpeedUpRBSheet) {
+          refSpeedUpRBSheet.current.close();
+        }
+        onClose();
+        console.log('newTxn Res: ', newTxnRes);
+        onSubmittedNewTxn('Speeding Up Transaction...', 'Tap to hide');
+        newTxnRes
+          .wait()
+          .then(newReciept => {
+            console.log('newReciept: ', newReciept);
+            onSuccessNewTxn(
+              'Speeded Up Txn #' + newTxnRes.nonce,
+              'Tap to hide',
+            );
+          })
+          .catch(err => {
+            console.log('Speed UP Txn ERR::::::: ', err);
+            onFailNewTxn('Fail speeding up.', 'Tap to hide');
+          });
+      })
+      .catch(err => {
+        // setSpeedLoading(false);
+        onClose();
+        console.log('Speed UP Txn ERR::::::: ', err);
+        onFailNewTxn('Fail speeding up.', 'Tap to hide');
+      });
+  };
+
+  const cancelTxn = () => {
+    console.log('Canceling Txn');
+    console.log('Starting new');
+    const newTxn = {
+      ...submittedTxn,
+      maxFeePerGas: submittedTxn.maxFeePerGas.div(10).mul(13),
+      maxPriorityFeePerGas: submittedTxn.maxPriorityFeePerGas.div(10).mul(13),
+      to: submittedAccount.address,
+      value: ethers.BigNumber.from(0),
+    };
+    console.log('new Txn: ', newTxn);
+    setCancelLoading(true);
+    wallet
+      .sendTransaction(newTxn)
+      .then(newTxnRes => {
+        // setCancelLoading(false);
+        if (refCancelRBSheet) {
+          refCancelRBSheet.current.close();
+        }
+        onClose();
+        console.log('newTxn Res: ', newTxnRes);
+        onSubmittedNewTxn('Cancelling Transaction...', 'Tap to hide');
+        newTxnRes
+          .wait()
+          .then(newReciept => {
+            console.log('newReciept: ', newReciept);
+            onSuccessNewTxn('Cancelled Txn #' + newTxnRes.nonce, 'Tap to hide');
+          })
+          .catch(err => {
+            console.log('Cancel Txn ERR1::::::: ', err);
+            onFailNewTxn('Fail cancelling.', 'Tap to hide');
+          });
+      })
+      .catch(err => {
+        // setCancelLoading(false);
+        onClose();
+        console.log('Cancel Txn ERR2::::::: ', err);
+        onFailNewTxn('Fail cancelling.', 'Tap to hide');
+      });
+  };
 
   const renderCancelRBSheet = () => {
     return (
@@ -103,11 +172,19 @@ const TxnRBSheet = ({submittedTxn, submittedTxnTime, submittedAccount}) => {
           }}>
           <TextButton
             text="Cancel"
+            style={{width: 160}}
             onPress={() => {
               refCancelRBSheet.current.close();
             }}
           />
-          <PrimaryButton text="Yes, let's try" onPress={() => {}} />
+          <PrimaryButton
+            loading={cancelLoading}
+            style={{width: 160}}
+            text="Yes, Try"
+            onPress={() => {
+              cancelTxn();
+            }}
+          />
         </View>
       </RBSheet>
     );
@@ -174,11 +251,19 @@ const TxnRBSheet = ({submittedTxn, submittedTxnTime, submittedAccount}) => {
           }}>
           <TextButton
             text="Cancel"
+            style={{width: 160}}
             onPress={() => {
               refSpeedUpRBSheet.current.close();
             }}
           />
-          <PrimaryButton text="Yes, let's try" onPress={() => {}} />
+          <PrimaryButton
+            text="Yes, Try"
+            loading={speedLoading}
+            style={{width: 160}}
+            onPress={() => {
+              speedUpTxn();
+            }}
+          />
         </View>
       </RBSheet>
     );
@@ -258,9 +343,9 @@ const TxnRBSheet = ({submittedTxn, submittedTxnTime, submittedAccount}) => {
                   ...fonts.para_regular,
                   color: 'white',
                 }}>
-                {submittedTxn.from.slice(0, 6) +
+                {submittedAccount.address.slice(0, 6) +
                   '...' +
-                  submittedTxn.from.slice(-4)}
+                  submittedAccount.address.slice(-4)}
               </Text>
             </View>
             <View>
@@ -317,7 +402,9 @@ const TxnRBSheet = ({submittedTxn, submittedTxnTime, submittedAccount}) => {
               </View>
               <View style={{flex: 1, alignItems: 'flex-end'}}>
                 <Text style={{...fonts.para_regular, color: 'white'}}>
-                  {utils.formatEther(submittedTxn.value) + ' ETH'}
+                  {submittedTxn.value
+                    ? utils.formatEther(submittedTxn.value) + ' ETH'
+                    : '0 ETH'}
                 </Text>
               </View>
             </View>
@@ -361,9 +448,11 @@ const TxnRBSheet = ({submittedTxn, submittedTxnTime, submittedAccount}) => {
               <View>
                 <Text style={{...fonts.title2, color: 'white'}}>
                   {utils.formatEther(
-                    submittedTxn.gasLimit
-                      .mul(submittedTxn.maxFeePerGas)
-                      .add(submittedTxn.value),
+                    submittedTxn.value
+                      ? submittedTxn.gasLimit
+                          .mul(submittedTxn.maxFeePerGas)
+                          .add(submittedTxn.value)
+                      : submittedTxn.gasLimit.mul(submittedTxn.maxFeePerGas),
                   ) + ' ETH'}
                 </Text>
               </View>

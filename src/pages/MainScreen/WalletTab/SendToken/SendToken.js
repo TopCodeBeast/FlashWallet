@@ -93,7 +93,6 @@ const SendToken = ({
 
   useEffect(() => {
     const timerId = setInterval(() => {
-      console.log('Getting Feedata');
       getFeeData(networks[currentNetwork].rpc);
     }, gettingFeeDataTimerInterval);
     setGettingFeeDataTimerId(timerId);
@@ -208,7 +207,6 @@ const SendToken = ({
       selectedToken,
     )
       .then(res => {
-        console.log('RES::::::: ', res);
         if (parseFloat(mainBalance) < res * utils.formatEther(maxFee)) {
           setError('Insufficient ETH to send token');
           setAmountLoading(false);
@@ -218,17 +216,14 @@ const SendToken = ({
           setStatus('confirm');
         }
         const timerId = setInterval(() => {
-          console.log('Getting Feedata');
           getFeeData(networks[currentNetwork].rpc);
         }, gettingFeeDataTimerInterval);
         setGettingFeeDataTimerId(timerId);
       })
       .catch(err => {
-        console.log(err);
         setError('Cannot send (maybe insufficient ETH to send token)');
         setAmountLoading(false);
         const timerId = setInterval(() => {
-          console.log('Getting Feedata');
           getFeeData(networks[currentNetwork].rpc);
         }, gettingFeeDataTimerInterval);
         setGettingFeeDataTimerId(timerId);
@@ -271,10 +266,9 @@ const SendToken = ({
       () => {
         setSendTransactionLoading(true);
       },
-      resTxn => {
-        console.log('From Send Token:::::: ', resTxn);
+      originTxn => {
         setSendTransactionLoading(false);
-        onSubmitTxn(resTxn);
+        onSubmitTxn(originTxn);
       },
       error => {
         setSendTransactionLoading(false);
@@ -769,7 +763,6 @@ const SendToken = ({
           maxPriorityFee={maxPriorityFee}
           gasLimit={gasLimit}
           onSave={({type, data}) => {
-            // console.log(type, data);
             if (type !== 'advanced') {
               setNetworkFeeType(type);
               setMaxFee(feeData[type].maxFeePerGas);

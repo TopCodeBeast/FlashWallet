@@ -9,6 +9,7 @@ export const toastConfig = ({hasRef, toastRef}) => {
   return {
     txnSubmitted: props => {
       const {transaction, onPress} = props.props;
+      // console.log('Toast txnSubmitted - transaction:::::: ', transaction);
       return (
         <TouchableOpacity
           onPress={onPress}
@@ -128,7 +129,6 @@ export const toastConfig = ({hasRef, toastRef}) => {
     error: props => {
       const {text1} = props;
       const {error} = props.props;
-      console.log(error);
       return (
         <TouchableOpacity
           onPress={() => {
@@ -164,6 +164,90 @@ export const toastConfig = ({hasRef, toastRef}) => {
                 color: colors.grey9,
               }}>
               Tap to hide
+            </Text>
+          </View>
+        </TouchableOpacity>
+      );
+    },
+    submitted: props => {
+      const {text1, text2} = props;
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            if (hasRef) {
+              toastRef.current.hide();
+            } else {
+              Toast.hide();
+            }
+          }}
+          style={{
+            height: 80,
+            width: '90%',
+            backgroundColor: colors.primary5 + '44',
+            padding: 16,
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderRadius: 8,
+            zIndex: 100,
+          }}>
+          <FontAwesome
+            style={{
+              fontSize: 40,
+              color: colors.primary5,
+              marginRight: 12,
+            }}
+            icon={RegularIcons.clock}
+          />
+          <View>
+            <Text style={{...fonts.title2, color: 'white'}}>{text1}</Text>
+            <Text
+              style={{
+                ...fonts.caption_small12_18_regular,
+                color: colors.grey9,
+              }}>
+              {text2}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      );
+    },
+    success: props => {
+      const {text1, text2} = props;
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            if (hasRef) {
+              toastRef.current.hide();
+            } else {
+              Toast.hide();
+            }
+          }}
+          style={{
+            height: 80,
+            width: '90%',
+            backgroundColor: colors.green5 + '44',
+            padding: 16,
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderRadius: 8,
+            zIndex: 100,
+          }}>
+          <FontAwesome
+            style={{
+              fontSize: 40,
+              color: colors.green5,
+              marginRight: 12,
+            }}
+            icon={RegularIcons.checkCircle}
+          />
+          <View>
+            <Text style={{...fonts.title2, color: 'white'}}>{text1}</Text>
+            <Text
+              style={{
+                ...fonts.caption_small12_18_regular,
+                color: colors.grey9,
+              }}>
+              {text2}
             </Text>
           </View>
         </TouchableOpacity>

@@ -26,7 +26,7 @@ const BalanceText = ({
         ? parseFloat(balancesInfo[address].main)
         : 0
       : 0;
-    console.log('init beforeBalance:::: ', beforeBalance);
+    // console.log('init beforeBalance:::: ', beforeBalance);
     const network = networks[currentNetwork];
     const provider = new ethers.providers.JsonRpcProvider(network.rpc);
     provider.on('block', blockNum => {
@@ -44,11 +44,11 @@ const BalanceText = ({
         // );
         // console.log('beforeBalance is ::::: ', beforeBalance);
         if (parseFloat(beforeBalance) !== parseFloat(value)) {
-          console.log(
-            'Updating Balance of ' + address + ' ..............',
-            parseFloat(beforeBalance),
-            parseFloat(value),
-          );
+          // console.log(
+          //   'Updating Balance of ' + address + ' ..............',
+          //   parseFloat(beforeBalance),
+          //   parseFloat(value),
+          // );
           beforeBalance = parseFloat(value);
           updateBalanceInfo({
             address,
@@ -73,10 +73,10 @@ const BalanceText = ({
     provider.getBalance(address).then(res => {
       const value = ethers.utils.formatEther(res);
       if (parseFloat(beforeBalance) !== parseFloat(value)) {
-        console.log(
-          'Updating Balance of ' + address + ' ..............',
-          value,
-        );
+        // console.log(
+        //   'Updating Balance of ' + address + ' ..............',
+        //   value,
+        // );
         updateBalanceInfo({
           address,
           balance: value,
