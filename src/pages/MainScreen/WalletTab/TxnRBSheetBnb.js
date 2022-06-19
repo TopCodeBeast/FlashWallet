@@ -11,7 +11,7 @@ import {
   denominatorForNewTxn,
 } from '../../../engine/constants';
 
-const TxnRBSheet = ({
+const TxnRBSheetBnb = ({
   submittedTxn,
   submittedTxnTime,
   submittedAccount,
@@ -39,10 +39,7 @@ const TxnRBSheet = ({
     console.log('Starting new');
     const newTxn = {
       ...submittedTxn,
-      maxFeePerGas: submittedTxn.maxFeePerGas
-        .div(denominatorForNewTxn)
-        .mul(numeratorForNewTxn),
-      maxPriorityFeePerGas: submittedTxn.maxPriorityFeePerGas
+      gasPrice: submittedTxn.gasPrice
         .div(denominatorForNewTxn)
         .mul(numeratorForNewTxn),
     };
@@ -85,10 +82,7 @@ const TxnRBSheet = ({
     console.log('Starting new');
     const newTxn = {
       ...submittedTxn,
-      maxFeePerGas: submittedTxn.maxFeePerGas
-        .div(denominatorForNewTxn)
-        .mul(numeratorForNewTxn),
-      maxPriorityFeePerGas: submittedTxn.maxPriorityFeePerGas
+      gasPrice: submittedTxn.gasPrice
         .div(denominatorForNewTxn)
         .mul(numeratorForNewTxn),
       to: submittedAccount.address,
@@ -438,7 +432,7 @@ const TxnRBSheet = ({
               <View style={{flex: 1, alignItems: 'flex-end'}}>
                 <Text style={{...fonts.para_regular, color: 'white'}}>
                   {utils.formatEther(
-                    submittedTxn.gasLimit.mul(submittedTxn.maxFeePerGas),
+                    submittedTxn.gasLimit.mul(submittedTxn.gasPrice),
                   ) +
                     ' ' +
                     currentNetworkSymbol}
@@ -468,9 +462,9 @@ const TxnRBSheet = ({
                   {utils.formatEther(
                     submittedTxn.value
                       ? submittedTxn.gasLimit
-                          .mul(submittedTxn.maxFeePerGas)
+                          .mul(submittedTxn.gasPrice)
                           .add(submittedTxn.value)
-                      : submittedTxn.gasLimit.mul(submittedTxn.maxFeePerGas),
+                      : submittedTxn.gasLimit.mul(submittedTxn.gasPrice),
                   ) +
                     ' ' +
                     currentNetworkSymbol}
@@ -520,4 +514,4 @@ const mapStateToProps = state => ({
 });
 const mapDispatchToProps = dispatch => ({});
 
-export default connect(mapStateToProps, mapDispatchToProps)(TxnRBSheet);
+export default connect(mapStateToProps, mapDispatchToProps)(TxnRBSheetBnb);

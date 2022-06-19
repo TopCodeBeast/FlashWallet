@@ -83,39 +83,47 @@ export const sendTransaction = (
       .transfer(toAddress, ethers.utils.parseEther(value.toString()))
       .then(rawTx => {
         console.log('Transaction actions raw tx: ', rawTx);
-        successCallback({...rawTx, ...feeInfo});
         wallet
-          .sendTransaction({...rawTx, ...feeInfo})
-          .then(resTxn => {
-            console.log(
-              'Token send Transaction actions;;;;;;; Res txn:::: ',
-              resTxn,
-            );
-            resTxn
-              .wait()
-              .then(receipt => {
-                Toast.show({
-                  type: 'txnCompleted',
-                  position: 'bottom',
-                  bottomOffset: 120,
-                  props: {
-                    transaction: {...resTxn},
-                  },
-                });
+          .populateTransaction(rawTx)
+          .then(refinedTxn => {
+            successCallback({...refinedTxn, ...feeInfo});
+            wallet
+              .sendTransaction({...rawTx, ...feeInfo})
+              .then(resTxn => {
+                console.log(
+                  'Token send Transaction actions;;;;;;; Res txn:::: ',
+                  resTxn,
+                );
+                resTxn
+                  .wait()
+                  .then(receipt => {
+                    Toast.show({
+                      type: 'txnCompleted',
+                      position: 'bottom',
+                      bottomOffset: 120,
+                      props: {
+                        transaction: {...resTxn},
+                      },
+                    });
+                  })
+                  .catch(err => {
+                    console.log(err, err.reason);
+                    if (err.reason != 'cancelled') {
+                      Toast.show({
+                        type: 'error',
+                        position: 'bottom',
+                        bottomOffset: 120,
+                        text1: 'Error occured',
+                        props: {
+                          error: err,
+                        },
+                      });
+                    }
+                  });
               })
               .catch(err => {
-                console.log(err, err.reason);
-                if (err.reason != 'cancelled') {
-                  Toast.show({
-                    type: 'error',
-                    position: 'bottom',
-                    bottomOffset: 120,
-                    text1: 'Error occured',
-                    props: {
-                      error: err,
-                    },
-                  });
-                }
+                console.log('Transaction Action Error:::::: ', err);
+                failCallback();
               });
           })
           .catch(err => {

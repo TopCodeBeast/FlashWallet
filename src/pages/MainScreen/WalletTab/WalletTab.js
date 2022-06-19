@@ -38,6 +38,7 @@ import BuyToken from './BuyToken/BuyToken';
 import Toast from 'react-native-toast-message';
 import moment from 'moment';
 import TxnRBSheet from './TxnRBSheet';
+import SendTokenBnb from './SendToken/SendTokenBnb';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 const buyIconSvgXml = require('../SVGData').buyIcon;
@@ -195,26 +196,50 @@ const WalletTab = ({
             backgroundColor: colors.grey24,
           },
         }}>
-        <SendToken
-          isToken={false}
-          onPressClose={() => {
-            if (refRBSendTokenSheet && refRBSendTokenSheet.current) {
-              refRBSendTokenSheet.current.close();
-            }
-          }}
-          onSubmitTxn={originTxn => {
-            if (refRBSendTokenSheet && refRBSendTokenSheet.current) {
-              refRBSendTokenSheet.current.close();
-            }
-            onSendSubmittedTxn(originTxn);
-          }}
-          onErrorOccured={error => {
-            if (refRBSendTokenSheet && refRBSendTokenSheet.current) {
-              refRBSendTokenSheet.current.close();
-            }
-            onSendError(error);
-          }}
-        />
+        {networks[currentNetwork].chainType === 'ethereum' && (
+          <SendToken
+            isToken={false}
+            onPressClose={() => {
+              if (refRBSendTokenSheet && refRBSendTokenSheet.current) {
+                refRBSendTokenSheet.current.close();
+              }
+            }}
+            onSubmitTxn={originTxn => {
+              if (refRBSendTokenSheet && refRBSendTokenSheet.current) {
+                refRBSendTokenSheet.current.close();
+              }
+              onSendSubmittedTxn(originTxn);
+            }}
+            onErrorOccured={error => {
+              if (refRBSendTokenSheet && refRBSendTokenSheet.current) {
+                refRBSendTokenSheet.current.close();
+              }
+              onSendError(error);
+            }}
+          />
+        )}
+        {networks[currentNetwork].chainType === 'binance' && (
+          <SendTokenBnb
+            isToken={false}
+            onPressClose={() => {
+              if (refRBSendTokenSheet && refRBSendTokenSheet.current) {
+                refRBSendTokenSheet.current.close();
+              }
+            }}
+            onSubmitTxn={originTxn => {
+              if (refRBSendTokenSheet && refRBSendTokenSheet.current) {
+                refRBSendTokenSheet.current.close();
+              }
+              onSendSubmittedTxn(originTxn);
+            }}
+            onErrorOccured={error => {
+              if (refRBSendTokenSheet && refRBSendTokenSheet.current) {
+                refRBSendTokenSheet.current.close();
+              }
+              onSendError(error);
+            }}
+          />
+        )}
       </RBSheet>
     );
   };

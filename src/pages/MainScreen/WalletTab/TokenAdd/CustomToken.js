@@ -25,6 +25,7 @@ const CustomToken = ({
   const [fetchingData, setFetchingData] = useState(false);
   const [fetchError, setFetchError] = useState('');
   const [canEditSymbol, setCanEditSymbol] = useState(false);
+  const [importError, setImportError] = useState('');
 
   const checkCanNext = data => {
     if (data.tokenAddress && isValidAddress(data.tokenAddress)) {
@@ -96,6 +97,17 @@ const CustomToken = ({
                 color: colors.red5,
               }}>
               {fetchError}
+            </Text>
+          )}
+          {importError.length > 0 && (
+            <Text
+              style={{
+                paddingLeft: 16,
+                marginTop: 8,
+                ...fonts.caption_small12_16_regular,
+                color: colors.red5,
+              }}>
+              {importError}
             </Text>
           )}
         </View>
@@ -253,9 +265,11 @@ const CustomToken = ({
                     console.log('success on add custom token');
                     onCancel();
                   },
-                  () => {
+                  err => {
                     console.log('fail on add custom token');
-                    onCancel();
+                    setImportError(err);
+                    setAddTokenLoading(false);
+                    setStep(0);
                   },
                 );
               }

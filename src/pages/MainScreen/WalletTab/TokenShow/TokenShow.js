@@ -37,6 +37,8 @@ import TokenBalanceText from '../../../../components/TokenBalanceText';
 import Toast from 'react-native-toast-message';
 import TxnRBSheet from '../TxnRBSheet';
 import moment from 'moment';
+import SendTokenBnb from '../SendToken/SendTokenBnb';
+import TxnRBSheetBnb from '../TxnRBSheetBnb';
 
 const backImage = require('../../../../assets/images/mainscreen/backimage.png');
 
@@ -56,7 +58,8 @@ const TokenShow = ({
   const [submittedTxn, setSubmittedTxn] = useState(undefined);
   const [submittedTxnTime, setSubmittedTxnTime] = useState('');
   const [submittedAccount, setSubmittedAccount] = useState(undefined);
-  const [submittedNetworkRPC, setSubmittedNetworkRPC] = useState('');
+  const [submittedNetworkObject, setSubmittedNetworkObject] =
+    useState(undefined);
   const refTxnRBSheet = useRef(null);
 
   useEffect(() => {
@@ -254,42 +257,84 @@ const TokenShow = ({
             backgroundColor: colors.grey24,
           },
         }}>
-        <TxnRBSheet
-          submittedTxn={submittedTxn}
-          submittedTxnTime={submittedTxnTime}
-          submittedAccount={submittedAccount}
-          submittedNetworkRPC={submittedNetworkRPC}
-          onClose={() => {
-            refTxnRBSheet.current.close();
-          }}
-          onSubmittedNewTxn={(text1, text2) => {
-            Toast.show({
-              type: 'submitted',
-              position: 'bottom',
-              bottomOffset: 120,
-              text1: text1,
-              text2: text2,
-            });
-          }}
-          onSuccessNewTxn={(text1, text2) => {
-            Toast.show({
-              type: 'success',
-              position: 'bottom',
-              bottomOffset: 120,
-              text1: text1,
-              text2: text2,
-            });
-          }}
-          onFailNewTxn={(text1, text2) => {
-            Toast.show({
-              type: 'error',
-              position: 'bottom',
-              bottomOffset: 120,
-              text1: text1,
-              text2: text2,
-            });
-          }}
-        />
+        {submittedNetworkObject &&
+          submittedNetworkObject.chainType === 'ethereum' && (
+            <TxnRBSheet
+              submittedTxn={submittedTxn}
+              submittedTxnTime={submittedTxnTime}
+              submittedAccount={submittedAccount}
+              submittedNetworkRPC={submittedNetworkObject.rpc}
+              onClose={() => {
+                refTxnRBSheet.current.close();
+              }}
+              onSubmittedNewTxn={(text1, text2) => {
+                Toast.show({
+                  type: 'submitted',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  text1: text1,
+                  text2: text2,
+                });
+              }}
+              onSuccessNewTxn={(text1, text2) => {
+                Toast.show({
+                  type: 'success',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  text1: text1,
+                  text2: text2,
+                });
+              }}
+              onFailNewTxn={(text1, text2) => {
+                Toast.show({
+                  type: 'error',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  text1: text1,
+                  text2: text2,
+                });
+              }}
+            />
+          )}
+        {submittedNetworkObject &&
+          submittedNetworkObject.chainType === 'binance' && (
+            <TxnRBSheetBnb
+              submittedTxn={submittedTxn}
+              submittedTxnTime={submittedTxnTime}
+              submittedAccount={submittedAccount}
+              submittedNetworkRPC={submittedNetworkObject.rpc}
+              onClose={() => {
+                refTxnRBSheet.current.close();
+              }}
+              onSubmittedNewTxn={(text1, text2) => {
+                Toast.show({
+                  type: 'submitted',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  text1: text1,
+                  text2: text2,
+                });
+              }}
+              onSuccessNewTxn={(text1, text2) => {
+                Toast.show({
+                  type: 'success',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  text1: text1,
+                  text2: text2,
+                });
+              }}
+              onFailNewTxn={(text1, text2) => {
+                Toast.show({
+                  type: 'error',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  text1: text1,
+                  text2: text2,
+                });
+              }}
+            />
+          )}
       </RBSheet>
     );
   };
@@ -312,46 +357,90 @@ const TokenShow = ({
             backgroundColor: colors.grey24,
           },
         }}>
-        <SendToken
-          isToken={selectedToken === 'main' ? false : true}
-          token={selectedToken}
-          onPressClose={() => {
-            refRBSendTokenSheet.current.close();
-          }}
-          onSubmitTxn={originTxn => {
-            setSubmittedNetworkRPC(networks[currentNetwork].rpc);
-            setSubmittedTxn({...originTxn});
-            const timeString = moment(new Date().valueOf())
-              .format('MMM DD [at] hh:mm a')
-              .toString();
-            setSubmittedTxnTime(timeString);
-            setSubmittedAccount(currentAccount);
-            refRBSendTokenSheet.current.close();
-            Toast.show({
-              type: 'txnSubmitted',
-              position: 'bottom',
-              bottomOffset: 120,
-              props: {
-                transaction: {...originTxn},
-                onPress: () => {
-                  refTxnRBSheet.current.open();
+        {networks[currentNetwork].chainType === 'ethereum' && (
+          <SendToken
+            isToken={selectedToken === 'main' ? false : true}
+            token={selectedToken}
+            onPressClose={() => {
+              refRBSendTokenSheet.current.close();
+            }}
+            onSubmitTxn={originTxn => {
+              setSubmittedNetworkObject(networks[currentNetwork]);
+              setSubmittedTxn({...originTxn});
+              const timeString = moment(new Date().valueOf())
+                .format('MMM DD [at] hh:mm a')
+                .toString();
+              setSubmittedTxnTime(timeString);
+              setSubmittedAccount(currentAccount);
+              refRBSendTokenSheet.current.close();
+              Toast.show({
+                type: 'txnSubmitted',
+                position: 'bottom',
+                bottomOffset: 120,
+                props: {
+                  transaction: {...originTxn},
+                  onPress: () => {
+                    refTxnRBSheet.current.open();
+                  },
                 },
-              },
-            });
-          }}
-          onErrorOccured={error => {
-            refRBSendTokenSheet.current.close();
-            Toast.show({
-              type: 'error',
-              position: 'bottom',
-              bottomOffset: 120,
-              text1: 'Transaction failed',
-              props: {
-                error: error,
-              },
-            });
-          }}
-        />
+              });
+            }}
+            onErrorOccured={error => {
+              refRBSendTokenSheet.current.close();
+              Toast.show({
+                type: 'error',
+                position: 'bottom',
+                bottomOffset: 120,
+                text1: 'Transaction failed',
+                props: {
+                  error: error,
+                },
+              });
+            }}
+          />
+        )}
+        {networks[currentNetwork].chainType === 'binance' && (
+          <SendTokenBnb
+            isToken={selectedToken === 'main' ? false : true}
+            token={selectedToken}
+            onPressClose={() => {
+              refRBSendTokenSheet.current.close();
+            }}
+            onSubmitTxn={originTxn => {
+              setSubmittedNetworkObject(networks[currentNetwork]);
+              setSubmittedTxn({...originTxn});
+              const timeString = moment(new Date().valueOf())
+                .format('MMM DD [at] hh:mm a')
+                .toString();
+              setSubmittedTxnTime(timeString);
+              setSubmittedAccount(currentAccount);
+              refRBSendTokenSheet.current.close();
+              Toast.show({
+                type: 'txnSubmitted',
+                position: 'bottom',
+                bottomOffset: 120,
+                props: {
+                  transaction: {...originTxn},
+                  onPress: () => {
+                    refTxnRBSheet.current.open();
+                  },
+                },
+              });
+            }}
+            onErrorOccured={error => {
+              refRBSendTokenSheet.current.close();
+              Toast.show({
+                type: 'error',
+                position: 'bottom',
+                bottomOffset: 120,
+                text1: 'Transaction failed',
+                props: {
+                  error: error,
+                },
+              });
+            }}
+          />
+        )}
       </RBSheet>
     );
   };

@@ -46,24 +46,31 @@ export const addToken = (
           tokensList: [],
         };
       }
-      data[currentNetwork.toString()][currentAccountIndex].tokensList.push(
-        token,
-      );
-      const storingData = {
-        tokensData: data,
-        selectedToken: mainData.selectedToken || 'main',
-      };
-      AsyncStorage.setItem('tokens_info', JSON.stringify(storingData))
-        .then(() => {
-          dispatch({type: SET_TOKENS_DATA, payload: storingData});
-          setTimeout(() => {
-            successCallback();
-          }, 0);
-        })
-        .catch(err => {
-          console.log('Token actions: ERROR!!!!!: ', err);
-          failCallback();
-        });
+      let foundIndex = data[currentNetwork.toString()][
+        currentAccountIndex
+      ].tokensList.findIndex(e => e.tokenAddress == token.tokenAddress);
+      if (foundIndex >= 0) {
+        failCallback('This is token is now being used.');
+      } else {
+        data[currentNetwork.toString()][currentAccountIndex].tokensList.push(
+          token,
+        );
+        const storingData = {
+          tokensData: data,
+          selectedToken: mainData.selectedToken || 'main',
+        };
+        AsyncStorage.setItem('tokens_info', JSON.stringify(storingData))
+          .then(() => {
+            dispatch({type: SET_TOKENS_DATA, payload: storingData});
+            setTimeout(() => {
+              successCallback();
+            }, 0);
+          })
+          .catch(err => {
+            console.log('Token actions: ERROR!!!!!: ', err);
+            failCallback();
+          });
+      }
     })
     .catch(err => {
       console.log('Token actions: ERROR!!!!!: ', err);

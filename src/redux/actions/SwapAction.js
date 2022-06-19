@@ -179,12 +179,11 @@ export const swapToken = (
         }
 
         console.log(rawTxn);
-        const refinedTxn = await wallet.populateTransaction(rawTxn);
-        approveRouter(provider, wallet, fromToken.address, amountIn);
-        successCallback(refinedTxn);
+        await approveRouter(provider, wallet, fromToken.address, amountIn);
         const gasLimit = await wallet.estimateGas(rawTxn);
         console.log('Swap gaslimit: ', gasLimit);
-
+        const refinedTxn = await wallet.populateTransaction(rawTxn);
+        successCallback(refinedTxn);
         const txnRes = await wallet.sendTransaction(rawTxn);
         console.log('Swap Txn response::::: ', txnRes);
         const txnReceipt = await txnRes.wait();

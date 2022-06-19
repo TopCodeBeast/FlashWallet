@@ -17,13 +17,14 @@ import WalletTab from './WalletTab/WalletTab';
 import SettingsTab from './SettingsTab/SettingsTab';
 import {getFeeData} from '../../redux/actions/EngineAction';
 import SwapTab from './SwapTab/SwapTab';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import {initialSettings} from '../../engine/constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {initialSettings, NetworkList} from '../../engine/constants';
 import {ethers, utils} from 'ethers';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import TxnRBSheet from './WalletTab/TxnRBSheet';
 import Toast from 'react-native-toast-message';
 import moment from 'moment';
+import TxnRBSheetBnb from './WalletTab/TxnRBSheetBnb';
 
 const tempTxn = {
   type: 2,
@@ -52,27 +53,36 @@ const MainScreen = ({
   getFeeData,
   accounts,
   currentAccountIndex,
+  feeData,
 }) => {
   const [submittedTxn, setSubmittedTxn] = useState(tempTxn);
   const [submittedTxnTime, setSubmittedTxnTime] = useState('');
   const [submittedAccount, setSubmittedAccount] = useState(undefined);
-  const [submittedNetworkRPC, setSubmittedNetworkRPC] = useState('');
+  const [submittedNetworkObject, setSubmittedNetworkObject] =
+    useState(undefined);
 
   const refTxnRBSheet = useRef(null);
 
   const currentAccount = accounts[currentAccountIndex];
 
   useEffect(() => {
-    getFeeData(networks[currentNetwork].rpc);
+    getFeeData(networks[currentNetwork]);
+    console.log(networks[currentNetwork]);
   }, [currentNetwork]);
 
   // useEffect(() => {
-  //   AsyncStorage.setItem('settings_info', JSON.stringify(initialSettings)).then(
-  //     res => {
-  //       console.log('asdfasfd');
-  //     },
-  //   );
+  //   AsyncStorage.getItem('networks_info').then(res => {
+  //     let data = JSON.parse(res);
+  //     data.networks = NetworkList;
+  //     AsyncStorage.setItem('networks_info', JSON.stringify(data)).then(() => {
+  //       console.log('adfasdfasdf');
+  //     });
+  //   });
   // }, []);
+
+  useEffect(() => {
+    console.log(feeData);
+  }, []);
 
   const renderTxnRBSheet = () => {
     return (
@@ -93,44 +103,88 @@ const MainScreen = ({
             backgroundColor: colors.grey24,
           },
         }}>
-        <TxnRBSheet
-          submittedTxn={submittedTxn}
-          submittedTxnTime={submittedTxnTime}
-          submittedAccount={submittedAccount}
-          submittedNetworkRPC={submittedNetworkRPC}
-          onClose={() => {
-            if (refTxnRBSheet && refTxnRBSheet.current) {
-              refTxnRBSheet.current.close();
-            }
-          }}
-          onSubmittedNewTxn={(text1, text2) => {
-            Toast.show({
-              type: 'submitted',
-              position: 'bottom',
-              bottomOffset: 120,
-              text1: text1,
-              text2: text2,
-            });
-          }}
-          onSuccessNewTxn={(text1, text2) => {
-            Toast.show({
-              type: 'success',
-              position: 'bottom',
-              bottomOffset: 120,
-              text1: text1,
-              text2: text2,
-            });
-          }}
-          onFailNewTxn={(text1, text2) => {
-            Toast.show({
-              type: 'error',
-              position: 'bottom',
-              bottomOffset: 120,
-              text1: text1,
-              text2: text2,
-            });
-          }}
-        />
+        {submittedNetworkObject &&
+          submittedNetworkObject.chainType === 'ethereum' && (
+            <TxnRBSheet
+              submittedTxn={submittedTxn}
+              submittedTxnTime={submittedTxnTime}
+              submittedAccount={submittedAccount}
+              submittedNetworkRPC={submittedNetworkObject.rpc}
+              onClose={() => {
+                if (refTxnRBSheet && refTxnRBSheet.current) {
+                  refTxnRBSheet.current.close();
+                }
+              }}
+              onSubmittedNewTxn={(text1, text2) => {
+                Toast.show({
+                  type: 'submitted',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  text1: text1,
+                  text2: text2,
+                });
+              }}
+              onSuccessNewTxn={(text1, text2) => {
+                Toast.show({
+                  type: 'success',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  text1: text1,
+                  text2: text2,
+                });
+              }}
+              onFailNewTxn={(text1, text2) => {
+                Toast.show({
+                  type: 'error',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  text1: text1,
+                  text2: text2,
+                });
+              }}
+            />
+          )}
+        {submittedNetworkObject &&
+          submittedNetworkObject.chainType === 'binance' && (
+            <TxnRBSheetBnb
+              submittedTxn={submittedTxn}
+              submittedTxnTime={submittedTxnTime}
+              submittedAccount={submittedAccount}
+              submittedNetworkRPC={submittedNetworkObject.rpc}
+              onClose={() => {
+                if (refTxnRBSheet && refTxnRBSheet.current) {
+                  refTxnRBSheet.current.close();
+                }
+              }}
+              onSubmittedNewTxn={(text1, text2) => {
+                Toast.show({
+                  type: 'submitted',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  text1: text1,
+                  text2: text2,
+                });
+              }}
+              onSuccessNewTxn={(text1, text2) => {
+                Toast.show({
+                  type: 'success',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  text1: text1,
+                  text2: text2,
+                });
+              }}
+              onFailNewTxn={(text1, text2) => {
+                Toast.show({
+                  type: 'error',
+                  position: 'bottom',
+                  bottomOffset: 120,
+                  text1: text1,
+                  text2: text2,
+                });
+              }}
+            />
+          )}
       </RBSheet>
     );
   };
@@ -227,7 +281,7 @@ const MainScreen = ({
       <WalletTab
         navigation={navigation}
         onSendSubmittedTxn={originTxn => {
-          setSubmittedNetworkRPC(networks[currentNetwork].rpc);
+          setSubmittedNetworkObject(networks[currentNetwork]);
           setSubmittedTxn({...originTxn});
           const timeString = moment(new Date().valueOf())
             .format('MMM DD [at] hh:mm a')
@@ -267,7 +321,7 @@ const MainScreen = ({
         navigation={navigation}
         onSubmitTxn={originTxn => {
           navigation.navigate('Wallet');
-          setSubmittedNetworkRPC(networks[currentNetwork].rpc);
+          setSubmittedNetworkObject(networks[currentNetwork]);
           setSubmittedTxn({...originTxn});
           const timeString = moment(new Date().valueOf())
             .format('MMM DD [at] hh:mm a')
@@ -343,9 +397,11 @@ const mapStateToProps = state => ({
   currentNetwork: state.networks.currentNetwork,
   accounts: state.accounts.accounts,
   currentAccountIndex: state.accounts.currentAccountIndex,
+  feeData: state.engine.feeData,
 });
 const mapDispatchToProps = dispatch => ({
-  getFeeData: currentNetworkRPC => getFeeData(dispatch, currentNetworkRPC),
+  getFeeData: currentNetworkObject =>
+    getFeeData(dispatch, currentNetworkObject),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainScreen);

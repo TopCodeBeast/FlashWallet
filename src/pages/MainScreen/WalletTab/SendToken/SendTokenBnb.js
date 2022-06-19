@@ -35,7 +35,7 @@ import {ethers, utils} from 'ethers';
 //actions
 import {sendTransaction} from '../../../../redux/actions/TransactionActions';
 import {setCurrentAccountIndex} from '../../../../redux/actions/AccountsActions';
-import NetworkFeeRBSheet from '../../../../components/NetworkFeeRBSheet';
+import NetworkFeeRBSheetBnb from '../../../../components/NetworkFeeRBSheetBnb';
 
 import {
   transferETHGasLimit,
@@ -50,7 +50,7 @@ import {
 const avatars = require('../../../../constants').default.avatars;
 const avatarsCount = require('../../../../constants').default.avatarsCount;
 
-const SendToken = ({
+const SendTokenBnb = ({
   onPressClose,
   accounts,
   currentAccountIndex,
@@ -81,10 +81,11 @@ const SendToken = ({
   const [amountLoading, setAmountLoading] = useState(false);
   const [sendTransactionLoading, setSendTransactionLoading] = useState(false);
   const [showMyAccounts, setShowMyAccounts] = useState(false);
-  const [maxPriorityFee, setMaxPriorityFee] = useState(
-    feeData.medium.maxPriorityFeePerGas,
+
+  const [gasPrice, setGasPrice] = useState(
+    feeData.medium.gasPrice || utils.parseUnits('10', 'gwei'),
   );
-  const [maxFee, setMaxFee] = useState(feeData.medium.maxFeePerGas);
+
   const [networkFeeType, setNetworkFeeType] = useState('medium');
   const [sendTxnError, setSendTxnError] = useState('');
 
@@ -92,6 +93,7 @@ const SendToken = ({
   const currentNetworkSymbol = networks[currentNetwork].symbol;
 
   useEffect(() => {
+    getFeeData(networks[currentNetwork]);
     const timerId = setInterval(() => {
       console.log("...get Fee Data from 'sendToken");
       getFeeData(networks[currentNetwork]);
@@ -104,39 +106,30 @@ const SendToken = ({
   }, []);
 
   useEffect(() => {
-    if (!feeData.low.maxFeePerGas) {
+    if (!feeData.low.gasPrice) {
       return;
     }
     if (networkFeeType !== 'advanced') {
       if (networkFeeType === 'low') {
-        if (feeData.low.maxFeePerGas.toString() !== maxFee.toString()) {
-          setMaxFee(feeData.low.maxFeePerGas);
-        }
         if (
-          feeData.low.maxPriorityFeePerGas.toString() !==
-          maxPriorityFee.toString()
+          gasPrice != undefined &&
+          feeData.low.gasPrice.toString() !== gasPrice.toString()
         ) {
-          setMaxPriorityFee(feeData.low.maxPriorityFeePerGas);
+          setGasPrice(feeData.low.gasPrice);
         }
       } else if (networkFeeType === 'medium') {
-        if (feeData.medium.maxFeePerGas.toString() !== maxFee.toString()) {
-          setMaxFee(feeData.medium.maxFeePerGas);
-        }
         if (
-          feeData.medium.maxPriorityFeePerGas.toString() !==
-          maxPriorityFee.toString()
+          gasPrice != undefined &&
+          feeData.medium.gasPrice.toString() !== gasPrice.toString()
         ) {
-          setMaxPriorityFee(feeData.medium.maxPriorityFeePerGas);
+          setGasPrice(feeData.medium.gasPrice);
         }
       } else if (networkFeeType === 'high') {
-        if (feeData.high.maxFeePerGas.toString() !== maxFee.toString()) {
-          setMaxFee(feeData.high.maxFeePerGas);
-        }
         if (
-          feeData.high.maxPriorityFeePerGas.toString() !==
-          maxPriorityFee.toString()
+          gasPrice != undefined &&
+          feeData.high.gasPrice.toString() !== gasPrice.toString()
         ) {
-          setMaxPriorityFee(feeData.high.maxPriorityFeePerGas);
+          setGasPrice(feeData.high.gasPrice);
         }
       }
     }
@@ -144,8 +137,7 @@ const SendToken = ({
 
   const getSendingEtherGasFee = () => {
     return (
-      parseFloat(utils.formatEther(feeData.high.maxFeePerGas)) *
-      transferETHGasLimit
+      parseFloat(utils.formatEther(feeData.high.gasPrice)) * transferETHGasLimit
     );
   };
 
@@ -192,6 +184,7 @@ const SendToken = ({
       setError('Insufficient Funds');
       return;
     }
+    console.log(gasPrice);
     const mainBalance = balancesInfo[currentAccount.address]
       ? balancesInfo[currentAccount.address]['main']
       : 0;
@@ -205,7 +198,7 @@ const SendToken = ({
       selectedToken,
     )
       .then(res => {
-        if (parseFloat(mainBalance) < res * utils.formatEther(maxFee)) {
+        if (parseFloat(mainBalance) < res * utils.formatEther(gasPrice)) {
           setError('Insufficient ETH to send token');
           setAmountLoading(false);
         } else {
@@ -234,7 +227,7 @@ const SendToken = ({
     const mainBalance = balancesInfo[currentAccount.address]
       ? balancesInfo[currentAccount.address]['main']
       : 0;
-    const totalGasFee = parseFloat(utils.formatEther(maxFee)) * gasLimit;
+    const totalGasFee = parseFloat(utils.formatEther(gasPrice)) * gasLimit;
     if (selectedToken === 'main') {
       const totalAmount = parseFloat(sendValue) + totalGasFee;
       if (totalAmount > mainBalance) {
@@ -259,8 +252,7 @@ const SendToken = ({
         value: sendValue,
         token: selectedToken,
         feeInfo: {
-          maxFeePerGas: maxFee,
-          maxPriorityFeePerGas: maxPriorityFee,
+          gasPrice: gasPrice,
           gasLimit: ethers.BigNumber.from(gasLimit),
         },
       },
@@ -758,21 +750,18 @@ const SendToken = ({
             backgroundColor: colors.grey24,
           },
         }}>
-        <NetworkFeeRBSheet
+        <NetworkFeeRBSheetBnb
           networkFeeType={networkFeeType}
-          maxFee={maxFee}
-          maxPriorityFee={maxPriorityFee}
+          gasPrice={gasPrice}
           gasLimit={gasLimit}
           onSave={({type, data}) => {
             if (type !== 'advanced') {
               setNetworkFeeType(type);
-              setMaxFee(feeData[type].maxFeePerGas);
-              setMaxPriorityFee(feeData[type].maxPriorityFeePerGas);
+              setGasPrice(feeData[type].gasPrice);
               setGasLimit(parseInt(data.gasLimit));
             } else {
               setNetworkFeeType('advanced');
-              setMaxFee(utils.parseUnits(data.maxFee, 'gwei'));
-              setMaxPriorityFee(utils.parseUnits(data.maxPriorityFee, 'gwei'));
+              setGasPrice(utils.parseUnits(data.gasPrice, 'gwei'));
               setGasLimit(parseInt(data.gasLimit));
             }
             refRBNetworkFeeSheet.current.close();
@@ -953,7 +942,7 @@ const SendToken = ({
   };
 
   const renderConfirmStatus = () => {
-    const totalGasFee = parseFloat(utils.formatEther(maxFee)) * gasLimit;
+    const totalGasFee = parseFloat(utils.formatEther(gasPrice)) * gasLimit;
     return (
       <View style={{height: '100%'}}>
         {renderNetworkFeeRBSheet()}
@@ -1188,4 +1177,4 @@ const mapDispatchToProps = dispatch => ({
     setGettingFeeDataTimerId(dispatch, timerId),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SendToken);
+export default connect(mapStateToProps, mapDispatchToProps)(SendTokenBnb);

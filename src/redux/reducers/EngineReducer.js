@@ -16,14 +16,15 @@ const checkIfSame = (object1, object2) => {
   for (let key of keys1) {
     let o1 = object1[key];
     let o2 = object2[key];
-    if (
-      !(
-        o1.maxFeePerGas.toString() === o2.maxFeePerGas.toString() &&
-        o1.maxPriorityFeePerGas.toString() ===
-          o2.maxPriorityFeePerGas.toString()
-      )
-    ) {
+    let child1Keys = Object.keys(o1);
+    let child2Keys = Object.keys(o2);
+    if (child1Keys.length != child2Keys.length) {
       return false;
+    }
+    for (let childKey of child1Keys) {
+      if (!(o1[childKey].toString() === o2[childKey].toString())) {
+        return false;
+      }
     }
   }
   return true;

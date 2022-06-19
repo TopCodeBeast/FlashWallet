@@ -24,6 +24,7 @@ export const NetworkList = {
     networkType: 'mainnet',
     rpc: 'https://mainnet.infura.io/v3/' + infuraApiKey,
     symbol: 'ETH',
+    chainType: 'ethereum',
   },
   [ROPSTEN]: {
     name: 'Ropsten Test Network',
@@ -35,6 +36,7 @@ export const NetworkList = {
     networkType: 'ropsten',
     rpc: 'https://ropsten.infura.io/v3/' + infuraApiKey,
     symbol: 'ETH',
+    chainType: 'ethereum',
   },
   [KOVAN]: {
     name: 'Kovan Test Network',
@@ -46,6 +48,7 @@ export const NetworkList = {
     networkType: 'kovan',
     rpc: 'https://kovan.infura.io/v3/' + infuraApiKey,
     symbol: 'ETH',
+    chainType: 'ethereum',
   },
   [RINKEBY]: {
     name: 'Rinkeby Test Network',
@@ -57,6 +60,7 @@ export const NetworkList = {
     networkType: 'rinkeby',
     rpc: 'https://rinkeby.infura.io/v3/' + infuraApiKey,
     symbol: 'ETH',
+    chainType: 'ethereum',
   },
   [GOERLI]: {
     name: 'Goerli Test Network',
@@ -68,6 +72,7 @@ export const NetworkList = {
     networkType: 'goerli',
     rpc: 'https://goerli.infura.io/v3/' + infuraApiKey,
     symbol: 'ETH',
+    chainType: 'ethereum',
   },
   [BSCTESTNET]: {
     name: 'Binance Smart Chain Test Network',
@@ -79,6 +84,7 @@ export const NetworkList = {
     networkType: 'bsctestnet',
     rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
     symbol: 'BNB',
+    chainType: 'binance',
   },
 };
 

@@ -149,7 +149,7 @@ const SwapTab = ({
   };
 
   useEffect(() => {
-    getFeeData(networks[currentNetwork].rpc);
+    getFeeData(networks[currentNetwork]);
   }, []);
 
   const statusGoBack = curStatus => {
@@ -545,7 +545,8 @@ const mapStateToProps = state => ({
   balancesInfo: state.balances.balancesInfo,
 });
 const mapDispatchToProps = dispatch => ({
-  getFeeData: currentNetworkRPC => getFeeData(dispatch, currentNetworkRPC),
+  getFeeData: currentNetworkObject =>
+    getFeeData(dispatch, currentNetworkObject),
   setGettingFeeDataTimerId: timerId =>
     setGettingFeeDataTimerId(dispatch, timerId),
   swapToken: (data, beforeWork, successCallback, failCallback) =>

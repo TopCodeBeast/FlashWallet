@@ -36,6 +36,7 @@ import {setCurrentNetwork} from '../../../redux/actions/NetworkActions';
 
 import {isValidPrivateKey} from '../../../utils/common';
 import ScanQRScreen from '../../ScanQRScreen';
+import {getFeeData} from '../../../redux/actions/EngineAction';
 
 const backImage = require('../../../assets/images/mainscreen/backimage.png');
 
@@ -54,6 +55,7 @@ const Header = ({
   importAccount,
   setCurrentNetwork,
   navigation,
+  getFeeData,
 }) => {
   const refRBNetworkSelectSheet = useRef(null);
   const refRBAccountSelectSheet = useRef(null);
@@ -76,6 +78,7 @@ const Header = ({
         key={network.chainId || networkName}
         onPress={() => {
           setCurrentNetwork(network.chainId.toString());
+          getFeeData(network);
           refRBNetworkSelectSheet.current.close();
         }}>
         <View
@@ -683,6 +686,10 @@ const mapDispatchToProps = dispatch => ({
 
   //network actions
   setCurrentNetwork: network => setCurrentNetwork(dispatch, network),
+
+  //engine
+  getFeeData: currentNetworkObject =>
+    getFeeData(dispatch, currentNetworkObject),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

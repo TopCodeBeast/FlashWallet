@@ -131,7 +131,7 @@ const SwapConfirm = ({
             console.log(
               '...geting FEE data from swap confirm network fee rb sheet',
             );
-            getFeeData(networks[currentNetwork].rpc);
+            getFeeData(networks[currentNetwork]);
           }, gettingFeeDataTimerInterval);
           setGettingFeeDataTimerId(timerId);
         }}
@@ -332,7 +332,8 @@ const mapStateToProps = state => ({
   gettingFeeDataTimerId: state.engine.gettingFeeDataTimerId,
 });
 const mapDispatchToProps = dispatch => ({
-  getFeeData: currentNetworkRPC => getFeeData(dispatch, currentNetworkRPC),
+  getFeeData: currentNetworkObject =>
+    getFeeData(dispatch, currentNetworkObject),
   setGettingFeeDataTimerId: timerId =>
     setGettingFeeDataTimerId(dispatch, timerId),
 });
