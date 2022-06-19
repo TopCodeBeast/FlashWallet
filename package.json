@@ -16,6 +16,7 @@
     "@fortawesome/react-fontawesome": "^0.1.18",
     "@material-ui/icons": "^4.11.3",
     "@metamask/controllers": "^29.0.1",
+    "@pancakeswap/sdk": "^2.4.5",
     "@react-native-async-storage/async-storage": "^1.15.5",
     "@react-native-clipboard/clipboard": "^1.10.0",
     "@react-native-community/blur": "^3.6.0",

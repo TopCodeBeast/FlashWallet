@@ -18,7 +18,7 @@ import Header from './Header';
 import CanSendTokenList from '../../../components/CanSendTokenList';
 import {PrimaryButton, SecondaryButton} from '../../../components/Buttons';
 import {getPriceData} from '../../../utils/swap';
-import SwapConfirm from './SwapConfirm';
+import SwapConfirmBnb from './SwapConfirmBnb';
 import {
   getFeeData,
   setGettingFeeDataTimerId,
@@ -39,9 +39,9 @@ import '@ethersproject/shims';
 
 // Import the ethers library
 import {ethers, utils} from 'ethers';
-import {swapToken} from '../../../redux/actions/SwapAction';
+import {swapTokenBnb} from '../../../redux/actions/SwapActionBnb';
 
-const SwapTab = ({
+const SwapTabBnb = ({
   navigation,
   networks,
   currentNetwork,
@@ -51,7 +51,7 @@ const SwapTab = ({
   accounts,
   currentAccountIndex,
   balancesInfo,
-  swapToken,
+  swapTokenBnb,
   onSubmitTxn,
   onErrorOccured,
 }) => {
@@ -64,10 +64,7 @@ const SwapTab = ({
   const [fetchedPriceData, setFetchedPriceData] = useState('');
   const [status, setStatus] = useState('default');
   const [gasLimit, setGasLimit] = useState('200000');
-  const [maxPriorityFee, setMaxPriorityFee] = useState(
-    feeData.medium.maxPriorityFeePerGas,
-  );
-  const [maxFee, setMaxFee] = useState(feeData.medium.maxFeePerGas);
+  const [gasPrice, setGasPrice] = useState(feeData.medium.gasPrice);
   const [slippage, setSlippage] = useState('2');
   const [swapLoading, setSwapLoading] = useState(false);
 
@@ -85,7 +82,7 @@ const SwapTab = ({
     setStatus('default');
     setGasLimit('200000');
     setMaxPriorityFee(feeData.medium.maxPriorityFeePerGas);
-    setMaxFee(feeData.medium.maxFeePerGas);
+    setGasPrice(feeData.medium.gasPrice);
     setSlippage('2');
   };
 
@@ -123,7 +120,7 @@ const SwapTab = ({
   };
 
   const onSwap = () => {
-    swapToken(
+    swapTokenBnb(
       {
         currentNetwork: networks[currentNetwork],
         currentAccount,
@@ -160,7 +157,7 @@ const SwapTab = ({
 
   const getSwapGasFee = () => {
     return (
-      parseFloat(utils.formatEther(feeData.high.maxFeePerGas)) *
+      parseFloat(utils.formatEther(feeData.high.gasPrice)) *
       uniswapGasLimit *
       swapGasRatio
     );
@@ -490,7 +487,7 @@ const SwapTab = ({
 
         {status === 'default' && renderDefaultStatus()}
         {status === 'confirm' && (
-          <SwapConfirm
+          <SwapConfirmBnb
             swapData={{
               fromToken,
               toToken,
@@ -551,8 +548,8 @@ const mapDispatchToProps = dispatch => ({
     getFeeData(dispatch, currentNetworkObject),
   setGettingFeeDataTimerId: timerId =>
     setGettingFeeDataTimerId(dispatch, timerId),
-  swapToken: (data, beforeWork, successCallback, failCallback) =>
-    swapToken(dispatch, data, beforeWork, successCallback, failCallback),
+  swapTokenBnb: (data, beforeWork, successCallback, failCallback) =>
+    swapTokenBnb(dispatch, data, beforeWork, successCallback, failCallback),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SwapTab);
+export default connect(mapStateToProps, mapDispatchToProps)(SwapTabBnb);

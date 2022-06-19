@@ -1,26 +1,11 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {connect} from 'react-redux';
-import {
-  KeyboardAvoidingView,
-  SafeAreaView,
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-} from 'react-native';
+import {View, Text, TouchableOpacity, ActivityIndicator} from 'react-native';
 import {colors, fonts} from '../../../styles';
-import FontAwesome, {SolidIcons, RegularIcons} from 'react-native-fontawesome';
-import Ionicon from 'react-native-vector-icons/Ionicons';
 
-import Header from './Header';
-import CanSendTokenList from '../../../components/CanSendTokenList';
-import {PrimaryButton, SecondaryButton} from '../../../components/Buttons';
-import {getPriceData, getSwapEstimatedGasLimit} from '../../../utils/swap';
+import {getSwapEstimatedGasLimit} from '../../../utils/swap';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import FloatLabelInput from '../../../components/FloatLabelInput';
 import SlippageRBSheet from './SlippageRBSheet';
-import NetworkFeeRBSheet from '../../../components/NetworkFeeRBSheet';
 import {
   getFeeData,
   setGettingFeeDataTimerId,
@@ -35,8 +20,9 @@ import '@ethersproject/shims';
 
 // Import the ethers library
 import {ethers, utils} from 'ethers';
+import NetworkFeeRBSheetBnb from '../../../components/NetworkFeeRBSheetBnb';
 
-const SwapConfirm = ({
+const SwapConfirmBnb = ({
   navigation,
   accounts,
   currentAccountIndex,
@@ -56,10 +42,7 @@ const SwapConfirm = ({
   const refRBNetworkFeeSheet = useRef(null);
 
   const [networkFeeType, setNetworkFeeType] = useState('medium');
-  const [maxFee, setMaxFee] = useState(feeData.medium.maxFeePerGas);
-  const [maxPriorityFee, setMaxPriorityFee] = useState(
-    feeData.medium.maxPriorityFeePerGas,
-  );
+  const [gasPrice, setGasPrice] = useState(feeData.medium.gasPrice);
 
   const [gasLimit, setGasLimit] = useState('200000');
   const [fetchingGasLimit, setFetchingGasLimit] = useState(false);
@@ -82,12 +65,12 @@ const SwapConfirm = ({
       slippage: swapData.slippage,
     })
       .then(res => {
-        setGasLimit(res.toString());
         setFetchingGasLimit(false);
+        setGasLimit(res.toString());
       })
       .catch(err => {
-        setFetchingGasLimit(false);
         console.log('ERROR in swap confirm::::: ', err);
+        setFetchingGasLimit(false);
       });
   };
 
@@ -153,21 +136,18 @@ const SwapConfirm = ({
             backgroundColor: colors.grey24,
           },
         }}>
-        <NetworkFeeRBSheet
+        <NetworkFeeRBSheetBnb
           networkFeeType={networkFeeType}
-          maxFee={maxFee}
-          maxPriorityFee={maxPriorityFee}
+          gasPrice={gasPrice}
           gasLimit={gasLimit}
           onSave={({type, data}) => {
             if (type !== 'advanced') {
               setNetworkFeeType(type);
-              setMaxFee(feeData[type].maxFeePerGas);
-              setMaxPriorityFee(feeData[type].maxPriorityFeePerGas);
+              setGasPrice(feeData[type].gasPrice);
               setGasLimit(parseInt(data.gasLimit));
             } else {
               setNetworkFeeType('advanced');
-              setMaxFee(utils.parseUnits(data.maxFee, 'gwei'));
-              setMaxPriorityFee(utils.parseUnits(data.maxPriorityFee, 'gwei'));
+              setGasPrice(utils.parseUnits(data.gasPrice, 'gwei'));
               setGasLimit(parseInt(data.gasLimit));
             }
             refRBNetworkFeeSheet.current.close();
@@ -178,8 +158,9 @@ const SwapConfirm = ({
   };
 
   const totalFee =
-    parseFloat(utils.formatEther(utils.parseUnits(maxFee.toString(), 'wei'))) *
-    parseFloat(gasLimit);
+    parseFloat(
+      utils.formatEther(utils.parseUnits(gasPrice.toString(), 'wei')),
+    ) * parseFloat(gasLimit);
 
   return (
     <View
@@ -331,6 +312,7 @@ const SwapConfirm = ({
             </Text>
           </TouchableOpacity>
         )}
+
         <View style={{flex: 1, flexDirection: 'row-reverse'}}>
           <Text style={{...fonts.para_regular, color: 'white'}}>
             {totalFee.toFixed(6) + ' ' + currentNetworkSymbol}
@@ -357,4 +339,4 @@ const mapDispatchToProps = dispatch => ({
     setGettingFeeDataTimerId(dispatch, timerId),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SwapConfirm);
+export default connect(mapStateToProps, mapDispatchToProps)(SwapConfirmBnb);

@@ -9,6 +9,8 @@ import {MenuProvider} from 'react-native-popup-menu';
 import AppView from './src/AppViewContainer';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import './shim.js';
+import {LogBox} from 'react-native';
+LogBox.ignoreLogs(['Reanimated 2', 'React.createFactory']);
 
 export default function App() {
   return (

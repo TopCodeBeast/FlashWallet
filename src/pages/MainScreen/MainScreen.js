@@ -17,6 +17,7 @@ import WalletTab from './WalletTab/WalletTab';
 import SettingsTab from './SettingsTab/SettingsTab';
 import {getFeeData} from '../../redux/actions/EngineAction';
 import SwapTab from './SwapTab/SwapTab';
+import SwapTabBnb from './SwapTab/SwapTabBnb';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {initialSettings, NetworkList} from '../../engine/constants';
 import {ethers, utils} from 'ethers';
@@ -316,43 +317,83 @@ const MainScreen = ({
   };
 
   const updatedSwapTab = ({navigation}) => {
-    return (
-      <SwapTab
-        navigation={navigation}
-        onSubmitTxn={originTxn => {
-          navigation.navigate('Wallet');
-          setSubmittedNetworkObject(networks[currentNetwork]);
-          setSubmittedTxn({...originTxn});
-          const timeString = moment(new Date().valueOf())
-            .format('MMM DD [at] hh:mm a')
-            .toString();
-          setSubmittedTxnTime(timeString);
-          setSubmittedAccount(currentAccount);
-          Toast.show({
-            type: 'txnSubmitted',
-            position: 'bottom',
-            bottomOffset: 120,
-            props: {
-              transaction: {...originTxn},
-              onPress: () => {
-                refTxnRBSheet.current.open();
+    if (networks[currentNetwork].chainType == 'ethereum') {
+      return (
+        <SwapTab
+          navigation={navigation}
+          onSubmitTxn={originTxn => {
+            navigation.navigate('Wallet');
+            setSubmittedNetworkObject(networks[currentNetwork]);
+            setSubmittedTxn({...originTxn});
+            const timeString = moment(new Date().valueOf())
+              .format('MMM DD [at] hh:mm a')
+              .toString();
+            setSubmittedTxnTime(timeString);
+            setSubmittedAccount(currentAccount);
+            Toast.show({
+              type: 'txnSubmitted',
+              position: 'bottom',
+              bottomOffset: 120,
+              props: {
+                transaction: {...originTxn},
+                onPress: () => {
+                  refTxnRBSheet.current.open();
+                },
               },
-            },
-          });
-        }}
-        onErrorOccured={error => {
-          Toast.show({
-            type: 'error',
-            position: 'bottom',
-            bottomOffset: 120,
-            text1: 'Transaction failed',
-            props: {
-              error: error,
-            },
-          });
-        }}
-      />
-    );
+            });
+          }}
+          onErrorOccured={error => {
+            Toast.show({
+              type: 'error',
+              position: 'bottom',
+              bottomOffset: 120,
+              text1: 'Transaction failed',
+              props: {
+                error: error,
+              },
+            });
+          }}
+        />
+      );
+    } else if (networks[currentNetwork].chainType == 'binance') {
+      return (
+        <SwapTabBnb
+          navigation={navigation}
+          onSubmitTxn={originTxn => {
+            navigation.navigate('Wallet');
+            setSubmittedNetworkObject(networks[currentNetwork]);
+            setSubmittedTxn({...originTxn});
+            const timeString = moment(new Date().valueOf())
+              .format('MMM DD [at] hh:mm a')
+              .toString();
+            setSubmittedTxnTime(timeString);
+            setSubmittedAccount(currentAccount);
+            Toast.show({
+              type: 'txnSubmitted',
+              position: 'bottom',
+              bottomOffset: 120,
+              props: {
+                transaction: {...originTxn},
+                onPress: () => {
+                  refTxnRBSheet.current.open();
+                },
+              },
+            });
+          }}
+          onErrorOccured={error => {
+            Toast.show({
+              type: 'error',
+              position: 'bottom',
+              bottomOffset: 120,
+              text1: 'Transaction failed',
+              props: {
+                error: error,
+              },
+            });
+          }}
+        />
+      );
+    }
   };
 
   return (
