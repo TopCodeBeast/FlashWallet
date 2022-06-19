@@ -1,5 +1,7 @@
 export const infuraApiKey = '9aa3d95b3bc440fa88ea12eaa4456161';
 export const coinmarketcapApiKey = '35b4830d-54a6-45f1-802e-29dc8647e044';
+export const uniswapRouterAddress =
+  '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
 
 export const MAINNET = '1';
 export const ROPSTEN = '3';
@@ -9,6 +11,7 @@ export const GOERLI = '5';
 export const RPC = 'rpc';
 export const NO_RPC_BLOCK_EXPLORER = 'NO_BLOCK_EXPLORER';
 export const PRIVATENETWORK = 'PRIVATENETWORK';
+export const BSCTESTNET = '97';
 
 export const NetworkList = {
   [MAINNET]: {
@@ -66,6 +69,17 @@ export const NetworkList = {
     rpc: 'https://goerli.infura.io/v3/' + infuraApiKey,
     symbol: 'ETH',
   },
+  [BSCTESTNET]: {
+    name: 'Binance Smart Chain Test Network',
+    shortName: 'BSC Test',
+    networkId: 97,
+    chainId: 97,
+    hexChainId: '0x61',
+    color: '#d6f344',
+    networkType: 'bsctestnet',
+    rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
+    symbol: 'BNB',
+  },
 };
 
 export const feeRatio = {
@@ -74,10 +88,13 @@ export const feeRatio = {
 };
 
 export const transferETHGasLimit = 21000;
+export const uniswapGasLimit = 200000;
 export const estimateGasRatio = 1.5;
+export const swapGasRatio = 2.5;
 export const gettingFeeDataTimerInterval = 5000; //ms
+export const minimumEthToSwap = 0.0005;
 
-export const numeratorForNewTxn = 12;
+export const numeratorForNewTxn = 13;
 export const denominatorForNewTxn = 10;
 
 export const initialSettings = {

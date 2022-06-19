@@ -93,6 +93,7 @@ const TokenAndCollectiblesTab = ({
         <ScrollView>
           <TokenItemRow
             token={'main'}
+            removable={false}
             onPress={() => {
               setSelectedToken('main');
               navigation.navigate('tokenshow');
@@ -106,6 +107,7 @@ const TokenAndCollectiblesTab = ({
                   setSelectedToken(token);
                   navigation.navigate('tokenshow');
                 }}
+                removable={true}
                 key={'tokenRoute_' + token.tokenAddress}
               />
             );

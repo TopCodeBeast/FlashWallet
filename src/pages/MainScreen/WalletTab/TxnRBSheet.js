@@ -6,6 +6,10 @@ import {colors, fonts} from '../../../styles';
 import {PrimaryButton, TextButton} from '../../../components/Buttons';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {ethers, utils} from 'ethers';
+import {
+  numeratorForNewTxn,
+  denominatorForNewTxn,
+} from '../../../engine/constants';
 
 const TxnRBSheet = ({
   submittedTxn,
@@ -16,6 +20,8 @@ const TxnRBSheet = ({
   onSubmittedNewTxn,
   onSuccessNewTxn,
   onFailNewTxn,
+  networks,
+  currentNetwork,
 }) => {
   const refCancelRBSheet = useRef(null);
   const refSpeedUpRBSheet = useRef(null);
@@ -25,16 +31,20 @@ const TxnRBSheet = ({
   const provider = new ethers.providers.JsonRpcProvider(submittedNetworkRPC);
   const wallet = new ethers.Wallet(submittedAccount.privateKey, provider);
 
-  console.log('Txn RB Sheet - submittedTxn:::::: ', submittedTxn);
+  // console.log('Txn RB Sheet - submittedTxn:::::: ', submittedTxn);
 
-  /*Txn RB Sheet - submittedTxn::::::  {"chainId": 4, "from": "0x632Bd9a598cd5c52F1625c850A6c46ECd4Cb7829", "gasLimit": {"hex": "0x5208", "type": "BigNumber"}, "maxFeePerGas": {"hex": "0x957cebf6", "type": "BigNumber"}, "maxPriorityFeePerGas": {"hex": "0x540ae47f", "type": "BigNumber"}, "nonce": 81, "to": "0xB1e50315BbDa7D9Fd7e4F030e26eEC585A1Efc0c", "type": 2, "value": {"hex": "0xb5e620f48000", "type": "BigNumber"}}*/
+  const currentNetworkSymbol = networks[currentNetwork].symbol;
 
   const speedUpTxn = () => {
     console.log('Starting new');
     const newTxn = {
       ...submittedTxn,
-      maxFeePerGas: submittedTxn.maxFeePerGas.div(10).mul(13),
-      maxPriorityFeePerGas: submittedTxn.maxPriorityFeePerGas.div(10).mul(13),
+      maxFeePerGas: submittedTxn.maxFeePerGas
+        .div(denominatorForNewTxn)
+        .mul(numeratorForNewTxn),
+      maxPriorityFeePerGas: submittedTxn.maxPriorityFeePerGas
+        .div(denominatorForNewTxn)
+        .mul(numeratorForNewTxn),
     };
     console.log('new Txn: ', newTxn);
     setSpeedLoading(true);
@@ -150,7 +160,7 @@ const TxnRBSheet = ({
               textAlign: 'center',
               marginTop: 16,
             }}>
-            &lt; 0.00001 ETH
+            {'<' + '0.00001 ' + currentNetworkSymbol}
           </Text>
           <Text
             style={{
@@ -229,7 +239,7 @@ const TxnRBSheet = ({
               textAlign: 'center',
               marginTop: 16,
             }}>
-            &lt; 0.00001 ETH
+            {'<' + '0.00001 ' + currentNetworkSymbol}
           </Text>
           <Text
             style={{
@@ -277,7 +287,7 @@ const TxnRBSheet = ({
           <View style={{marginTop: 12}}>
             <Text
               style={{...fonts.title2, color: 'white', textAlign: 'center'}}>
-              {'Sent ETH'}
+              {'Sent ' + currentNetworkSymbol}
             </Text>
           </View>
           <View
@@ -403,8 +413,10 @@ const TxnRBSheet = ({
               <View style={{flex: 1, alignItems: 'flex-end'}}>
                 <Text style={{...fonts.para_regular, color: 'white'}}>
                   {submittedTxn.value
-                    ? utils.formatEther(submittedTxn.value) + ' ETH'
-                    : '0 ETH'}
+                    ? utils.formatEther(submittedTxn.value) +
+                      ' ' +
+                      currentNetworkSymbol
+                    : '0 ' + currentNetworkSymbol}
                 </Text>
               </View>
             </View>
@@ -423,7 +435,9 @@ const TxnRBSheet = ({
                 <Text style={{...fonts.para_regular, color: 'white'}}>
                   {utils.formatEther(
                     submittedTxn.gasLimit.mul(submittedTxn.maxFeePerGas),
-                  ) + ' ETH'}
+                  ) +
+                    ' ' +
+                    currentNetworkSymbol}
                 </Text>
               </View>
             </View>
@@ -453,7 +467,9 @@ const TxnRBSheet = ({
                           .mul(submittedTxn.maxFeePerGas)
                           .add(submittedTxn.value)
                       : submittedTxn.gasLimit.mul(submittedTxn.maxFeePerGas),
-                  ) + ' ETH'}
+                  ) +
+                    ' ' +
+                    currentNetworkSymbol}
                 </Text>
               </View>
               <View style={{marginTop: 8}}>
@@ -494,4 +510,10 @@ const TxnRBSheet = ({
   );
 };
 
-export default TxnRBSheet;
+const mapStateToProps = state => ({
+  networks: state.networks.networks,
+  currentNetwork: state.networks.currentNetwork,
+});
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(TxnRBSheet);

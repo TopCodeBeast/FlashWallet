@@ -25,7 +25,7 @@ import {SvgXml} from 'react-native-svg';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {toastConfig} from '../../../../components/utils/CustomToastConfig';
 
-const SendLink = ({token, onPressClose}) => {
+const SendLink = ({token, onPressClose, networks, currentNetwork}) => {
   const [status, setStatus] = useState('check_amount');
   const [selectedToken, setSelectedToken] = useState(token);
   const [amount, setAmount] = useState('');
@@ -33,6 +33,7 @@ const SendLink = ({token, onPressClose}) => {
 
   const refRBQRCodeSheet = useRef(null);
   const toastRef = useRef(null);
+  const currentNetworkSymbol = networks[currentNetwork].symbol;
 
   const onPressNext = () => {
     if (Number(amount) !== parseFloat(amount)) {
@@ -222,8 +223,8 @@ const SendLink = ({token, onPressClose}) => {
                 textAlign: 'center',
                 marginHorizontal: '10%',
               }}>
-              Your request link is already to send! Send this link to a friend,
-              and it will ask them to send 0.0001 ETH
+              {'Your request link is already to send! Send this link to a friend, and it will ask them to send 0.0001 ' +
+                currentNetworkSymbol}
             </Text>
             <Text
               style={{

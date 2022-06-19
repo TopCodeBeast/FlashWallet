@@ -28,6 +28,7 @@
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.5",
     "@tradle/react-native-http": "^2.0.0",
+    "@uniswap/sdk": "^3.0.3",
     "@wxik/core": "^0.4.14",
     "accordion-collapse-react-native": "^1.0.1",
     "assert": "^1.1.1",

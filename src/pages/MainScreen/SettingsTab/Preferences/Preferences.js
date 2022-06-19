@@ -119,7 +119,9 @@ const Preferences = ({navigation, onGoBack}) => {
         }}>
         <GeneralRBSheet
           onPressClose={() => {
-            refRBGeneralSheet.current.close();
+            if (refRBGeneralSheet && refRBGeneralSheet.current) {
+              refRBGeneralSheet.current.close();
+            }
           }}
         />
       </RBSheet>
@@ -147,7 +149,9 @@ const Preferences = ({navigation, onGoBack}) => {
         }}>
         <SecurityAndPrivacyRBSheet
           onPressClose={() => {
-            refRBSecuritySheet.current.close();
+            if (refRBSecuritySheet && refRBSecuritySheet.current) {
+              refRBSecuritySheet.current.close();
+            }
           }}
         />
       </RBSheet>

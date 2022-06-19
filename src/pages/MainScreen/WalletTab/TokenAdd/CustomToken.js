@@ -1,16 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import {connect} from 'react-redux';
-import {Text, View} from 'react-native';
+import {ActivityIndicator, Text, View, TouchableOpacity} from 'react-native';
 import {fonts, colors} from '../../../../styles';
 import {PrimaryButton, TextButton} from '../../../../components/Buttons';
 import FloatLabelInput from '../../../../components/FloatLabelInput';
 import FontAwesome, {RegularIcons, SolidIcons} from 'react-native-fontawesome';
 import {isValidAddress} from '../../../../utils/common';
 import {addToken} from '../../../../redux/actions/TokensActions';
+import {getTokenDataFromAddress} from '../../../../utils/token';
 
 const CustomToken = ({
   onCancel,
   addToken,
+  networks,
   currentNetwork,
   currentAccountIndex,
 }) => {
@@ -20,26 +22,36 @@ const CustomToken = ({
   const [step, setStep] = useState(0);
   const [canNext, setCanNext] = useState(false);
   const [addTokenLoading, setAddTokenLoading] = useState(false);
+  const [fetchingData, setFetchingData] = useState(false);
+  const [fetchError, setFetchError] = useState('');
+  const [canEditSymbol, setCanEditSymbol] = useState(false);
 
   const checkCanNext = data => {
-    if (!data.tokenAddress || !data.tokenSymbol || !data.tokenDecimal) {
+    if (data.tokenAddress && isValidAddress(data.tokenAddress)) {
+      if (!fetchingData) {
+        setFetchingData(true);
+        getTokenDataFromAddress(data.tokenAddress, networks[currentNetwork].rpc)
+          .then(res => {
+            setTokenSymbol(res.symbol.toString());
+            setTokenDecimal(res.decimals.toString());
+            setCanNext(true);
+            setFetchingData(false);
+          })
+          .catch(err => {
+            console.log(err);
+            setCanNext(false);
+            setFetchError('No such a contract.');
+            setFetchingData(false);
+          });
+      }
+    } else {
+      setCanEditSymbol(false);
+      setFetchingData(false);
+      setTokenSymbol('');
+      setTokenDecimal('');
       setCanNext(false);
       return false;
     }
-    if (!isValidAddress(data.tokenAddress)) {
-      setCanNext(false);
-      return false;
-    }
-    if (
-      !(
-        Number.isInteger(parseInt(data.tokenDecimal)) &&
-        parseInt(data.tokenDecimal) > 0
-      )
-    ) {
-      setCanNext(false);
-      return false;
-    }
-    setCanNext(true);
     return true;
   };
 
@@ -50,10 +62,12 @@ const CustomToken = ({
           <FloatLabelInput
             value={tokenAddress}
             onChangeText={value => {
+              setFetchError('');
               checkCanNext({tokenAddress: value, tokenSymbol, tokenDecimal});
               setTokenAddress(value);
             }}
             label="Token Address"
+            editable={!fetchingData}
           />
           <Text
             style={{
@@ -74,26 +88,70 @@ const CustomToken = ({
               />
             )}
           </Text>
+          {fetchError.length > 0 && (
+            <Text
+              style={{
+                paddingLeft: 16,
+                ...fonts.caption_small12_16_regular,
+                color: colors.red5,
+              }}>
+              {fetchError}
+            </Text>
+          )}
         </View>
+        {fetchingData && (
+          <View
+            style={{
+              width: '100%',
+              alignItems: 'center',
+              marginLeft: 24,
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+            }}>
+            <ActivityIndicator size={'small'} color={colors.green5} />
+            <Text
+              style={{
+                marginLeft: 12,
+                ...fonts.para_regular,
+                color: colors.grey9,
+              }}>
+              Fetching Token Data...
+            </Text>
+          </View>
+        )}
 
         <View style={{marginTop: 24}}>
           <FloatLabelInput
             value={tokenSymbol}
             onChangeText={value => {
-              checkCanNext({tokenAddress, tokenSymbol: value, tokenDecimal});
               setTokenSymbol(value);
             }}
             label="Token Symbol"
+            editable={!canEditSymbol ? false : fetchingData ? false : true}
           />
+          {!canEditSymbol && tokenSymbol.length > 0 && (
+            <View style={{width: '100%', flexDirection: 'row-reverse'}}>
+              <TouchableOpacity
+                onPress={() => {
+                  setCanEditSymbol(true);
+                }}>
+                <Text
+                  style={{
+                    ...fonts.para_semibold,
+                    color: colors.green5,
+                    paddingRight: 16,
+                  }}>
+                  Edit
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
         <View style={{marginTop: 24}}>
           <FloatLabelInput
             value={tokenDecimal}
-            onChangeText={value => {
-              checkCanNext({tokenAddress, tokenSymbol, tokenDecimal: value});
-              setTokenDecimal(value);
-            }}
             label="Token Precision"
+            editable={false}
           />
         </View>
       </>
@@ -212,6 +270,7 @@ const CustomToken = ({
 };
 
 const mapStateToProps = state => ({
+  networks: state.networks.networks,
   currentNetwork: state.networks.currentNetwork,
   currentAccountIndex: state.accounts.currentAccountIndex,
 });

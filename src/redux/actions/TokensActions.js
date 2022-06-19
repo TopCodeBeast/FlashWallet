@@ -85,3 +85,54 @@ export const loadTokensDataFromStorage = dispatch => {
       console.log('Token actions: ERROR!!!!!: ', err);
     });
 };
+
+export const removeToken = (
+  dispatch,
+  data,
+  beforeWork,
+  successCallback,
+  failCallback,
+) => {
+  beforeWork();
+  const {tokenAddress, currentNetwork, currentAccountIndex} = data;
+  AsyncStorage.getItem('tokens_info')
+    .then(res => {
+      let mainData = JSON.parse(res);
+      let data = mainData.tokensData;
+
+      let foundIndex = data[currentNetwork.toString()][
+        currentAccountIndex
+      ].tokensList.findIndex(token => token.tokenAddress == tokenAddress);
+      console.log(
+        data[currentNetwork.toString()][currentAccountIndex].tokensList,
+      );
+      if (foundIndex >= 0) {
+        data[currentNetwork.toString()][currentAccountIndex].tokensList.splice(
+          foundIndex,
+          1,
+        );
+      }
+      const storingData = {
+        tokensData: data,
+        selectedToken: 'main',
+      };
+      console.log(
+        data[currentNetwork.toString()][currentAccountIndex].tokensList,
+      );
+      AsyncStorage.setItem('tokens_info', JSON.stringify(storingData))
+        .then(() => {
+          dispatch({type: SET_TOKENS_DATA, payload: storingData});
+          setTimeout(() => {
+            successCallback();
+          }, 0);
+        })
+        .catch(err => {
+          console.log('Token actions: ERROR!!!!!: ', err);
+          failCallback();
+        });
+    })
+    .catch(err => {
+      console.log('Token actions: ERROR!!!!!: ', err);
+      failCallback();
+    });
+};

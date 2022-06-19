@@ -9,9 +9,9 @@ import {
 } from 'react-native';
 import {connect} from 'react-redux';
 import FontAwesome, {RegularIcons, SolidIcons} from 'react-native-fontawesome';
-import {fonts, colors} from '../../../../styles';
-import {PrimaryButton} from '../../../../components/Buttons';
-import FloatLabelInput from '../../../../components/FloatLabelInput';
+import {fonts, colors} from '../styles';
+import {PrimaryButton} from './Buttons';
+import FloatLabelInput from './FloatLabelInput';
 
 // Import the crypto getRandomValues shim (**BEFORE** the shims)
 import 'react-native-get-random-values';
@@ -21,7 +21,7 @@ import '@ethersproject/shims';
 
 // Import the ethers library
 import {ethers, utils} from 'ethers';
-import {transferETHGasLimit} from '../../../../engine/constants';
+import {transferETHGasLimit} from '../engine/constants';
 
 const NetworkFeeRBSheet = props => {
   const {onSave, feeData} = props;
@@ -256,7 +256,15 @@ const NetworkFeeRBSheet = props => {
       </View>
     );
   };
-
+  console.log(
+    parseFloat(
+      utils.formatEther(
+        utils.parseUnits(parseFloat(maxFee).toFixed(9), 'gwei'),
+      ),
+    ),
+    gasLimit,
+    maxFee,
+  );
   const renderAdvancedStatus = () => {
     return (
       <View>

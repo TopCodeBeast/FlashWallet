@@ -105,7 +105,9 @@ const CanSendTokenList = ({
             <TokenRow
               onPress={() => {
                 onSelectToken('main');
-                refRBTokensListSheet.current.close();
+                if (refRBTokensListSheet && refRBTokensListSheet.current) {
+                  refRBTokensListSheet.current.close();
+                }
               }}
               key={'cansendTokenList_main'}
               token={{
@@ -117,7 +119,9 @@ const CanSendTokenList = ({
               <TokenRow
                 onPress={() => {
                   onSelectToken(token);
-                  refRBTokensListSheet.current.close();
+                  if (refRBTokensListSheet && refRBTokensListSheet.current) {
+                    refRBTokensListSheet.current.close();
+                  }
                 }}
                 key={'cansendTokenList_' + token.tokenAddress}
                 token={token}

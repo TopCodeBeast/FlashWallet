@@ -93,7 +93,9 @@ const SecurityAndPrivacyRBSheet = ({onPressClose}) => {
         }}>
         <RevealSeedRBSheet
           onPressDone={() => {
-            refRBRevealSeedSheet.current.close();
+            if (refRBRevealSeedSheet && refRBRevealSeedSheet.current) {
+              refRBRevealSeedSheet.current.close();
+            }
           }}
         />
       </RBSheet>

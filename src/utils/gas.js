@@ -6,7 +6,7 @@ import '@ethersproject/shims';
 
 // Import the ethers library
 import {ethers, utils} from 'ethers';
-import {transferETHGasLimit, estimateGasRatio} from './constants';
+import {transferETHGasLimit, estimateGasRatio} from '../engine/constants';
 
 import erc20ABI from '../abis/erc20ABI.json';
 
@@ -38,6 +38,7 @@ export const getEstimatedGasLimit = (
         const gasLimit = await wallet.estimateGas(rawTx);
         resolve(parseInt(gasLimit.toNumber() * estimateGasRatio));
       } catch (err) {
+        console.log(err);
         reject(err);
       }
     }

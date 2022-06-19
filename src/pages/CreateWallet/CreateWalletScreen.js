@@ -585,7 +585,9 @@ const CreateWalletScreen = ({navigation, createWallet}) => {
             <View style={{paddingTop: 40, paddingHorizontal: 24}}>
               <PrimaryButton
                 onPress={() => {
-                  refRBSeedPhraseSheet.current.close();
+                  if (refRBSeedPhraseSheet && refRBSeedPhraseSheet.current) {
+                    refRBSeedPhraseSheet.current.close();
+                  }
                 }}
                 text="I Got It."
               />
@@ -704,7 +706,12 @@ const CreateWalletScreen = ({navigation, createWallet}) => {
             <View style={{paddingTop: 40, paddingHorizontal: 24}}>
               <PrimaryButton
                 onPress={() => {
-                  refRBProtectWalletSheet.current.close();
+                  if (
+                    refRBProtectWalletSheet &&
+                    refRBProtectWalletSheet.current
+                  ) {
+                    refRBProtectWalletSheet.current.close();
+                  }
                 }}
                 text="I Got It."
               />

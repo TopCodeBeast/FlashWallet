@@ -35,13 +35,13 @@ import {ethers, utils} from 'ethers';
 //actions
 import {sendTransaction} from '../../../../redux/actions/TransactionActions';
 import {setCurrentAccountIndex} from '../../../../redux/actions/AccountsActions';
-import NetworkFeeRBSheet from './NetworkFeeRBSheet';
+import NetworkFeeRBSheet from '../../../../components/NetworkFeeRBSheet';
 
 import {
   transferETHGasLimit,
   gettingFeeDataTimerInterval,
 } from '../../../../engine/constants';
-import {getEstimatedGasLimit} from '../../../../engine/gas';
+import {getEstimatedGasLimit} from '../../../../utils/gas';
 import {
   getFeeData,
   setGettingFeeDataTimerId,
@@ -93,10 +93,12 @@ const SendToken = ({
 
   useEffect(() => {
     const timerId = setInterval(() => {
+      console.log("...get Fee Data from 'sendToken");
       getFeeData(networks[currentNetwork].rpc);
     }, gettingFeeDataTimerInterval);
     setGettingFeeDataTimerId(timerId);
     return () => {
+      console.log('bybye sendToken');
       clearTimeout(timerId);
     };
   }, []);
@@ -138,13 +140,6 @@ const SendToken = ({
   }, [feeData, networkFeeType]);
 
   const getSendingEtherGasFee = () => {
-    return (
-      parseFloat(utils.formatEther(feeData.high.maxFeePerGas)) *
-      transferETHGasLimit
-    );
-  };
-
-  const getSendingEtherMaxGasFee = () => {
     return (
       parseFloat(utils.formatEther(feeData.high.maxFeePerGas)) *
       transferETHGasLimit
@@ -216,6 +211,7 @@ const SendToken = ({
           setStatus('confirm');
         }
         const timerId = setInterval(() => {
+          console.log('...get fee data from sedToken');
           getFeeData(networks[currentNetwork].rpc);
         }, gettingFeeDataTimerInterval);
         setGettingFeeDataTimerId(timerId);
@@ -224,6 +220,7 @@ const SendToken = ({
         setError('Cannot send (maybe insufficient ETH to send token)');
         setAmountLoading(false);
         const timerId = setInterval(() => {
+          console.log('...get fee data from sendToken');
           getFeeData(networks[currentNetwork].rpc);
         }, gettingFeeDataTimerInterval);
         setGettingFeeDataTimerId(timerId);
@@ -250,6 +247,7 @@ const SendToken = ({
     if (sendTxnError.length > 0) {
       setSendTxnError('');
     }
+    clearTimeout(gettingFeeDataTimerId);
     sendTransaction(
       {
         currentNetworkRPC: networks[currentNetwork].rpc,
@@ -856,10 +854,13 @@ const SendToken = ({
                   : 0
                 : 0;
               setSendValue(
-                parseFloat(
-                  selectedToken === 'main'
-                    ? curBalance - getSendingEtherGasFee()
-                    : curBalance,
+                Math.max(
+                  parseFloat(
+                    selectedToken === 'main'
+                      ? curBalance - getSendingEtherGasFee()
+                      : curBalance,
+                  ),
+                  0,
                 ).toString(),
               );
             }}>

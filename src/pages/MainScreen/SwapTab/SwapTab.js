@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import {connect} from 'react-redux';
 import {
   KeyboardAvoidingView,
   SafeAreaView,
@@ -6,6 +7,8 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
+  feeData,
 } from 'react-native';
 import {colors, fonts} from '../../../styles';
 import FontAwesome, {SolidIcons, RegularIcons} from 'react-native-fontawesome';
@@ -14,24 +17,259 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import Header from './Header';
 import CanSendTokenList from '../../../components/CanSendTokenList';
 import {PrimaryButton, SecondaryButton} from '../../../components/Buttons';
+import {getPriceData} from '../../../utils/swap';
+import SwapConfirm from './SwapConfirm';
+import {
+  getFeeData,
+  setGettingFeeDataTimerId,
+} from '../../../redux/actions/EngineAction';
+import {
+  estimateGasRatio,
+  gettingFeeDataTimerInterval,
+  minimumEthToSwap,
+  swapGasRatio,
+  uniswapGasLimit,
+} from '../../../engine/constants';
 
-const SwapTab = ({navigation}) => {
-  const onUseMaxPress = () => {};
+// Import the crypto getRandomValues shim (**BEFORE** the shims)
+import 'react-native-get-random-values';
+
+// Import the the ethers shims (**BEFORE** ethers)
+import '@ethersproject/shims';
+
+// Import the ethers library
+import {ethers, utils} from 'ethers';
+import {swapToken} from '../../../redux/actions/SwapAction';
+
+const SwapTab = ({
+  navigation,
+  networks,
+  currentNetwork,
+  feeData,
+  getFeeData,
+  setGettingFeeDataTimerId,
+  accounts,
+  currentAccountIndex,
+  balancesInfo,
+  swapToken,
+  onSubmitTxn,
+  onErrorOccured,
+}) => {
   const [fromToken, setFromToken] = useState('main');
   const [toToken, setToToken] = useState('main');
   const [fromValue, setFromValue] = useState('');
-  const [toValue, setToValue] = useState('0');
+  const [confirmError, setConfirmError] = useState('');
+  const [canSwap, setCanSwap] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(false);
+  const [fetchedPriceData, setFetchedPriceData] = useState('');
+  const [status, setStatus] = useState('default');
+  const [gasLimit, setGasLimit] = useState('200000');
+  const [maxPriorityFee, setMaxPriorityFee] = useState(
+    feeData.medium.maxPriorityFeePerGas,
+  );
+  const [maxFee, setMaxFee] = useState(feeData.medium.maxFeePerGas);
+  const [slippage, setSlippage] = useState('2');
+  const [swapLoading, setSwapLoading] = useState(false);
 
-  return (
-    <KeyboardAvoidingView>
-      <SafeAreaView
-        style={{
-          backgroundColor: colors.grey24,
-          width: '100%',
-          height: '100%',
-        }}>
-        <Header navigation={navigation} />
+  const currentAccount = accounts[currentAccountIndex];
+  const currentNetworkSymbol = networks[currentNetwork].symbol;
 
+  const onCloseTab = () => {
+    console.log('close Tab;;;;;;;;;');
+    setFromToken('main');
+    setToToken('main');
+    setFromValue('');
+    setCanSwap(false);
+    setFetchLoading(false);
+    setFetchedPriceData('');
+    setStatus('default');
+    setGasLimit('200000');
+    setMaxPriorityFee(feeData.medium.maxPriorityFeePerGas);
+    setMaxFee(feeData.medium.maxFeePerGas);
+    setSlippage('2');
+  };
+
+  const onConfirm = () => {
+    const mainBalance = balancesInfo[currentAccount.address]
+      ? balancesInfo[currentAccount.address]['main']
+      : 0;
+    const curBalance = balancesInfo[currentAccount.address]
+      ? balancesInfo[currentAccount.address][
+          fromToken === 'main' ? 'main' : fromToken.tokenAddress
+        ]
+        ? parseFloat(
+            balancesInfo[currentAccount.address][
+              fromToken === 'main' ? 'main' : fromToken.tokenAddress
+            ],
+          )
+        : 0
+      : 0;
+    if (fromToken == 'main') {
+      if (fromValue + minimumEthToSwap > curBalance) {
+        setConfirmError('Not Enough ' + currentNetworkSymbol);
+        return;
+      }
+    } else {
+      if (fromValue > curBalance) {
+        setConfirmError('Not Enough ' + fromToken.tokenSymbol);
+        return;
+      }
+      if (mainBalance < minimumEthToSwap) {
+        setConfirmError('Not Enough ' + currentNetworkSymbol + ' to Swap');
+        return;
+      }
+    }
+    setStatus('confirm');
+  };
+
+  const onSwap = () => {
+    swapToken(
+      {
+        currentNetwork: networks[currentNetwork],
+        currentAccount,
+        fromTokenData: fromToken,
+        toTokenData: toToken,
+        fromValue,
+        toValue,
+        slippage,
+        gasLimit,
+      },
+      () => {
+        setSwapLoading(true);
+      },
+      originTxn => {
+        setSwapLoading(false);
+        onSubmitTxn(originTxn);
+      },
+      error => {
+        setSwapLoading(false);
+        onErrorOccured(error);
+      },
+    );
+  };
+
+  useEffect(() => {
+    getFeeData(networks[currentNetwork].rpc);
+  }, []);
+
+  const statusGoBack = curStatus => {
+    if (curStatus === 'confirm') {
+      setStatus('default');
+    }
+  };
+
+  const getSwapGasFee = () => {
+    return (
+      parseFloat(utils.formatEther(feeData.high.maxFeePerGas)) *
+      uniswapGasLimit *
+      swapGasRatio
+    );
+  };
+
+  const fetchPriceData = data => {
+    const {fromToken, toToken, fromValue} = data;
+    setFetchLoading(true);
+    setFetchedPriceData('');
+    getPriceData(networks[currentNetwork], fromToken, toToken)
+      .then(res => {
+        setFetchLoading(false);
+        // console.log('Fetched price::::::', res);
+        setFetchedPriceData(res);
+      })
+      .catch(err => {
+        setFetchLoading(false);
+        console.log('Fail Fetch price::::::', err);
+        setFetchedPriceData('');
+      });
+  };
+
+  const changeEachToken = () => {
+    if (
+      (fromToken == 'main' && toToken == 'main') ||
+      (fromToken != 'main' &&
+        toToken != 'main' &&
+        fromToken.tokenAddress == toToken.tokenAddress)
+    ) {
+      return;
+    }
+    const temp = fromToken == 'main' ? 'main' : {...fromToken};
+    setFromToken(toToken == 'main' ? 'main' : {...toToken});
+    setToToken(temp);
+    fetchPriceData({fromToken: toToken, toToken: temp});
+  };
+
+  const calcMaxAmount = () => {
+    const curBalance = balancesInfo[currentAccount.address]
+      ? balancesInfo[currentAccount.address][
+          fromToken === 'main' ? 'main' : fromToken.tokenAddress
+        ]
+        ? parseFloat(
+            balancesInfo[currentAccount.address][
+              fromToken === 'main' ? 'main' : fromToken.tokenAddress
+            ],
+          )
+        : 0
+      : 0;
+    setFromValue(
+      Math.max(
+        0,
+        parseFloat(
+          fromToken === 'main' ? curBalance - getSwapGasFee() : curBalance,
+        ),
+      ).toString(),
+    );
+  };
+
+  const checkCanSwap = data => {
+    const {fromToken, toToken, fromValue} = data;
+    if (fromToken == 'main' && toToken == 'main') {
+      setCanSwap(false);
+      setFetchLoading(false);
+      setFetchedPriceData('');
+      return;
+    }
+    if (
+      fromToken != 'main' &&
+      toToken != 'main' &&
+      fromToken.tokenAddress == toToken.tokenAddress
+    ) {
+      setCanSwap(false);
+      setFetchLoading(false);
+      setFetchedPriceData('');
+      return;
+    }
+    if (parseFloat(fromValue) != Number(fromValue)) {
+      setCanSwap(false);
+      setFetchLoading(false);
+      setFetchedPriceData('');
+      return;
+    }
+    if (!fetchLoading) {
+      fetchPriceData(data);
+    }
+    if (!canSwap) {
+      setCanSwap(true);
+    }
+  };
+
+  const toValue =
+    (fromToken == 'main' && toToken == 'main') ||
+    (fromToken != 'main' &&
+      toToken != 'main' &&
+      fromToken.tokenAddress == toToken.tokenAddress)
+      ? fromValue
+      : fetchedPriceData.length > 0 &&
+        parseFloat(fromValue) === Number(fromValue)
+      ? (parseFloat(fromValue) / parseFloat(fetchedPriceData)).toFixed(6)
+      : fromValue.length === 0
+      ? '0'
+      : parseFloat(fromValue) !== Number(fromValue)
+      ? 'NaN'
+      : '...';
+
+  const renderDefaultStatus = () => {
+    return (
+      <>
         {/* From panel */}
         <View style={{marginTop: 40, paddingHorizontal: 24}}>
           <View
@@ -43,7 +281,7 @@ const SwapTab = ({navigation}) => {
             <Text style={{...fonts.title2, color: 'white'}}>From</Text>
             <TouchableOpacity
               onPress={() => {
-                onUseMaxPress();
+                calcMaxAmount();
               }}>
               <Text style={{...fonts.btn_medium_normal, color: colors.green5}}>
                 Use Max
@@ -75,6 +313,7 @@ const SwapTab = ({navigation}) => {
               selectedToken={fromToken}
               onSelectToken={token => {
                 setFromToken(token);
+                checkCanSwap({toToken, fromToken: token, fromValue});
               }}
             />
             <View style={{paddingHorizontal: 12, flex: 1}}>
@@ -83,7 +322,9 @@ const SwapTab = ({navigation}) => {
                 placeholder={'0'}
                 placeholderTextColor={colors.grey9}
                 onChangeText={value => {
+                  setConfirmError('');
                   setFromValue(value);
+                  checkCanSwap({toToken, fromToken, fromValue: value});
                 }}
                 style={{
                   color: 'white',
@@ -95,9 +336,24 @@ const SwapTab = ({navigation}) => {
           </View>
         </View>
 
+        {confirmError.length > 0 && (
+          <Text
+            style={{
+              paddingLeft: 40,
+              paddingTop: 12,
+              ...fonts.para_semibold,
+              color: colors.red5,
+            }}>
+            {confirmError}
+          </Text>
+        )}
+
         {/* Middle panel */}
         <View style={{marginVertical: 24, alignItems: 'center'}}>
           <SecondaryButton
+            onPress={() => {
+              changeEachToken();
+            }}
             icon={
               <Ionicon name="swap-vertical" size={32} color={colors.green5} />
             }
@@ -132,6 +388,7 @@ const SwapTab = ({navigation}) => {
               selectedToken={toToken}
               onSelectToken={token => {
                 setToToken(token);
+                checkCanSwap({toToken: token, fromToken, fromValue});
               }}
             />
             <View
@@ -143,9 +400,6 @@ const SwapTab = ({navigation}) => {
               }}>
               <TextInput
                 value={toValue}
-                onChangeText={value => {
-                  setToValue(value);
-                }}
                 editable={false}
                 selectTextOnFocus={false}
                 style={{
@@ -155,7 +409,100 @@ const SwapTab = ({navigation}) => {
               />
             </View>
           </View>
+          {fetchLoading && (
+            <View
+              style={{
+                width: '100%',
+                alignItems: 'center',
+                marginTop: 12,
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+              }}>
+              <ActivityIndicator size={'small'} color={colors.green5} />
+              <Text
+                style={{
+                  marginLeft: 12,
+                  ...fonts.para_regular,
+                  color: colors.grey9,
+                }}>
+                Fetching Price Data...
+              </Text>
+            </View>
+          )}
+          {fetchedPriceData.length > 0 && (
+            <View
+              style={{
+                width: '100%',
+                alignItems: 'center',
+                marginTop: 12,
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+              }}>
+              <FontAwesome
+                onPress={() => {
+                  fetchPriceData({fromToken, toToken, fromValue});
+                }}
+                style={{paddingLeft: 8, fontSize: 16, color: 'white'}}
+                icon={SolidIcons.redo}
+              />
+              <Text
+                style={{
+                  marginLeft: 12,
+                  ...fonts.para_regular,
+                  color: colors.grey9,
+                }}>
+                {'1 ' +
+                  (toToken == 'main'
+                    ? currentNetworkSymbol
+                    : toToken.tokenSymbol) +
+                  ' = ' +
+                  parseFloat(fetchedPriceData).toFixed(4) +
+                  ' ' +
+                  (fromToken == 'main'
+                    ? currentNetworkSymbol
+                    : fromToken.tokenSymbol)}
+              </Text>
+            </View>
+          )}
         </View>
+      </>
+    );
+  };
+
+  return (
+    <KeyboardAvoidingView>
+      <SafeAreaView
+        style={{
+          backgroundColor: colors.grey24,
+          width: '100%',
+          height: '100%',
+        }}>
+        <Header
+          navigation={navigation}
+          status={status}
+          statusGoBack={status => statusGoBack(status)}
+          onCloseTab={() => {
+            onCloseTab();
+          }}
+        />
+
+        {status === 'default' && renderDefaultStatus()}
+        {status === 'confirm' && (
+          <SwapConfirm
+            swapData={{
+              fromToken,
+              toToken,
+              fromValue,
+              toValue,
+              inversePrice: fetchedPriceData,
+              slippage,
+            }}
+            navigation={navigation}
+            setSlippage={value => {
+              setSlippage(value);
+            }}
+          />
+        )}
         <View
           style={{
             flex: 1,
@@ -163,15 +510,46 @@ const SwapTab = ({navigation}) => {
             marginBottom: 40,
             marginHorizontal: 24,
           }}>
-          <PrimaryButton
-            text="Swap"
-            onPress={() => {}}
-            enableFlag={fromToken.length > 0}
-          />
+          {status === 'default' && (
+            <PrimaryButton
+              text="Swap"
+              onPress={() => {
+                onConfirm();
+              }}
+              enableFlag={canSwap && !fetchLoading}
+            />
+          )}
+          {status === 'confirm' && (
+            <PrimaryButton
+              text="Swap"
+              onPress={() => {
+                onSwap();
+              }}
+              loading={swapLoading}
+            />
+          )}
         </View>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };
 
-export default SwapTab;
+const mapStateToProps = state => ({
+  accounts: state.accounts.accounts,
+  currentAccountIndex: state.accounts.currentAccountIndex,
+  networks: state.networks.networks,
+  currentNetwork: state.networks.currentNetwork,
+  tokens: state.tokens.tokensData,
+  feeData: state.engine.feeData,
+  gettingFeeDataTimerId: state.engine.gettingFeeDataTimerId,
+  balancesInfo: state.balances.balancesInfo,
+});
+const mapDispatchToProps = dispatch => ({
+  getFeeData: currentNetworkRPC => getFeeData(dispatch, currentNetworkRPC),
+  setGettingFeeDataTimerId: timerId =>
+    setGettingFeeDataTimerId(dispatch, timerId),
+  swapToken: (data, beforeWork, successCallback, failCallback) =>
+    swapToken(dispatch, data, beforeWork, successCallback, failCallback),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(SwapTab);
