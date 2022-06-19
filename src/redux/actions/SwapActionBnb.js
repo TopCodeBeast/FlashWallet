@@ -65,6 +65,7 @@ export const swapTokenBnb = (
     toValue,
     slippage,
     gasLimit,
+    gasPrice,
   } = data;
   const provider = new ethers.providers.JsonRpcProvider(currentNetwork.rpc);
   const PANCAKESWAP_ROUTER_CONTRACT = new ethers.Contract(
@@ -156,6 +157,8 @@ export const swapTokenBnb = (
               deadline,
               {
                 value: valueHex,
+                gasPrice: gasPrice,
+                gasLimit: gasLimit,
               },
             );
         } else if (toTokenData == 'main') {
@@ -166,6 +169,10 @@ export const swapTokenBnb = (
               path,
               to,
               deadline,
+              {
+                gasPrice: gasPrice,
+                gasLimit: gasLimit,
+              },
             );
         } else {
           rawTxn =
@@ -175,6 +182,10 @@ export const swapTokenBnb = (
               path,
               to,
               deadline,
+              {
+                gasPrice: gasPrice,
+                gasLimit: gasLimit,
+              },
             );
         }
 

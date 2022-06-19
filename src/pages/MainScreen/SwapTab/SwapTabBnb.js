@@ -130,6 +130,7 @@ const SwapTabBnb = ({
         toValue,
         slippage,
         gasLimit,
+        gasPrice,
       },
       () => {
         setSwapLoading(true);

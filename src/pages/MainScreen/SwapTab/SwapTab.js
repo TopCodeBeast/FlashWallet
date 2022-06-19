@@ -133,6 +133,8 @@ const SwapTab = ({
         toValue,
         slippage,
         gasLimit,
+        maxPriorityFee,
+        maxFee,
       },
       () => {
         setSwapLoading(true);

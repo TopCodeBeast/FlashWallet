@@ -1,24 +1,10 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef} from 'react';
 import {connect} from 'react-redux';
-import {
-  KeyboardAvoidingView,
-  SafeAreaView,
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-} from 'react-native';
+import {View, Text, TouchableOpacity} from 'react-native';
 import {colors, fonts} from '../../../styles';
-import FontAwesome, {SolidIcons, RegularIcons} from 'react-native-fontawesome';
-import Ionicon from 'react-native-vector-icons/Ionicons';
 
-import Header from './Header';
-import CanSendTokenList from '../../../components/CanSendTokenList';
-import {PrimaryButton, SecondaryButton} from '../../../components/Buttons';
 import {getPriceData, getSwapEstimatedGasLimit} from '../../../utils/swap';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import FloatLabelInput from '../../../components/FloatLabelInput';
 import SlippageRBSheet from './SlippageRBSheet';
 import NetworkFeeRBSheet from '../../../components/NetworkFeeRBSheet';
 import {
@@ -62,34 +48,34 @@ const SwapConfirm = ({
   );
 
   const [gasLimit, setGasLimit] = useState('200000');
-  const [fetchingGasLimit, setFetchingGasLimit] = useState(false);
+  // const [fetchingGasLimit, setFetchingGasLimit] = useState(false);
 
   const currentAccount = accounts[currentAccountIndex];
 
-  useEffect(() => {
-    getEstimatedGasLimit();
-  }, []);
+  // useEffect(() => {
+  //   getEstimatedGasLimit();
+  // }, []);
 
-  const getEstimatedGasLimit = () => {
-    setFetchingGasLimit(true);
-    getSwapEstimatedGasLimit({
-      currentNetwork: networks[currentNetwork],
-      currentAccount,
-      fromTokenData: fromToken,
-      toTokenData: toToken,
-      fromValue,
-      toValue,
-      slippage: swapData.slippage,
-    })
-      .then(res => {
-        setGasLimit(res.toString());
-        setFetchingGasLimit(false);
-      })
-      .catch(err => {
-        setFetchingGasLimit(false);
-        console.log('ERROR in swap confirm::::: ', err);
-      });
-  };
+  // const getEstimatedGasLimit = () => {
+  //   setFetchingGasLimit(true);
+  //   getSwapEstimatedGasLimit({
+  //     currentNetwork: networks[currentNetwork],
+  //     currentAccount,
+  //     fromTokenData: fromToken,
+  //     toTokenData: toToken,
+  //     fromValue,
+  //     toValue,
+  //     slippage: swapData.slippage,
+  //   })
+  //     .then(res => {
+  //       setGasLimit(res.toString());
+  //       setFetchingGasLimit(false);
+  //     })
+  //     .catch(err => {
+  //       setFetchingGasLimit(false);
+  //       console.log('ERROR in swap confirm::::: ', err);
+  //     });
+  // };
 
   const renderSlippageRBSheet = () => {
     return (
@@ -114,7 +100,7 @@ const SwapConfirm = ({
           slippage={swapData.slippage}
           onSaveSlippage={value => {
             setSlippage(value);
-            getEstimatedGasLimit();
+            // getEstimatedGasLimit();
             refSlippageRBSheet.current.close();
           }}
         />
@@ -303,7 +289,7 @@ const SwapConfirm = ({
         <Text style={{...fonts.para_regular, color: 'white'}}>
           Estimated Fee
         </Text>
-        {fetchingGasLimit ? (
+        {/* {fetchingGasLimit ? (
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text
               style={{
@@ -330,7 +316,20 @@ const SwapConfirm = ({
               Edit
             </Text>
           </TouchableOpacity>
-        )}
+        )} */}
+        <TouchableOpacity
+          onPress={() => {
+            refRBNetworkFeeSheet.current.open();
+          }}>
+          <Text
+            style={{
+              ...fonts.para_semibold,
+              color: colors.green5,
+              marginLeft: 12,
+            }}>
+            Edit
+          </Text>
+        </TouchableOpacity>
         <View style={{flex: 1, flexDirection: 'row-reverse'}}>
           <Text style={{...fonts.para_regular, color: 'white'}}>
             {totalFee.toFixed(6) + ' ' + currentNetworkSymbol}

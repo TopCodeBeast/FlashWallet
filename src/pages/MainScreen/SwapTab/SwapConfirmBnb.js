@@ -45,34 +45,34 @@ const SwapConfirmBnb = ({
   const [gasPrice, setGasPrice] = useState(feeData.medium.gasPrice);
 
   const [gasLimit, setGasLimit] = useState('200000');
-  const [fetchingGasLimit, setFetchingGasLimit] = useState(false);
+  // const [fetchingGasLimit, setFetchingGasLimit] = useState(false);
 
   const currentAccount = accounts[currentAccountIndex];
 
-  useEffect(() => {
-    getEstimatedGasLimit();
-  }, []);
+  // useEffect(() => {
+  //   getEstimatedGasLimit();
+  // }, []);
 
-  const getEstimatedGasLimit = () => {
-    setFetchingGasLimit(true);
-    getSwapEstimatedGasLimit({
-      currentNetwork: networks[currentNetwork],
-      currentAccount,
-      fromTokenData: fromToken,
-      toTokenData: toToken,
-      fromValue,
-      toValue,
-      slippage: swapData.slippage,
-    })
-      .then(res => {
-        setFetchingGasLimit(false);
-        setGasLimit(res.toString());
-      })
-      .catch(err => {
-        console.log('ERROR in swap confirm::::: ', err);
-        setFetchingGasLimit(false);
-      });
-  };
+  // const getEstimatedGasLimit = () => {
+  //   setFetchingGasLimit(true);
+  //   getSwapEstimatedGasLimit({
+  //     currentNetwork: networks[currentNetwork],
+  //     currentAccount,
+  //     fromTokenData: fromToken,
+  //     toTokenData: toToken,
+  //     fromValue,
+  //     toValue,
+  //     slippage: swapData.slippage,
+  //   })
+  //     .then(res => {
+  //       setFetchingGasLimit(false);
+  //       setGasLimit(res.toString());
+  //     })
+  //     .catch(err => {
+  //       console.log('ERROR in swap confirm::::: ', err);
+  //       setFetchingGasLimit(false);
+  //     });
+  // };
 
   const renderSlippageRBSheet = () => {
     return (
@@ -97,7 +97,7 @@ const SwapConfirmBnb = ({
           slippage={swapData.slippage}
           onSaveSlippage={value => {
             setSlippage(value);
-            getEstimatedGasLimit();
+            // getEstimatedGasLimit();
             refSlippageRBSheet.current.close();
           }}
         />
@@ -284,7 +284,7 @@ const SwapConfirmBnb = ({
         <Text style={{...fonts.para_regular, color: 'white'}}>
           Estimated Fee
         </Text>
-        {fetchingGasLimit ? (
+        {/* {fetchingGasLimit ? (
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text
               style={{
@@ -311,8 +311,20 @@ const SwapConfirmBnb = ({
               Edit
             </Text>
           </TouchableOpacity>
-        )}
-
+        )} */}
+        <TouchableOpacity
+          onPress={() => {
+            refRBNetworkFeeSheet.current.open();
+          }}>
+          <Text
+            style={{
+              ...fonts.para_semibold,
+              color: colors.green5,
+              marginLeft: 12,
+            }}>
+            Edit
+          </Text>
+        </TouchableOpacity>
         <View style={{flex: 1, flexDirection: 'row-reverse'}}>
           <Text style={{...fonts.para_regular, color: 'white'}}>
             {totalFee.toFixed(6) + ' ' + currentNetworkSymbol}

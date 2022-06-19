@@ -65,6 +65,8 @@ export const swapToken = (
     toValue,
     slippage,
     gasLimit,
+    maxPriorityFee,
+    maxFee,
   } = data;
   const provider = new ethers.providers.JsonRpcProvider(currentNetwork.rpc);
   const UNISWAP_ROUTER_CONTRACT = new ethers.Contract(
@@ -156,6 +158,9 @@ export const swapToken = (
               deadline,
               {
                 value: valueHex,
+                gasLimit: gasLimit,
+                maxPriorityFeePerGas: maxPriorityFee,
+                maxFeePerGas: maxFee,
               },
             );
         } else if (toTokenData == 'main') {
@@ -166,6 +171,11 @@ export const swapToken = (
               path,
               to,
               deadline,
+              {
+                gasLimit: gasLimit,
+                maxPriorityFeePerGas: maxPriorityFee,
+                maxFeePerGas: maxFee,
+              },
             );
         } else {
           rawTxn =
@@ -175,6 +185,11 @@ export const swapToken = (
               path,
               to,
               deadline,
+              {
+                gasLimit: gasLimit,
+                maxPriorityFeePerGas: maxPriorityFee,
+                maxFeePerGas: maxFee,
+              },
             );
         }
 
