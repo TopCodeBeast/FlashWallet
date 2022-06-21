@@ -14,7 +14,6 @@
     "@ethersproject/shims": "^5.6.0",
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.1.18",
-    "@material-ui/icons": "^4.11.3",
     "@metamask/controllers": "^29.0.1",
     "@pancakeswap/sdk": "^2.4.5",
     "@react-native-async-storage/async-storage": "^1.15.5",
